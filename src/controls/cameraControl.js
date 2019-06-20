@@ -65,6 +65,12 @@
  the {{#crossLink "Camera"}}{{/crossLink}} towards the hoveredd point on the Mesh's surface.
  @param [cfg.panToPivot=false] {Boolean} TODO.
  @param [cfg.inertia=0.5] {Number} A factor in range [0..1] indicating how much the camera keeps moving after you finish panning or rotating it.
+ @param [cfg.userZoomFactor=1] {Double} user-set zoom factor that is multiplied with the standard value - that means setting it to 0.5 will
+lead to a zoom 50% slower, setting it to 2 will make it twice as fast...
+@param [cfg.userPanFactor=1] {Double} user-set pan factor that is multiplied with the standard value - that means setting it to 0.5 will
+lead to a zoom 50% slower, setting it to 2 will make it twice as fast...
+@param [cfg.userRotateFactor=1] {Double} user-set rotation factor that is multiplied with the standard value - that means setting it to 0.5 will
+lead to a zoom 50% slower, setting it to 2 will make it twice as fast...
  @author xeolabs / http://xeolabs.com
  @author DerSchmale / http://www.derschmale.com
  @extends Component
@@ -266,7 +272,9 @@ class CameraControl extends Component {
         this.pivoting = cfg.pivoting;
         this.panToPointer = cfg.panToPointer;
         this.panToPivot = cfg.panToPivot;
-        this.inertia = cfg.inertia;
+        this.userZoomFactor = cfg.userZoomFactor ? cfg.userZoomFactor : 1.0;
+        this.userPanFactor = cfg.userPanFactor ? cfg.userPanFactor : 1.0;
+        this.userRotateFactor = cfg.userRotateFactor ? cfg.userRotateFactor : 1.0;
 
         this._initEvents(); // Set up all the mouse/touch/kb handlers
     }
@@ -358,6 +366,48 @@ class CameraControl extends Component {
         return this._firstPerson;
     }
 
+    /**modified!!!!! added a zoom, pan and rotation factor that the user can modify
+
+        @property userZoomFactor
+        @default 1.0
+        @type float
+        */
+       set userZoomFactor(value) {
+        this._userZoomFactor = value === undefined ? 1.0 : value;
+    }
+
+    get userZoomFactor() {
+        return this._userZoomFactor;
+    }
+
+    /**
+    @property userPanFactor
+    @default 1.0
+    @type float
+    */
+
+    set userPanFactor(value) {
+        this._userPanFactor = value === undefined ? 1.0 : value;
+    }
+
+    get userPanFactor() {
+        return this._userPanFactor;
+    }
+
+    /**
+    @property userRotateFactor
+    @default 1.0
+    @type float
+    */
+
+    set userRotateFactor(value) {
+        this._userRotateFactor = value === undefined ? 1.0 : value;
+    }
+
+    get userRotateFacort() {
+        return this._userRotateFactor;
+    }
+
     /**
      Indicates whether this CameraControl is in "walking" mode.
 
@@ -439,19 +489,20 @@ class CameraControl extends Component {
         const scene = this.scene;
         const input = scene.input;
         const camera = scene.camera;
+        const math = xeogl.math;
         const canvas = this.scene.canvas.canvas;
         let over = false;
         const mouseHoverDelay = 500;
-        const mouseOrbitRate = 0.4;
-        const mousePanRate = 0.4;
-        const mouseZoomRate = 0.8;
+        const mouseOrbitRate = 0.3;
+        const mousePanRate = 0.3;
+        const mouseZoomRate = 0.2;
         const mouseWheelPanRate = 0.4;
         const keyboardOrbitRate = .02;
         const keyboardPanRate = .02;
         const keyboardZoomRate = .02;
-        const touchRotateRate = 0.3;
-        const touchPanRate = 0.2;
-        const touchZoomRate = 0.05;
+        const touchRotateRate = 0.12;
+        const touchPanRate = 0.05;
+        const touchZoomRate = 0.01;
 
         canvas.oncontextmenu = function (e) {
             e.preventDefault();
@@ -1005,8 +1056,8 @@ class CameraControl extends Component {
                     }
                     const x = mousePos[0];
                     const y = mousePos[1];
-                    xDelta += (x - lastX) * mouseOrbitRate;
-                    yDelta += (y - lastY) * mouseOrbitRate;
+                    xDelta += (x - lastX) * mouseOrbitRate * self._userRotateFactor;
+                    yDelta += (y - lastY) * mouseOrbitRate * self._userRotateFactor;
                     lastX = x;
                     lastY = y;
                 });
@@ -1025,15 +1076,15 @@ class CameraControl extends Component {
 
                         // Panning
 
-                        panVx = xDelta * mousePanRate;
-                        panVy = yDelta * mousePanRate;
+                        panVx = xDelta * mousePanRate * self._userPanFactor;
+                        panVy = yDelta * mousePanRate * self._userPanFactor;
 
                     } else {
 
                         // Orbiting
 
-                        rotateVy = -xDelta * mouseOrbitRate;
-                        rotateVx = yDelta * mouseOrbitRate;
+                        rotateVy = -xDelta * mouseOrbitRate * self._userRotateFactor;
+                        rotateVx = yDelta * mouseOrbitRate * self._userRotateFactor;
                     }
 
                     xDelta = 0;
@@ -1054,7 +1105,7 @@ class CameraControl extends Component {
                         return;
                     }
                     const d = delta / Math.abs(delta);
-                    vZoom = -d * getZoomRate() * mouseZoomRate;
+                    vZoom = -d * getZoomRate() * mouseZoomRate * self._userZoomFactor;
                     e.preventDefault();
                 });
 
@@ -1073,9 +1124,9 @@ class CameraControl extends Component {
                         const skey = input.keyDown[input.KEY_SUBTRACT];
                         if (wkey || skey) {
                             if (skey) {
-                                vZoom = elapsed * getZoomRate() * keyboardZoomRate;
+                                vZoom = elapsed * getZoomRate() * keyboardZoomRate * self._userZoomFactor;
                             } else if (wkey) {
-                                vZoom = -elapsed * getZoomRate() * keyboardZoomRate;
+                                vZoom = -elapsed * getZoomRate() * keyboardZoomRate * self._userZoomFactor;
                             }
                         }
                     }
@@ -1114,19 +1165,19 @@ class CameraControl extends Component {
                         }
                         if (front || back || left || right || up || down) {
                             if (down) {
-                                panVy = -elapsed * keyboardPanRate;
+                                panVy += elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (up) {
-                                panVy = elapsed * keyboardPanRate;
+                                panVy -= -elapsed * keyboardPanRate * self._userPanFactor;
                             }
                             if (right) {
-                                panVx = -elapsed * keyboardPanRate;
+                                panVx += -elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (left) {
-                                panVx = elapsed * keyboardPanRate;
+                                panVx = elapsed * keyboardPanRate * self._userPanFactor;
                             }
                             if (back) {
-                                panVz = elapsed * keyboardPanRate;
+                                panVz = elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (front) {
-                                panVz = -elapsed * keyboardPanRate;
+                                panVz = -elapsed * keyboardPanRate * self._userPanFactor;
                             }
                         }
                         //          }
@@ -1208,6 +1259,14 @@ class CameraControl extends Component {
                     }
                     const touches = event.touches;
 
+                    if (!touches[1] && numTouches === 2 || !touches[0] && numTouches === 2) { //modified!!!!!###############################
+                        //obviously it is possible that numTouches===2, but one of the touches is undefined
+                        // - this check avoids error messages. Was not a fatal error, nothing crashed, just errors printed
+                        //therefore probably less a fix than a simple supression of errors...
+                        event.stopPropagation();
+                        return;
+                    }
+
                     if (numTouches === 1) {
 
                         var touch0 = touches[0];
@@ -1215,8 +1274,8 @@ class CameraControl extends Component {
                         if (checkMode(MODE_ROTATE)) {
                             const deltaX = touch0.pageX - lastTouches[0][0];
                             const deltaY = touch0.pageY - lastTouches[0][1];
-                            const rotateX = deltaX * touchRotateRate;
-                            const rotateY = deltaY * touchRotateRate;
+                            const rotateX = deltaX * touchRotateRate * self._userRotateFactor;
+                            const rotateY = deltaY * touchRotateRate * self._userRotateFactor;
                             rotateVx = rotateY;
                             rotateVy = -rotateX;
                         }
@@ -1233,18 +1292,22 @@ class CameraControl extends Component {
 
                         if (panning && checkMode(MODE_PAN)) {
                             math.subVec2([touch0.pageX, touch0.pageY], lastTouches[0], touch0Vec);
-                            panVx = touch0Vec[0] * touchPanRate;
-                            panVy = touch0Vec[1] * touchPanRate;
+                            panVx = touch0Vec[0] * touchPanRate * self._userPanFactor;
+                            panVy = touch0Vec[1] * touchPanRate * self._userPanFactor;
                         }
 
                         if (!panning && checkMode(MODE_ZOOM)) {
                             const d1 = math.distVec2([touch0.pageX, touch0.pageY], [touch1.pageX, touch1.pageY]);
                             const d2 = math.distVec2(lastTouches[0], lastTouches[1]);
-                            vZoom = (d2 - d1) * getZoomRate() * touchZoomRate;
+                            vZoom = (d2 - d1) * getZoomRate() * touchZoomRate * self._userZoomFactor;
                         }
                     }
 
                     for (let i = 0; i < numTouches; ++i) {
+                        if (!touches[i]) {//modified!!! same as above
+                            event.stopPropagation();
+                            return;
+                        }
                         lastTouches[i][0] = touches[i].pageX;
                         lastTouches[i][1] = touches[i].pageY;
                     }
@@ -1272,16 +1335,16 @@ class CameraControl extends Component {
                     const down = input.keyDown[input.KEY_DOWN_ARROW];
                     if (left || right || up || down) {
                         if (right) {
-                            rotateVy += -elapsed * keyboardOrbitRate;
+                            rotateVy += -elapsed * keyboardOrbitRate * self._userRotateFactor;
 
                         } else if (left) {
-                            rotateVy += elapsed * keyboardOrbitRate;
+                            rotateVy += elapsed * keyboardOrbitRate * self._userRotateFactor;
                         }
                         if (down) {
-                            rotateVx += elapsed * keyboardOrbitRate;
+                            rotateVx += elapsed * keyboardOrbitRate * self._userRotateFactor;
 
                         } else if (up) {
-                            rotateVx += -elapsed * keyboardOrbitRate;
+                            rotateVx += -elapsed * keyboardOrbitRate * self._userRotateFactor;
                         }
                     }
                 });
@@ -1310,9 +1373,9 @@ class CameraControl extends Component {
                     }
                     if (rotateRight || rotateLeft) {
                         if (rotateLeft) {
-                            rotateVy += elapsed * keyboardOrbitRate;
+                            rotateVy += elapsed * keyboardOrbitRate * self._userRotateFactor;
                         } else if (rotateRight) {
-                            rotateVy += -elapsed * keyboardOrbitRate;
+                            rotateVy += -elapsed * keyboardOrbitRate * self._userRotateFactor;
                         }
                     }
                 });
