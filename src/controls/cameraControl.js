@@ -66,11 +66,11 @@
  @param [cfg.panToPivot=false] {Boolean} TODO.
  @param [cfg.inertia=0.5] {Number} A factor in range [0..1] indicating how much the camera keeps moving after you finish panning or rotating it.
  @param [cfg.userZoomFactor=1] {Double} user-set zoom factor that is multiplied with the standard value - that means setting it to 0.5 will
- lead to a zoom 50% slower, setting it to 2 will make it twice as fast...
- @param [cfg.userPanFactor=1] {Double} user-set pan factor that is multiplied with the standard value - that means setting it to 0.5 will
- lead to a zoom 50% slower, setting it to 2 will make it twice as fast...
- @param [cfg.userRotateFactor=1] {Double} user-set rotation factor that is multiplied with the standard value - that means setting it to 0.5 will
- lead to a zoom 50% slower, setting it to 2 will make it twice as fast...
+lead to a zoom 50% slower, setting it to 2 will make it twice as fast...
+@param [cfg.userPanFactor=1] {Double} user-set pan factor that is multiplied with the standard value - that means setting it to 0.5 will
+lead to a zoom 50% slower, setting it to 2 will make it twice as fast...
+@param [cfg.userRotateFactor=1] {Double} user-set rotation factor that is multiplied with the standard value - that means setting it to 0.5 will
+lead to a zoom 50% slower, setting it to 2 will make it twice as fast...
  @author xeolabs / http://xeolabs.com
  @author DerSchmale / http://www.derschmale.com
  @extends Component
@@ -272,7 +272,6 @@ class CameraControl extends Component {
         this.pivoting = cfg.pivoting;
         this.panToPointer = cfg.panToPointer;
         this.panToPivot = cfg.panToPivot;
-        this.inertia = cfg.inertia;
         this.userZoomFactor = cfg.userZoomFactor ? cfg.userZoomFactor : 1.0;
         this.userPanFactor = cfg.userPanFactor ? cfg.userPanFactor : 1.0;
         this.userRotateFactor = cfg.userRotateFactor ? cfg.userRotateFactor : 1.0;
@@ -369,11 +368,11 @@ class CameraControl extends Component {
 
     /**modified!!!!! added a zoom, pan and rotation factor that the user can modify
 
-    @property userZoomFactor
-    @default 1.0
-    @type float
-    */
-    set userZoomFactor(value) {
+        @property userZoomFactor
+        @default 1.0
+        @type float
+        */
+       set userZoomFactor(value) {
         this._userZoomFactor = value === undefined ? 1.0 : value;
     }
 
@@ -897,11 +896,7 @@ class CameraControl extends Component {
                 const zsize = aabb[5] - aabb[2];
                 let max = (xsize > ysize ? xsize : ysize);
                 max = (zsize > max ? zsize : max);
-                if (isFinite(max)){
-                    return max / 30;
-                } else {
-                    return 0;
-                }
+                return max / 30;
             }
 
             document.addEventListener("keyDown", function (e) {
@@ -974,6 +969,7 @@ class CameraControl extends Component {
                             getCanvasPosFromEvent(e, mousePos);
                             lastX = mousePos[0];
                             lastY = mousePos[1];
+                            break;
                             break;
                         default:
                             break;
@@ -1155,13 +1151,6 @@ class CameraControl extends Component {
                             right = input.keyDown[input.KEY_D];
                             up = input.keyDown[input.KEY_W];
                             down = input.keyDown[input.KEY_X];
-                        } else if (self._keyboardLayout == 'qwertz') {
-                            front = input.keyDown[input.KEY_W];
-                            back = input.keyDown[input.KEY_S];
-                            left = input.keyDown[input.KEY_A];
-                            right = input.keyDown[input.KEY_D];
-                            up = input.keyDown[input.KEY_Y];
-                            down = input.keyDown[input.KEY_X];
                         } else {
                             front = input.keyDown[input.KEY_W];
                             back = input.keyDown[input.KEY_S];
@@ -1172,12 +1161,12 @@ class CameraControl extends Component {
                         }
                         if (front || back || left || right || up || down) {
                             if (down) {
-                                panVy = -elapsed * keyboardPanRate * self._userPanFactor;
+                                panVy += elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (up) {
-                                panVy = elapsed * keyboardPanRate * self._userPanFactor;
+                                panVy -= -elapsed * keyboardPanRate * self._userPanFactor;
                             }
                             if (right) {
-                                panVx = -elapsed * keyboardPanRate * self._userPanFactor;
+                                panVx += -elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (left) {
                                 panVx = elapsed * keyboardPanRate * self._userPanFactor;
                             }
@@ -1258,9 +1247,7 @@ class CameraControl extends Component {
                     numTouches = touches.length;
 
                     event.stopPropagation();
-                }, {
-                    passive: true
-                });
+                }, {passive: true});
 
                 canvas.addEventListener("touchmove", function (event) {
                     if (!self._active) {
@@ -1268,8 +1255,8 @@ class CameraControl extends Component {
                     }
                     const touches = event.touches;
 
-                    if (!touches[1] && numTouches === 2 || !touches[0] && numTouches === 2) //modified!!!!!###############################
-                    { //obviously it is possible that numTouches===2, but one of the touches is undefined
+                    if (!touches[1] && numTouches === 2 || !touches[0] && numTouches === 2) { //modified!!!!!###############################
+                        //obviously it is possible that numTouches===2, but one of the touches is undefined
                         // - this check avoids error messages. Was not a fatal error, nothing crashed, just errors printed
                         //therefore probably less a fix than a simple supression of errors...
                         event.stopPropagation();
@@ -1313,9 +1300,7 @@ class CameraControl extends Component {
                     }
 
                     for (let i = 0; i < numTouches; ++i) {
-
-                        if (!touches[i]) //modified!!! same as above
-                        {
+                        if (!touches[i]) {//modified!!! same as above
                             event.stopPropagation();
                             return;
                         }
@@ -1324,9 +1309,7 @@ class CameraControl extends Component {
                     }
 
                     event.stopPropagation();
-                }, {
-                    passive: true
-                });
+                }, {passive: true});
 
             })();
 
@@ -1461,12 +1444,6 @@ class CameraControl extends Component {
                             return;
                         }
 
-                        // rightclick on canvas disabled
-                        if (e.button !== 0) {
-                            // maybe show context menu
-                            return;
-                        }
-
                         if (!self._doublePickFlyTo && !self.hasSubs("doublePicked") && !self.hasSubs("doublePickedSurface") && !self.hasSubs("doublePickedNothing")) {
 
                             //  Avoid the single/double click differentiation timeout
@@ -1532,7 +1509,7 @@ class CameraControl extends Component {
                                 }
 
                                 clicks = 0;
-                            }, 250); // FIXME: Too short for track pads
+                            }, 250);  // FIXME: Too short for track pads
 
                         } else {
 
@@ -1619,7 +1596,7 @@ class CameraControl extends Component {
                     }
 
                     while (activeTouches.length < touches.length) {
-                        activeTouches.push(new Float32Array(2));
+                        activeTouches.push(new Float32Array(2))
                     }
 
                     for (let i = 0, len = touches.length; i < len; ++i) {
@@ -1630,9 +1607,7 @@ class CameraControl extends Component {
                     activeTouches.length = touches.length;
 
                     event.stopPropagation();
-                }, {
-                    passive: true
-                });
+                }, {passive: true});
 
                 //canvas.addEventListener("touchmove", function (event) {
                 //    event.preventDefault();
@@ -1706,7 +1681,7 @@ class CameraControl extends Component {
                                 lastTapTime = currentTime;
                             }
 
-                            tapStartTime = -1;
+                            tapStartTime = -1
                         }
                     }
 
@@ -1718,9 +1693,7 @@ class CameraControl extends Component {
                     }
 
                     event.stopPropagation();
-                }, {
-                    passive: true
-                });
+                }, {passive: true});
             })();
         })();
 
@@ -1845,7 +1818,7 @@ class CameraControl extends Component {
         let pos;
 
         if (hit && hit.worldPos) {
-            pos = hit.worldPos;
+            pos = hit.worldPos
         }
 
         const aabb = hit ? hit.mesh.aabb : this.scene.aabb;
