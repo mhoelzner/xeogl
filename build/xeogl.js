@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  * 
- * Built on 2019-06-26
+ * Built on 2019-06-21
  * 
  * MIT License
  * Copyright 2019, Lindsay Kay
@@ -27546,12 +27546,12 @@ class Scene extends Component {
         if (target.length === 0) {
             return this.aabb;
         }
-        let xmin = math.MAX_DOUBLE;
-        let ymin = math.MAX_DOUBLE;
-        let zmin = math.MAX_DOUBLE;
-        let xmax = -math.MAX_DOUBLE;
-        let ymax = -math.MAX_DOUBLE;
-        let zmax = -math.MAX_DOUBLE;
+        let xmin = 100000;
+        let ymin = 100000;
+        let zmin = 100000;
+        let xmax = -100000;
+        let ymax = -100000;
+        let zmax = -100000;
         let valid;
         this.withObjects(target, object => {
                 const aabb = object.aabb;
@@ -28988,7 +28988,7 @@ class ClipControl extends Component {
         var camera = scene.camera;
 
         var radius = cfg.radius === undefined ? 100 : cfg.radius;
-        var hoopRadius = radius * 0.6;
+        var hoopRadius = radius - 40;
 
         // Option for xeogl.Group.addChild(), to prevent child xeogl.Objects from inheriting
         // state from their parent xeogl.Group, such as 'pickable', 'visible', 'collidable' etc.
@@ -31175,13 +31175,6 @@ class CameraControl extends Component {
                             right = input.keyDown[input.KEY_D];
                             up = input.keyDown[input.KEY_W];
                             down = input.keyDown[input.KEY_X];
-                        } else if (self._keyboardLayout == 'qwertz') {
-                            front = input.keyDown[input.KEY_W];
-                            back = input.keyDown[input.KEY_S];
-                            left = input.keyDown[input.KEY_A];
-                            right = input.keyDown[input.KEY_D];
-                            up = input.keyDown[input.KEY_Y];
-                            down = input.keyDown[input.KEY_X];
                         } else {
                             front = input.keyDown[input.KEY_W];
                             back = input.keyDown[input.KEY_S];
@@ -31192,12 +31185,12 @@ class CameraControl extends Component {
                         }
                         if (front || back || left || right || up || down) {
                             if (down) {
-                                panVy = -elapsed * keyboardPanRate * self._userPanFactor;
+                                panVy += elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (up) {
-                                panVy = elapsed * keyboardPanRate * self._userPanFactor;
+                                panVy -= -elapsed * keyboardPanRate * self._userPanFactor;
                             }
                             if (right) {
-                                panVx = -elapsed * keyboardPanRate * self._userPanFactor;
+                                panVx += -elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (left) {
                                 panVx = elapsed * keyboardPanRate * self._userPanFactor;
                             }
