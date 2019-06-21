@@ -1,11 +1,11 @@
 /**
  * xeogl V0.9.0
- *
+ * 
  * WebGL-based 3D visualization library
  * http://xeogl.org/
- *
- * Built on 2019-02-09
- *
+ * 
+ * Built on 2019-06-21
+ * 
  * MIT License
  * Copyright 2019, Lindsay Kay
  * http://xeolabs.com/
@@ -26366,8 +26366,12 @@ class Scene extends Component {
     _addComponent(component) {
         if (component.id) { // Manual ID
             if (this.components[component.id]) {
-                this.error("Component " + utils.inQuotes(component.id) + " already exists in Scene - ignoring ID, will randomly-generate instead");
-                component.id = null;
+                // this.error("Component " + utils.inQuotes(component.id) + " already exists in Scene - ignoring ID, will randomly-generate instead");
+                // component.id = null;
+                const intitialComponentID = component.id;
+                while (this.components[component.id]) {
+                    component.id = intitialComponentID + '?|?' + math.createUUID();
+                }
             }
         }
         if (!component.id) { // Auto ID
@@ -28842,10 +28846,9 @@ componentClasses[type$22] = CameraFlightAnimation;
  @param [cfg.dir=[0,0 -1]] {Array of Number} Vector perpendicular to the plane surface, indicating its orientation.
  @extends Component
  */
-const type$23 = "xeogl.Clip";
+const type$23 = 'xeogl.Clip';
 
 class Clip extends Component {
-
     /**
      JavaScript class name for this Component.
 
@@ -28860,7 +28863,6 @@ class Clip extends Component {
     }
 
     init(cfg) {
-
         super.init(cfg);
 
         this._state = new State({
@@ -28892,7 +28894,7 @@ class Clip extends Component {
          @event active
          @param value {Boolean} The property's new value
          */
-        this.fire("active", this._state.active);
+        this.fire('active', this._state.active);
     }
 
     get active() {
@@ -28915,7 +28917,7 @@ class Clip extends Component {
          @event pos
          @param value Float32Array The property's new value
          */
-        this.fire("pos", this._state.pos);
+        this.fire('pos', this._state.pos);
     }
 
     get pos() {
@@ -28941,7 +28943,7 @@ class Clip extends Component {
          @event dir
          @param value {Float32Array} The property's new value
          */
-        this.fire("dir", this._state.dir);
+        this.fire('dir', this._state.dir);
     }
 
     get dir() {
@@ -28956,6 +28958,1084 @@ class Clip extends Component {
 }
 
 componentClasses[type$23] = Clip;
+
+const type$24 = 'xeogl.ClipControl';
+
+class ClipControl extends Component {
+
+    get type() {
+        return type$24;
+    }
+
+    init(cfg) {
+        super.init(cfg);
+
+        this._active = true;
+        this._solid = false;
+        this._visible = false;
+        this._clipStartDir = xeogl.math.vec3();
+        this._clipPos = xeogl.math.vec3();
+        this._cameraControl = undefined;
+
+        // gruppe die alle elemente fuer den ClipController
+        var gumballGroup = (this._gumballGroup = new xeogl.Group(this, {
+            id: 'gumballGroup',
+            positions: [0, 0, 0]
+        }));
+
+        // set scene and camera of current objet
+        var scene = gumballGroup.scene;
+        var camera = scene.camera;
+
+        var radius = cfg.radius === undefined ? 100 : cfg.radius;
+        var hoopRadius = radius - 40;
+
+        // Option for xeogl.Group.addChild(), to prevent child xeogl.Objects from inheriting
+        // state from their parent xeogl.Group, such as 'pickable', 'visible', 'collidable' etc.
+        // Although, the children's transforms are relative to the xeogl.Group.
+        const DONT_INHERIT_GROUP_STATE = false;
+
+        var geometries = {
+            arrowHead: new xeogl.CylinderGeometry(this, {
+                radiusTop: 0.001,
+                radiusBottom: radius / 10,
+                height: radius / 5,
+                radialSegments: 16,
+                heightSegments: 1,
+                openEnded: false
+            }),
+            curve: new xeogl.TorusGeometry(this, {
+                radius: hoopRadius,
+                tube: radius / 70,
+                radialSegments: 64,
+                tubeSegments: 14,
+                arc: (Math.PI * 2.0) / 4.0
+            }),
+            hoop: new xeogl.TorusGeometry(this, {
+                radius: hoopRadius,
+                tube: radius / 70,
+                radialSegments: 64,
+                tubeSegments: 8,
+                arc: Math.PI * 2.0
+            }),
+            curvePickable: new xeogl.TorusGeometry(this, {
+                radius: hoopRadius,
+                tube: radius / 20,
+                radialSegments: 64,
+                tubeSegments: 14,
+                arc: (Math.PI * 2.0) / 4.0
+            }),
+            axis: new xeogl.CylinderGeometry(scene, {
+                radiusTop: radius / 50,
+                radiusBottom: radius / 50,
+                height: radius,
+                radialSegments: 20,
+                heightSegments: 1,
+                openEnded: false
+            })
+        };
+
+        var materials = {
+            pickable: new xeogl.PhongMaterial(this, {
+                diffuse: [1, 1, 0],
+                alpha: 0, // Invisible
+                alphaMode: 'blend'
+            }),
+            gray: new xeogl.PhongMaterial(scene, {
+                diffuse: [0.6, 0.6, 0.6],
+                ambient: [0.0, 0.0, 0.0],
+                specular: [0.6, 0.6, 0.3],
+                shininess: 80,
+                lineWidth: 2
+            }),
+            transparentBlue: new xeogl.PhongMaterial(scene, {
+                diffuse: [0.3, 0.3, 1.0],
+                ambient: [0.0, 0.0, 0.0],
+                specular: [0.6, 0.6, 0.3],
+                shininess: 80,
+                lineWidth: 2,
+                alpha: 0.8,
+                alphaMode: 'blend'
+            }),
+            highlightBlue: new xeogl.EmphasisMaterial(scene, {
+                edges: false,
+                fill: true,
+                fillColor: [0, 0, 1],
+                fillAlpha: 0.5,
+                vertices: false
+            }),
+            ball: new xeogl.PhongMaterial(scene, {
+                diffuse: [0, 0, 1],
+                ambient: [0.0, 0.0, 0.0],
+                specular: [0.6, 0.6, 0.3],
+                shininess: 80,
+                lineWidth: 2
+            }),
+            highlightBall: new xeogl.EmphasisMaterial(scene, {
+                edges: false,
+                fill: true,
+                fillColor: [0.5, 0.5, 0.5],
+                fillAlpha: 0.5,
+                vertices: false
+            }),
+            highlightPlane: new xeogl.EmphasisMaterial(scene, {
+                edges: true,
+                edgeWidth: 3,
+                fill: false,
+                fillColor: [0.5, 0.5, 0.5],
+                fillAlpha: 0.5,
+                vertices: false
+            })
+        };
+
+        this._display = {
+            planeWire: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    id: 'gumballPlaneWire',
+                    geometry: new xeogl.Geometry(this, {
+                        primitive: 'lines',
+                        positions: [
+                            radius / 0.75, radius / 0.75, 0.0, radius / 0.75, -radius / 0.75, 0.0, // 0
+                            -radius / 0.75, -radius / 0.75, 0.0, -radius / 0.75, radius / 0.75, 0.0, // 1
+                            radius / 0.75, radius / 0.75, -0.0, radius / 0.75, -radius / 0.75, -0.0, // 2
+                            -radius / 0.75, -radius / 0.75, -0.0, -radius / 0.75, radius / 0.75, -0.0 // 3
+                        ],
+                        indices: [0, 1, 0, 3, 1, 2, 2, 3]
+                    }),
+                    highlight: true,
+                    highlightMaterial: materials.highlightPlane,
+                    material: new xeogl.PhongMaterial(this, {
+                        emissive: [1, 0, 0],
+                        diffuse: [0, 0, 0],
+                        lineWidth: 2
+                    }),
+                    pickable: false,
+                    collidable: true,
+                    clippable: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            planeSolid: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    id: 'gumballPlaneSolid',
+                    geometry: new xeogl.Geometry(this, {
+                        primitive: 'triangles',
+                        positions: [
+                            radius / 0.75, radius / 0.75, 0.0, radius / 0.75, -radius / 0.75, 0.0, // 0
+                            -radius / 0.75, -radius / 0.75, 0.0, -radius / 0.75, radius / 0.75, 0.0, // 1
+                            radius / 0.75, radius / 0.75, -0.0,radius / 0.75, -radius / 0.75, -0.0, // 2
+                            -radius / 0.75, -radius / 0.75, -0.0, -radius / 0.75, radius / 0.75, -0.0 // 3
+                        ],
+                        indices: [0, 1, 2, 2, 3, 0]
+                    }),
+                    highlight: true,
+                    highlightMaterial: materials.highlightPlane,
+                    material: new xeogl.PhongMaterial(this, {
+                        emissive: [0, 0, 0],
+                        diffuse: [0, 0, 0],
+                        specular: [1, 1, 1],
+                        shininess: 120,
+                        alpha: 0.3,
+                        alphaMode: 'blend',
+                        backfaces: true
+                    }),
+                    pickable: false,
+                    collidable: true,
+                    clippable: false,
+                    backfaces: true
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            xRedCurve: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    // Red hoop about Y-axis
+                    geometry: geometries.curve,
+                    material: materials.gray,
+                    highlight: true,
+                    highlightMaterial: materials.highlightBlue,
+                    matrix: (function () {
+                        var rotate2 = xeogl.math.rotationMat4v(90 * xeogl.math.DEGTORAD, [0, 1, 0], xeogl.math.identityMat4());
+                        var rotate1 = xeogl.math.rotationMat4v(0 * xeogl.math.DEGTORAD, [1, 0, 0], xeogl.math.identityMat4());
+                        return xeogl.math.mulMat4(rotate1, rotate2, xeogl.math.identityMat4());
+                    })(),
+                    pickable: false,
+                    collidable: true,
+                    clippable: false,
+                    backfaces: true
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            xRedCurvePickable: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    id: 'xRedCurvePickable',
+                    geometry: geometries.curvePickable,
+                    material: materials.pickable,
+                    matrix: (function () {
+                        var rotate2 = xeogl.math.rotationMat4v(90 * xeogl.math.DEGTORAD, [0, 1, 0], xeogl.math.identityMat4());
+                        var rotate1 = xeogl.math.rotationMat4v(0 * xeogl.math.DEGTORAD, [1, 0, 0], xeogl.math.identityMat4());
+                        return xeogl.math.mulMat4(rotate1, rotate2, xeogl.math.identityMat4());
+                    })(),
+                    pickable: true,
+                    collidable: true,
+                    clippable: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            yGreenCurve: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    geometry: geometries.curve,
+                    material: materials.gray,
+                    highlight: true,
+                    highlightMaterial: materials.highlightBlue,
+                    rotation: [-90, 0, 0],
+                    pickable: false,
+                    collidable: true,
+                    clippable: false,
+                    backfaces: true
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            yGreenCurvePickable: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    id: 'yGreenCurvePickable',
+                    geometry: geometries.curvePickable,
+                    material: materials.pickable,
+                    rotation: [-90, 0, 0],
+                    pickable: true,
+                    collidable: true,
+                    clippable: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            zBlueCurve: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    // Blue hoop about Z-axis
+                    geometry: geometries.curve,
+                    material: materials.gray,
+                    highlight: true,
+                    highlightMaterial: materials.highlightBlue,
+                    matrix: (function () {
+                        var rotate2 = xeogl.math.rotationMat4v(180 * xeogl.math.DEGTORAD, [1, 0, 0], xeogl.math.identityMat4());
+                        var rotate1 = xeogl.math.rotationMat4v(180 * xeogl.math.DEGTORAD, [1, 0, 0], xeogl.math.identityMat4());
+                        return xeogl.math.mulMat4(rotate2, rotate1, xeogl.math.identityMat4());
+                    })(),
+                    pickable: false,
+                    collidable: true,
+                    clippable: false,
+                    backfaces: true
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            zBlueCurvePickable: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    id: 'zBlueCurvePickable',
+                    geometry: geometries.curvePickable,
+                    material: materials.pickable,
+                    matrix: (function () {
+                        var rotate2 = xeogl.math.rotationMat4v(180 * xeogl.math.DEGTORAD, [1, 0, 0], xeogl.math.identityMat4());
+                        var rotate1 = xeogl.math.rotationMat4v(180 * xeogl.math.DEGTORAD, [1, 0, 0], xeogl.math.identityMat4());
+                        return xeogl.math.mulMat4(rotate2, rotate1, xeogl.math.identityMat4());
+                    })(),
+                    pickable: true,
+                    collidable: true,
+                    clippable: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            ball: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    geometry: new xeogl.SphereGeometry(this, {
+                        radius: radius / 20
+                    }),
+                    highlight: true,
+                    highlightMaterial: materials.highlightBall,
+                    material: materials.ball,
+                    pickable: false,
+                    collidable: true,
+                    clippable: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            xRedArrow: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    id: 'xRedArrow',
+                    geometry: geometries.arrowHead,
+                    material: materials.gray,
+                    highlight: true,
+                    highlightMaterial: materials.highlightBlue,
+                    matrix: (function () {
+                        var translate = xeogl.math.translateMat4c(0, radius + .1, 0, xeogl.math.identityMat4());
+                        var rotate = xeogl.math.rotationMat4v(-90 * xeogl.math.DEGTORAD, [0, 0, 1], xeogl.math.identityMat4());
+                        return xeogl.math.mulMat4(rotate, translate, xeogl.math.identityMat4());
+                    })(),
+                    pickable: true,
+                    collidable: true,
+                    clippable: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            xRedShaft: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    geometry: geometries.axis,
+                    material: materials.gray,
+                    highlight: true,
+                    highlightMaterial: materials.highlightBlue,
+                    matrix: (function () {
+                        var translate = xeogl.math.translateMat4c(0, radius / 2, 0, xeogl.math.identityMat4());
+                        var rotate = xeogl.math.rotationMat4v(-90 * xeogl.math.DEGTORAD, [0, 0, 1], xeogl.math.identityMat4());
+                        return xeogl.math.mulMat4(rotate, translate, xeogl.math.identityMat4());
+                    })(),
+                    pickable: false,
+                    collidable: true,
+                    clippable: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            yGreenArrow: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    id: 'xGreenArrow',
+                    geometry: geometries.arrowHead,
+                    material: materials.gray,
+                    highlight: true,
+                    highlightMaterial: materials.highlightBlue,
+                    matrix: (function () {
+                        var translate = xeogl.math.translateMat4c(0, radius + .1, 0, xeogl.math.identityMat4());
+                        var rotate = xeogl.math.rotationMat4v(0 * xeogl.math.DEGTORAD, [1, 0, 0], xeogl.math.identityMat4());
+                        return xeogl.math.mulMat4(rotate, translate, xeogl.math.identityMat4());
+                    })(),
+                    pickable: true,
+                    collidable: true,
+                    clippable: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            yGreenShaft: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    geometry: geometries.axis,
+                    material: materials.gray,
+                    highlight: true,
+                    highlightMaterial: materials.highlightBlue,
+                    position: [0, radius / 2, 0],
+                    pickable: false,
+                    collidable: true,
+                    clippable: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            zBlueArrow: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    id: 'zBlueArrow',
+                    geometry: geometries.arrowHead,
+                    material: materials.gray,
+                    highlight: true,
+                    highlightMaterial: materials.highlightBlue,
+                    matrix: (function () {
+                        var translate = xeogl.math.translateMat4c(0, radius + .1, 0, xeogl.math.identityMat4());
+                        var rotate = xeogl.math.rotationMat4v(-90 * xeogl.math.DEGTORAD, [0.8, 0, 0], xeogl.math.identityMat4());
+                        return xeogl.math.mulMat4(rotate, translate, xeogl.math.identityMat4());
+                    })(),
+                    pickable: true,
+                    collidable: true,
+                    clippable: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            zBlueShaft: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    geometry: geometries.axis,
+                    material: materials.gray,
+                    highlight: true,
+                    highlightMaterial: materials.highlightBlue,
+                    matrix: (function () {
+                        var translate = xeogl.math.translateMat4c(0, radius / 2, 0, xeogl.math.identityMat4());
+                        var rotate = xeogl.math.rotationMat4v(-90 * xeogl.math.DEGTORAD, [1, 0, 0], xeogl.math.identityMat4());
+                        return xeogl.math.mulMat4(rotate, translate, xeogl.math.identityMat4());
+                    })(),
+                    clippable: false,
+                    pickable: false,
+                    collidable: true
+                }),
+                DONT_INHERIT_GROUP_STATE
+            )
+        };
+
+        this._hoops = {
+            xHoop: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    // Red hoop about Y-axis
+                    geometry: geometries.hoop,
+                    material: materials.transparentBlue,
+                    highlight: true,
+                    highlightMaterial: materials.highlightBlue,
+                    matrix: (function () {
+                        var rotate2 = xeogl.math.rotationMat4v(90 * xeogl.math.DEGTORAD, [0, 1, 0], xeogl.math.identityMat4());
+                        var rotate1 = xeogl.math.rotationMat4v(270 * xeogl.math.DEGTORAD, [1, 0, 0], xeogl.math.identityMat4());
+                        return xeogl.math.mulMat4(rotate1, rotate2, xeogl.math.identityMat4());
+                    })(),
+                    pickable: false,
+                    collidable: true,
+                    clippable: false,
+                    visible: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            yHoop: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    // Green hoop about Y-axis
+                    geometry: geometries.hoop,
+                    material: materials.transparentBlue,
+                    highlight: true,
+                    highlightMaterial: materials.highlightBlue,
+                    rotation: [-90, 0, 0],
+                    pickable: false,
+                    collidable: true,
+                    clippable: false,
+                    visible: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            ),
+
+            zHoop: gumballGroup.addChild(
+                new xeogl.Mesh(this, {
+                    // Blue hoop about Z-axis
+                    geometry: geometries.hoop,
+                    material: materials.transparentBlue,
+                    highlight: true,
+                    highlightMaterial: materials.highlightBlue,
+                    matrix: (function () {
+                        var rotate2 = xeogl.math.rotationMat4v(90 * xeogl.math.DEGTORAD, [1, 0, 0], xeogl.math.identityMat4());
+                        var rotate1 = xeogl.math.rotationMat4v(90 * xeogl.math.DEGTORAD, [1, 0, 0], xeogl.math.identityMat4());
+                        return xeogl.math.mulMat4(rotate2, rotate1, xeogl.math.identityMat4());
+                    })(),
+                    pickable: false,
+                    collidable: true,
+                    clippable: false,
+                    visible: false
+                }),
+                DONT_INHERIT_GROUP_STATE
+            )
+        };
+
+        this.planeSize = cfg.planeSize;
+        this.autoPlaneSize = cfg.autoPlaneSize;
+        this.pos = cfg.pos;
+        this.dir = cfg.dir;
+        this.color = cfg.color;
+        this.solid = cfg.solid;
+        this.clip = cfg.clip;
+        this.visible = cfg.visible;
+        this.cameraControl = cfg.cameraControl;
+
+        var self = this;
+        var canvas = scene.canvas.canvas;
+        var math = xeogl.math;
+
+        var down = false;
+        var over = false;
+
+        const DRAG_ACTIONS = {
+            none: -1,
+            xPan: 0,
+            yPan: 1,
+            zPan: 2,
+            xRotate: 3,
+            yRotate: 4,
+            zRotate: 5
+        };
+
+        var nextDragAction = null; // As we hover over an arrow or hoop, self is the action we would do if we then dragged it.
+        var dragAction = null; // Action we're doing while we drag an arrow or hoop.
+
+        var lastMouse = math.vec2();
+
+        var xLocalAxis = math.vec3([1, 0, 0]);
+        var yLocalAxis = math.vec3([0, 1, 0]);
+        var zLocalAxis = math.vec3([0, 0, 1]);
+
+        var lastHighlightedMesh;
+        var lastShownMesh;
+
+        var getClickCoordsWithinElement = event => {
+            var coords = new Float32Array(2);
+
+            if (!event) {
+                event = window.event;
+                coords[0] = event.x;
+                coords[a] = event.y;
+            } else {
+                var element = event.target;
+                var totalOffsetLeft = 0;
+                var totalOffsetTop = 0;
+
+                while (element.offsetParent) {
+                    totalOffsetLeft += element.offsetLeft;
+                    totalOffsetTop += element.offsetTop;
+                    element = element.offsetParent;
+                }
+                coords[0] = event.pageX - totalOffsetLeft;
+                coords[1] = event.pageY - totalOffsetTop;
+            }
+            return coords;
+        };
+
+        var localToWorldVec = (localVec, worldVec) => {
+            var math = xeogl.math;
+            var mat = math.mat4();
+
+            math.quaternionToMat4(self._gumballGroup.quaternion, mat);
+            math.transformVec3(mat, localVec, worldVec);
+            math.normalizeVec3(worldVec);
+            return worldVec;
+        };
+
+        var pan = (localAxis, fromMouse, toMouse) => {
+            var p1 = math.vec3();
+            var p2 = math.vec3();
+            var worldAxis = math.vec4();
+
+            localToWorldVec(localAxis, worldAxis);
+
+            var planeNormal = getTranslationPlane(
+                worldAxis,
+                fromMouse,
+                toMouse
+            );
+
+            getMouseVectorOnPlane(fromMouse, planeNormal, p1);
+            getMouseVectorOnPlane(toMouse, planeNormal, p2);
+
+            math.subVec3(p2, p1);
+
+            var dot = math.dotVec3(p2, worldAxis);
+
+            self._clipPos[0] += worldAxis[0] * dot;
+            self._clipPos[1] += worldAxis[1] * dot;
+            self._clipPos[2] += worldAxis[2] * dot;
+
+            self._gumballGroup.position = self._clipPos;
+            if (self._attached.clip) {
+                self._attached.clip.pos = self._clipPos;
+            }
+        };
+
+        var getTranslationPlane = worldAxis => {
+            var planeNormal = math.vec3();
+
+            // find a best fit to find intersections with
+            var absX = Math.abs(worldAxis.x);
+            if (absX > Math.abs(worldAxis.y) && absX > Math.abs(worldAxis.z))
+                math.cross3Vec3(worldAxis, [0, 1, 0], planeNormal);
+            else math.cross3Vec3(worldAxis, [1, 0, 0], planeNormal);
+
+            math.cross3Vec3(planeNormal, worldAxis, planeNormal);
+
+            math.normalizeVec3(planeNormal);
+            return planeNormal;
+        };
+
+        var rotate = (localAxis, fromMouse, toMouse) => {
+            var p1 = math.vec4();
+            var p2 = math.vec4();
+            var c = math.vec4();
+            var worldAxis = math.vec4();
+
+            localToWorldVec(localAxis, worldAxis);
+
+            var dot;
+            var hasData = getMouseVectorOnPlane(fromMouse, worldAxis, p1);
+            hasData = hasData && getMouseVectorOnPlane(toMouse, worldAxis, p2);
+
+            if (!hasData) {
+                // find intersections with view plane and project down to origin
+                var planeNormal = getTranslationPlane(
+                    worldAxis,
+                    fromMouse,
+                    toMouse
+                );
+
+                // the "1" makes sure the plane moves closer to the camera a bit, so the angles become workable
+                getMouseVectorOnPlane(fromMouse, planeNormal, p1, 1);
+                getMouseVectorOnPlane(toMouse, planeNormal, p2, 1);
+                dot = math.dotVec3(p1, worldAxis);
+                p1[0] -= dot * worldAxis[0];
+                p1[1] -= dot * worldAxis[1];
+                p1[2] -= dot * worldAxis[2];
+
+                dot = math.dotVec3(p2, worldAxis);
+                p2[0] -= dot * worldAxis[0];
+                p2[1] -= dot * worldAxis[1];
+                p2[2] -= dot * worldAxis[2];
+            }
+
+            math.normalizeVec3(p1);
+            math.normalizeVec3(p2);
+
+            dot = math.dotVec3(p1, p2);
+            // rounding errors can cause the dot to exceed its allowed range
+            dot = math.clamp(dot, -1.0, 1.0);
+            var incDegrees = Math.acos(dot) * math.RADTODEG;
+
+            // console.log(incDegrees);
+            math.cross3Vec3(p1, p2, c);
+            // test orientation of cross with actual axis
+            if (math.dotVec3(c, worldAxis) < 0.0) incDegrees = -incDegrees;
+
+            self._gumballGroup.rotate(localAxis, incDegrees);
+            rotateClip();
+        };
+
+        // this returns the vector that points from the gumball origin to where the mouse ray intersects the plane
+        var getMouseVectorOnPlane = (mouse, axis, dest, offset) => {
+            var dir = math.vec4([0, 0, 0, 1]);
+            var matrix = math.mat4();
+
+            offset = offset || 0;
+            dir[0] = (mouse[0] / canvas.width) * 2.0 - 1.0;
+            dir[1] = -((mouse[1] / canvas.height) * 2.0 - 1.0);
+            dir[2] = 0.0;
+            dir[3] = 1.0;
+
+            // unproject ndc to view coords
+            math.mulMat4(camera.projMatrix, camera.viewMatrix, matrix);
+            math.inverseMat4(matrix);
+            math.transformVec4(matrix, dir, dir);
+
+            // this is now "a" point on the ray in world space
+            math.mulVec4Scalar(dir, 1.0 / dir[3]);
+
+            // the direction
+            var rayO = camera.eye;
+            math.subVec4(dir, rayO, dir);
+
+            // the plane origin:
+            if (self._attached.clip) {
+                var origin = self._attached.clip.pos;
+
+                var d = -math.dotVec3(origin, axis) - offset;
+                var dot = math.dotVec3(axis, dir);
+
+                if (Math.abs(dot) > 0.005) {
+                    var t = -(math.dotVec3(axis, rayO) + d) / dot;
+                    math.mulVec3Scalar(dir, t, dest);
+                    math.addVec3(dest, rayO);
+                    math.subVec3(dest, origin, dest);
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        var rotateClip = () => {
+            var math = xeogl.math;
+            var dir = math.vec3();
+            var mat = math.mat4();
+
+            if (self._attached.clip) {
+                math.quaternionToMat4(self._gumballGroup.quaternion, mat); // << ---
+                math.transformVec3(mat, [0, 0, 1], dir);
+                self._attached.clip.dir = dir;
+            }
+        };
+
+        var pick = canvasPos => {
+            var hit = scene.pick({
+                canvasPos: canvasPos
+            });
+
+            if (lastHighlightedMesh) {
+                lastHighlightedMesh.highlighted = false;
+            }
+
+            if (lastShownMesh) {
+                lastShownMesh.visible = false;
+            }
+
+            if (hit) {
+                var id = hit.mesh.id;
+
+                var highlightMesh;
+                var shownMesh;
+
+                switch (id) {
+                    case self._display.xRedArrow.id:
+                        highlightMesh = self._display.xRedArrow;
+                        nextDragAction = DRAG_ACTIONS.xPan;
+                        // localToWorldVec(xLocalAxis, panWorldVec);
+                        // worldToCanvasVec(panWorldVec, panCanvasVec);
+                        break;
+
+                    case self._display.yGreenArrow.id:
+                        highlightMesh = self._display.yGreenArrow;
+                        nextDragAction = DRAG_ACTIONS.yPan;
+                        // localToWorldVec(yLocalAxis, panWorldVec);
+                        // worldToCanvasVec(panWorldVec, panCanvasVec);
+                        break;
+
+                    case self._display.zBlueArrow.id:
+                        highlightMesh = self._display.zBlueArrow;
+                        nextDragAction = DRAG_ACTIONS.zPan;
+                        // localToWorldVec(zLocalAxis, panWorldVec);
+                        // worldToCanvasVec(panWorldVec, panCanvasVec);
+                        break;
+
+                    case self._display.xRedCurvePickable.id:
+                        highlightMesh = self._display.xRedCurve;
+                        shownMesh = self._hoops.xHoop;
+                        nextDragAction = DRAG_ACTIONS.xRotate;
+                        break;
+
+                    case self._display.yGreenCurvePickable.id:
+                        highlightMesh = self._display.yGreenCurve;
+                        shownMesh = self._hoops.yHoop;
+                        nextDragAction = DRAG_ACTIONS.yRotate;
+                        break;
+
+                    case self._display.zBlueCurvePickable.id:
+                        highlightMesh = self._display.zBlueCurve;
+                        shownMesh = self._hoops.zHoop;
+                        nextDragAction = DRAG_ACTIONS.zRotate;
+                        break;
+
+                    default:
+                        nextDragAction = DRAG_ACTIONS.none;
+                        return; // Not clicked an arrow or hoop
+                }
+
+                if (highlightMesh) {
+                    highlightMesh.highlighted = true;
+                }
+
+                if (shownMesh) {
+                    shownMesh.visible = true;
+                }
+
+                lastHighlightedMesh = highlightMesh;
+                lastShownMesh = shownMesh;
+            } else {
+                lastHighlightedMesh = null;
+                lastShownMesh = null;
+                nextDragAction = DRAG_ACTIONS.none;
+            }
+        };
+
+        canvas.addEventListener('mousemove', function(e) {
+            if (!self._active) {
+                return;
+            }
+
+            if (!over) {
+                return;
+            }
+
+            var coords = getClickCoordsWithinElement(e);
+
+            if (!down) {
+                pick(coords);
+                return;
+            }
+
+            var x = coords[0];
+            var y = coords[1];
+
+            updateControls(coords, lastMouse);
+
+            lastMouse[0] = x;
+            lastMouse[1] = y;
+        });
+
+        canvas.addEventListener('mousedown', function(e) {
+            if (!self._active) {
+                return;
+            }
+            if (!over) {
+                return;
+            }
+            switch (e.which) {
+                case 1: // Left button
+                    
+                    down = true;
+                    var coords = getClickCoordsWithinElement(e);
+
+                    dragAction = nextDragAction;
+
+                    lastMouse[0] = coords[0];
+                    lastMouse[1] = coords[1];
+
+                    break;
+
+                default:
+                    break;
+            }
+        });
+
+        canvas.addEventListener('mouseup', function(e) {
+            if (!self._active) {
+                return;
+            }
+            switch (e.which) {
+                case 1: // Left button
+                    
+                    break;
+                case 2: // Middle/both buttons
+                    
+                    break;
+                case 3: // Right button
+                    
+                    break;
+                default:
+                    break;
+            }
+            down = false;
+            // reset parent cameraControl to true
+            self._cameraControl.active = true;
+        });
+
+        canvas.addEventListener('mouseenter', function() {
+            if (!self._active) {
+                return;
+            }
+            over = true;
+        });
+
+        canvas.addEventListener('mouseleave', function() {
+            if (!self._active) {
+                return;
+            }
+            over = false;
+        });
+
+        canvas.addEventListener('wheel', function(e) {
+            if (!self._active) {
+                return;
+            }
+            var delta = Math.max(-1, Math.min(1, -e.deltaY * 40));
+            if (delta === 0) {
+                return;
+            }
+            e.preventDefault();
+        });
+
+        function updateControls(mouse, oldMouse) {
+            if (dragAction === DRAG_ACTIONS.none) {
+                return;
+            }
+
+            self._cameraControl.active = false;
+
+            switch (dragAction) {
+                case DRAG_ACTIONS.xPan:
+                    // defined by projections on axis
+                    pan(xLocalAxis, oldMouse, mouse);
+                    break;
+                case DRAG_ACTIONS.yPan:
+                    pan(yLocalAxis, oldMouse, mouse);
+                    break;
+                case DRAG_ACTIONS.zPan:
+                    pan(zLocalAxis, oldMouse, mouse);
+                    break;
+                case DRAG_ACTIONS.xRotate:
+                    rotate(xLocalAxis, oldMouse, mouse);
+                    break;
+                case DRAG_ACTIONS.yRotate:
+                    rotate(yLocalAxis, oldMouse, mouse);
+                    break;
+                case DRAG_ACTIONS.zRotate:
+                    rotate(zLocalAxis, oldMouse, mouse);
+                    break;
+            }
+        }
+    }
+
+    set cameraControl(value) {
+        this._cameraControl = value;
+    }
+
+    get cameraControl() {
+        return this._cameraControl;
+    }
+
+    set clip(value) {
+        this._attach({
+            name: 'clip',
+            type: 'xeogl.Clip',
+            component: value
+        });
+        var clip = this._attached.clip;
+        if (clip) {
+            // Reset this rotation and translation basis
+            // to direction and position of clip
+            this._setGumballDir(clip.dir);
+            this._setGumballPos(clip.pos);
+        }
+    }
+
+    get clip() {
+        return this._attached.clip;
+    }
+    /**
+     * The width and height of the PlaneHelper plane indicator.
+     *
+     * Values assigned to this property will be overridden by an auto-computed value when
+     * {{#crossLink "PlaneHelper/autoPlaneSize:property"}}{{/crossLink}} is true.
+     *
+     * @property planeSize
+     * @default [1,1]
+     * @type {Float32Array}
+     */
+    set planeSize(value) {
+        (this._planeSize = this._planeSize || xeogl.math.vec2()).set(
+            value || [1, 1]
+        );
+        //this._gumballGroup.scale = [this._planeSize[0], this._planeSize[1], 1.0];
+    }
+
+    get planeSize() {
+        return this._planeSize;
+    }
+
+    /**
+     * Indicates whether this PlaneHelper's {{#crossLink "PlaneHelper/planeSize:property"}}{{/crossLink}} is automatically
+     * generated or not.
+     *
+     * When auto-generated, {{#crossLink "PlaneHelper/planeSize:property"}}{{/crossLink}} will automatically size
+     * to fit within the {{#crossLink "Scene/aabb:property"}}Scene's boundary{{/crossLink}}.
+     *
+     * @property autoPlaneSize
+     * @default false
+     * @type {Boolean}
+     */
+    set autoPlaneSize(value) {
+        value = !!value;
+
+        if (this._autoPlaneSize === value) {
+            return;
+        }
+
+        this._autoPlaneSize = value;
+
+        if (this._autoPlaneSize) {
+            if (!this._onSceneAABB) {
+                this._onSceneAABB = this.scene.on(
+                    'boundary',
+                    function() {
+                        const aabbDiag = xeogl.math.getAABB3Diag(
+                            this.scene.aabb
+                        );
+                        const clipSize = aabbDiag * 0.5;
+                        this.planeSize = [clipSize, clipSize];
+                    },
+                    this
+                );
+            }
+        } else {
+            if (this._onSceneAABB) {
+                this.scene.off(this._onSceneAABB);
+                this._onSceneAABB = null;
+            }
+        }
+    }
+
+    get color() {
+        return this._autoPlaneSize;
+    }
+
+    /**
+     * Emmissive color of this PlaneHelper.
+     *
+     * @property color
+     * @default [0.4,0.4,0.4]
+     * @type {Float32Array}
+     */
+    set color(value) {
+        (this._color = this._color || xeogl.math.vec3()).set(
+            value || [0.4, 0.4, 0.4]
+        );
+        this._display.planeWire.material.emissive = this._color;
+    }
+
+    get color() {
+        return this._color;
+    }
+
+    /**
+     Indicates whether this PlaneHelper is filled with color or just wireframe.
+
+     @property solid
+     @default true
+     @type Boolean
+     */
+    set solid(value) {
+        this._solid = value !== false;
+        this._display.planeSolid.visible = this._solid && this._visible;
+    }
+
+    get solid() {
+        return this._solid;
+    }
+
+    /**
+     Indicates whether this PlaneHelper is visible or not.
+
+     @property visible
+     @default true
+     @type Boolean
+     */
+    set visible(value) {
+        value = !!value;
+        if (this._visible === value) {
+            return;
+        }
+        this._visible = value;
+        for (var id in this._display) {
+            if (this._display.hasOwnProperty(id)) {
+                this._display[id].visible = value;
+            }
+        }
+    }
+
+    get visible() {
+        return this._visible;
+    }
+
+    _setGumballPos(xyz) {
+        this._clipPos.set(xyz);
+        this._gumballGroup.position = xyz;
+    }
+
+    _setGumballDir(xyz) {
+        var zeroVec = new Float32Array([0, 0, 1]);
+        var quat = new Float32Array(4);
+        this._clipStartDir.set(xyz);
+        xeogl.math.vec3PairToQuaternion(zeroVec, xyz, quat);
+        this._gumballGroup.quaternion = quat;
+    }
+
+    destroy() {
+        super.destroy();
+        if (this._onSceneAABB) {
+            this.scene.off(this._onSceneAABB);
+        }
+    }
+
+}
+
+componentClasses[type$24] = ClipControl;
 
 /**
  Rotates, pans and zooms the {{#crossLink "Scene"}}{{/crossLink}}'s {{#crossLink "Camera"}}{{/crossLink}} with keyboard, mouse and touch input.
@@ -29024,12 +30104,18 @@ componentClasses[type$23] = Clip;
  the {{#crossLink "Camera"}}{{/crossLink}} towards the hoveredd point on the Mesh's surface.
  @param [cfg.panToPivot=false] {Boolean} TODO.
  @param [cfg.inertia=0.5] {Number} A factor in range [0..1] indicating how much the camera keeps moving after you finish panning or rotating it.
+ @param [cfg.userZoomFactor=1] {Double} user-set zoom factor that is multiplied with the standard value - that means setting it to 0.5 will
+ lead to a zoom 50% slower, setting it to 2 will make it twice as fast...
+ @param [cfg.userPanFactor=1] {Double} user-set pan factor that is multiplied with the standard value - that means setting it to 0.5 will
+ lead to a zoom 50% slower, setting it to 2 will make it twice as fast...
+ @param [cfg.userRotateFactor=1] {Double} user-set rotation factor that is multiplied with the standard value - that means setting it to 0.5 will
+ lead to a zoom 50% slower, setting it to 2 will make it twice as fast...
  @author xeolabs / http://xeolabs.com
  @author DerSchmale / http://www.derschmale.com
  @extends Component
  */
 
-const type$24 = "xeogl.CameraControl";
+const type$25 = "xeogl.CameraControl";
 
 class CameraControl extends Component {
 
@@ -29043,7 +30129,7 @@ class CameraControl extends Component {
      @final
      */
     get type() {
-        return type$24;
+        return type$25;
     }
 
     init(cfg) {
@@ -29217,6 +30303,9 @@ class CameraControl extends Component {
         this.panToPointer = cfg.panToPointer;
         this.panToPivot = cfg.panToPivot;
         this.inertia = cfg.inertia;
+        this.userZoomFactor = cfg.userZoomFactor ? cfg.userZoomFactor : 1.0;
+        this.userPanFactor = cfg.userPanFactor ? cfg.userPanFactor : 1.0;
+        this.userRotateFactor = cfg.userRotateFactor ? cfg.userRotateFactor : 1.0;
 
         this._initEvents(); // Set up all the mouse/touch/kb handlers
     }
@@ -29308,6 +30397,48 @@ class CameraControl extends Component {
         return this._firstPerson;
     }
 
+    /**modified!!!!! added a zoom, pan and rotation factor that the user can modify
+
+    @property userZoomFactor
+    @default 1.0
+    @type float
+    */
+    set userZoomFactor(value) {
+        this._userZoomFactor = value === undefined ? 1.0 : value;
+    }
+
+    get userZoomFactor() {
+        return this._userZoomFactor;
+    }
+
+    /**
+    @property userPanFactor
+    @default 1.0
+    @type float
+    */
+
+    set userPanFactor(value) {
+        this._userPanFactor = value === undefined ? 1.0 : value;
+    }
+
+    get userPanFactor() {
+        return this._userPanFactor;
+    }
+
+    /**
+    @property userRotateFactor
+    @default 1.0
+    @type float
+    */
+
+    set userRotateFactor(value) {
+        this._userRotateFactor = value === undefined ? 1.0 : value;
+    }
+
+    get userRotateFacort() {
+        return this._userRotateFactor;
+    }
+
     /**
      Indicates whether this CameraControl is in "walking" mode.
 
@@ -29389,17 +30520,18 @@ class CameraControl extends Component {
         const scene = this.scene;
         const input = scene.input;
         const camera = scene.camera;
+        const math$$1 = xeogl.math;
         const canvas = this.scene.canvas.canvas;
         let over = false;
-        const mouseOrbitRate = 0.4;
-        const mousePanRate = 0.4;
-        const mouseZoomRate = 0.8;
+        const mouseOrbitRate = 0.3;
+        const mousePanRate = 0.3;
+        const mouseZoomRate = 0.2;
         const keyboardOrbitRate = .02;
         const keyboardPanRate = .02;
         const keyboardZoomRate = .02;
-        const touchRotateRate = 0.3;
-        const touchPanRate = 0.2;
-        const touchZoomRate = 0.05;
+        const touchRotateRate = 0.12;
+        const touchPanRate = 0.05;
+        const touchZoomRate = 0.01;
 
         canvas.oncontextmenu = function (e) {
             e.preventDefault();
@@ -29530,7 +30662,7 @@ class CameraControl extends Component {
             let panVy = 0;
             let panVz = 0;
             let vZoom = 0;
-            const mousePos = math.vec2();
+            const mousePos = math$$1.vec2();
             let panToMouse = false;
 
             let ctrlDown = false;
@@ -29543,7 +30675,7 @@ class CameraControl extends Component {
             const getEyeLookDist = (function () {
                 const vec = new Float32Array(3);
                 return function () {
-                    return math.lenVec3(math.subVec3(camera.look, camera.eye, vec));
+                    return math$$1.lenVec3(math$$1.subVec3(camera.look, camera.eye, vec));
                 };
             })();
 
@@ -29552,10 +30684,10 @@ class CameraControl extends Component {
                 camera.on("projMatrix", function () {
                     projMatDirty = true;
                 });
-                const inverseProjectMat = math.mat4();
+                const inverseProjectMat = math$$1.mat4();
                 return function () {
                     if (projMatDirty) {
-                        math.inverseMat4(camera.projMatrix, inverseProjectMat);
+                        math$$1.inverseMat4(camera.projMatrix, inverseProjectMat);
                     }
                     return inverseProjectMat;
                 }
@@ -29566,10 +30698,10 @@ class CameraControl extends Component {
                 camera.on("projMatrix", function () {
                     projMatDirty = true;
                 });
-                const transposedProjectMat = math.mat4();
+                const transposedProjectMat = math$$1.mat4();
                 return function () {
                     if (projMatDirty) {
-                        math.transposeMat4(camera.projMatrix, transposedProjectMat);
+                        math$$1.transposeMat4(camera.projMatrix, transposedProjectMat);
                     }
                     return transposedProjectMat;
                 }
@@ -29580,10 +30712,10 @@ class CameraControl extends Component {
                 camera.on("viewMatrix", function () {
                     viewMatDirty = true;
                 });
-                const inverseViewMat = math.mat4();
+                const inverseViewMat = math$$1.mat4();
                 return function () {
                     if (viewMatDirty) {
-                        math.inverseMat4(camera.viewMatrix, inverseViewMat);
+                        math$$1.inverseMat4(camera.viewMatrix, inverseViewMat);
                     }
                     return inverseViewMat;
                 }
@@ -29597,7 +30729,7 @@ class CameraControl extends Component {
                 });
                 return function () {
                     if (sceneSizeDirty) {
-                        diag = math.getAABB3Diag(scene.aabb);
+                        diag = math$$1.getAABB3Diag(scene.aabb);
                     }
                     return diag;
                 };
@@ -29605,10 +30737,10 @@ class CameraControl extends Component {
 
             const panToMousePos = (function () {
 
-                const cp = math.vec4();
-                const viewPos = math.vec4();
-                const worldPos = math.vec4();
-                const eyeCursorVec = math.vec3();
+                const cp = math$$1.vec4();
+                const viewPos = math$$1.vec4();
+                const worldPos = math$$1.vec4();
+                const eyeCursorVec = math$$1.vec3();
 
                 const unproject = function (inverseProjMat, inverseViewMat, mousePos, z, viewPos, worldPos) {
                     const canvas = scene.canvas.canvas;
@@ -29618,11 +30750,11 @@ class CameraControl extends Component {
                     cp[1] = (mousePos[1] - halfCanvasHeight) / halfCanvasHeight;
                     cp[2] = z;
                     cp[3] = 1.0;
-                    math.mulMat4v4(inverseProjMat, cp, viewPos);
-                    math.mulVec3Scalar(viewPos, 1.0 / viewPos[3]); // Normalize homogeneous coord
+                    math$$1.mulMat4v4(inverseProjMat, cp, viewPos);
+                    math$$1.mulVec3Scalar(viewPos, 1.0 / viewPos[3]); // Normalize homogeneous coord
                     viewPos[3] = 1.0;
                     viewPos[1] *= -1; // TODO: Why is this reversed?
-                    math.mulMat4v4(inverseViewMat, viewPos, worldPos);
+                    math$$1.mulMat4v4(inverseViewMat, viewPos, worldPos);
                 };
 
                 return function (mousePos, factor) {
@@ -29636,12 +30768,12 @@ class CameraControl extends Component {
                     const Pt3 = transposedProjectMat.subarray(8, 12);
                     const Pt4 = transposedProjectMat.subarray(12);
                     const D = [0, 0, -(lastHoverDistance || getSceneDiagSize()), 1];
-                    const Z = math.dotVec4(D, Pt3) / math.dotVec4(D, Pt4);
+                    const Z = math$$1.dotVec4(D, Pt3) / math$$1.dotVec4(D, Pt4);
 
                     unproject(inverseProjMat, inverseViewMat, mousePos, Z, viewPos, worldPos);
 
-                    math.subVec3(worldPos, camera.eye, eyeCursorVec);
-                    math.normalizeVec3(eyeCursorVec);
+                    math$$1.subVec3(worldPos, camera.eye, eyeCursorVec);
+                    math$$1.normalizeVec3(eyeCursorVec);
 
                     const px = eyeCursorVec[0] * factor;
                     const py = eyeCursorVec[1] * factor;
@@ -29656,10 +30788,10 @@ class CameraControl extends Component {
             })();
 
             const panToWorldPos = (function () {
-                const eyeCursorVec = math.vec3();
+                const eyeCursorVec = math$$1.vec3();
                 return function (worldPos, factor) {
-                    math.subVec3(worldPos, camera.eye, eyeCursorVec);
-                    math.normalizeVec3(eyeCursorVec);
+                    math$$1.subVec3(worldPos, camera.eye, eyeCursorVec);
+                    math$$1.normalizeVec3(eyeCursorVec);
                     const px = eyeCursorVec[0] * factor;
                     const py = eyeCursorVec[1] * factor;
                     const pz = eyeCursorVec[2] * factor;
@@ -29944,8 +31076,8 @@ class CameraControl extends Component {
                     }
                     const x = mousePos[0];
                     const y = mousePos[1];
-                    xDelta += (x - lastX) * mouseOrbitRate;
-                    yDelta += (y - lastY) * mouseOrbitRate;
+                    xDelta += (x - lastX) * mouseOrbitRate * self._userRotateFactor;
+                    yDelta += (y - lastY) * mouseOrbitRate * self._userRotateFactor;
                     lastX = x;
                     lastY = y;
                 });
@@ -29964,15 +31096,15 @@ class CameraControl extends Component {
 
                         // Panning
 
-                        panVx = xDelta * mousePanRate;
-                        panVy = yDelta * mousePanRate;
+                        panVx = xDelta * mousePanRate * self._userPanFactor;
+                        panVy = yDelta * mousePanRate * self._userPanFactor;
 
                     } else {
 
                         // Orbiting
 
-                        rotateVy = -xDelta * mouseOrbitRate;
-                        rotateVx = yDelta * mouseOrbitRate;
+                        rotateVy = -xDelta * mouseOrbitRate * self._userRotateFactor;
+                        rotateVx = yDelta * mouseOrbitRate * self._userRotateFactor;
                     }
 
                     xDelta = 0;
@@ -29993,7 +31125,7 @@ class CameraControl extends Component {
                         return;
                     }
                     const d = delta / Math.abs(delta);
-                    vZoom = -d * getZoomRate() * mouseZoomRate;
+                    vZoom = -d * getZoomRate() * mouseZoomRate * self._userZoomFactor;
                     e.preventDefault();
                 });
 
@@ -30012,9 +31144,9 @@ class CameraControl extends Component {
                         const skey = input.keyDown[input.KEY_SUBTRACT];
                         if (wkey || skey) {
                             if (skey) {
-                                vZoom = elapsed * getZoomRate() * keyboardZoomRate;
+                                vZoom = elapsed * getZoomRate() * keyboardZoomRate * self._userZoomFactor;
                             } else if (wkey) {
-                                vZoom = -elapsed * getZoomRate() * keyboardZoomRate;
+                                vZoom = -elapsed * getZoomRate() * keyboardZoomRate * self._userZoomFactor;
                             }
                         }
                     }
@@ -30053,19 +31185,19 @@ class CameraControl extends Component {
                         }
                         if (front || back || left || right || up || down) {
                             if (down) {
-                                panVy += elapsed * keyboardPanRate;
+                                panVy += elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (up) {
-                                panVy -= -elapsed * keyboardPanRate;
+                                panVy -= -elapsed * keyboardPanRate * self._userPanFactor;
                             }
                             if (right) {
-                                panVx += -elapsed * keyboardPanRate;
+                                panVx += -elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (left) {
-                                panVx = elapsed * keyboardPanRate;
+                                panVx = elapsed * keyboardPanRate * self._userPanFactor;
                             }
                             if (back) {
-                                panVz = elapsed * keyboardPanRate;
+                                panVz = elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (front) {
-                                panVz = -elapsed * keyboardPanRate;
+                                panVz = -elapsed * keyboardPanRate * self._userPanFactor;
                             }
                         }
                         //          }
@@ -30133,13 +31265,23 @@ class CameraControl extends Component {
                     numTouches = touches.length;
 
                     event.stopPropagation();
-                }, {passive: true});
+                }, {
+                    passive: true
+                });
 
                 canvas.addEventListener("touchmove", function (event) {
                     if (!self._active) {
                         return;
                     }
                     const touches = event.touches;
+
+                    if (!touches[1] && numTouches === 2 || !touches[0] && numTouches === 2) //modified!!!!!###############################
+                    { //obviously it is possible that numTouches===2, but one of the touches is undefined
+                        // - this check avoids error messages. Was not a fatal error, nothing crashed, just errors printed
+                        //therefore probably less a fix than a simple supression of errors...
+                        event.stopPropagation();
+                        return;
+                    }
 
                     if (numTouches === 1) {
 
@@ -30148,8 +31290,8 @@ class CameraControl extends Component {
                         if (checkMode(MODE_ROTATE)) {
                             const deltaX = touch0.pageX - lastTouches[0][0];
                             const deltaY = touch0.pageY - lastTouches[0][1];
-                            const rotateX = deltaX * touchRotateRate;
-                            const rotateY = deltaY * touchRotateRate;
+                            const rotateX = deltaX * touchRotateRate * self._userRotateFactor;
+                            const rotateY = deltaY * touchRotateRate * self._userRotateFactor;
                             rotateVx = rotateY;
                             rotateVy = -rotateX;
                         }
@@ -30159,31 +31301,39 @@ class CameraControl extends Component {
                         var touch0 = touches[0];
                         const touch1 = touches[1];
 
-                        math.subVec2([touch0.pageX, touch0.pageY], lastTouches[0], touch0Vec);
-                        math.subVec2([touch1.pageX, touch1.pageY], lastTouches[1], touch1Vec);
+                        math$$1.subVec2([touch0.pageX, touch0.pageY], lastTouches[0], touch0Vec);
+                        math$$1.subVec2([touch1.pageX, touch1.pageY], lastTouches[1], touch1Vec);
 
-                        const panning = math.dotVec2(touch0Vec, touch1Vec) > 0;
+                        const panning = math$$1.dotVec2(touch0Vec, touch1Vec) > 0;
 
                         if (panning && checkMode(MODE_PAN)) {
-                            math.subVec2([touch0.pageX, touch0.pageY], lastTouches[0], touch0Vec);
-                            panVx = touch0Vec[0] * touchPanRate;
-                            panVy = touch0Vec[1] * touchPanRate;
+                            math$$1.subVec2([touch0.pageX, touch0.pageY], lastTouches[0], touch0Vec);
+                            panVx = touch0Vec[0] * touchPanRate * self._userPanFactor;
+                            panVy = touch0Vec[1] * touchPanRate * self._userPanFactor;
                         }
 
                         if (!panning && checkMode(MODE_ZOOM)) {
-                            const d1 = math.distVec2([touch0.pageX, touch0.pageY], [touch1.pageX, touch1.pageY]);
-                            const d2 = math.distVec2(lastTouches[0], lastTouches[1]);
-                            vZoom = (d2 - d1) * getZoomRate() * touchZoomRate;
+                            const d1 = math$$1.distVec2([touch0.pageX, touch0.pageY], [touch1.pageX, touch1.pageY]);
+                            const d2 = math$$1.distVec2(lastTouches[0], lastTouches[1]);
+                            vZoom = (d2 - d1) * getZoomRate() * touchZoomRate * self._userZoomFactor;
                         }
                     }
 
                     for (let i = 0; i < numTouches; ++i) {
+
+                        if (!touches[i]) //modified!!! same as above
+                        {
+                            event.stopPropagation();
+                            return;
+                        }
                         lastTouches[i][0] = touches[i].pageX;
                         lastTouches[i][1] = touches[i].pageY;
                     }
 
                     event.stopPropagation();
-                }, {passive: true});
+                }, {
+                    passive: true
+                });
 
             })();
 
@@ -30205,16 +31355,16 @@ class CameraControl extends Component {
                     const down = input.keyDown[input.KEY_DOWN_ARROW];
                     if (left || right || up || down) {
                         if (right) {
-                            rotateVy += -elapsed * keyboardOrbitRate;
+                            rotateVy += -elapsed * keyboardOrbitRate * self._userRotateFactor;
 
                         } else if (left) {
-                            rotateVy += elapsed * keyboardOrbitRate;
+                            rotateVy += elapsed * keyboardOrbitRate * self._userRotateFactor;
                         }
                         if (down) {
-                            rotateVx += elapsed * keyboardOrbitRate;
+                            rotateVx += elapsed * keyboardOrbitRate * self._userRotateFactor;
 
                         } else if (up) {
-                            rotateVx += -elapsed * keyboardOrbitRate;
+                            rotateVx += -elapsed * keyboardOrbitRate * self._userRotateFactor;
                         }
                     }
                 });
@@ -30243,9 +31393,9 @@ class CameraControl extends Component {
                     }
                     if (rotateRight || rotateLeft) {
                         if (rotateLeft) {
-                            rotateVy += elapsed * keyboardOrbitRate;
+                            rotateVy += elapsed * keyboardOrbitRate * self._userRotateFactor;
                         } else if (rotateRight) {
-                            rotateVy += -elapsed * keyboardOrbitRate;
+                            rotateVy += -elapsed * keyboardOrbitRate * self._userRotateFactor;
                         }
                     }
                 });
@@ -30383,7 +31533,7 @@ class CameraControl extends Component {
                                 }
 
                                 clicks = 0;
-                            }, 250);  // FIXME: Too short for track pads
+                            }, 250); // FIXME: Too short for track pads
 
                         } else {
 
@@ -30481,7 +31631,9 @@ class CameraControl extends Component {
                     activeTouches.length = touches.length;
 
                     event.stopPropagation();
-                }, {passive: true});
+                }, {
+                    passive: true
+                });
 
                 //canvas.addEventListener("touchmove", function (event) {
                 //    event.preventDefault();
@@ -30532,7 +31684,7 @@ class CameraControl extends Component {
 
                                 lastTapTime = -1;
 
-                            } else if (math.distVec2(activeTouches[0], tapStartPos) < TAP_DISTANCE_THRESHOLD) {
+                            } else if (math$$1.distVec2(activeTouches[0], tapStartPos) < TAP_DISTANCE_THRESHOLD) {
 
                                 // Single-tap
 
@@ -30567,7 +31719,9 @@ class CameraControl extends Component {
                     }
 
                     event.stopPropagation();
-                }, {passive: true});
+                }, {
+                    passive: true
+                });
             })();
         })();
 
@@ -30584,10 +31738,10 @@ class CameraControl extends Component {
             const KEY_NUM_5 = 53;
             const KEY_NUM_6 = 54;
 
-            const center = math.vec3();
-            const tempVec3a = math.vec3();
-            const tempVec3b = math.vec3();
-            const tempVec3c = math.vec3();
+            const center = math$$1.vec3();
+            const tempVec3a = math$$1.vec3();
+            const tempVec3b = math$$1.vec3();
+            const tempVec3c = math$$1.vec3();
 
             const cameraTarget = {
                 eye: new Float32Array(3),
@@ -30617,7 +31771,7 @@ class CameraControl extends Component {
                 }
 
                 const aabb = scene.aabb;
-                const diag = math.getAABB3Diag(aabb);
+                const diag = math$$1.getAABB3Diag(aabb);
                 center[0] = aabb[0] + aabb[3] / 2.0;
                 center[1] = aabb[1] + aabb[4] / 2.0;
                 center[2] = aabb[2] + aabb[5] / 2.0;
@@ -30627,7 +31781,7 @@ class CameraControl extends Component {
 
                     case KEY_NUM_1: // Right
 
-                        cameraTarget.eye.set(math.mulVec3Scalar(camera.worldRight, dist, tempVec3a));
+                        cameraTarget.eye.set(math$$1.mulVec3Scalar(camera.worldRight, dist, tempVec3a));
                         cameraTarget.look.set(center);
                         cameraTarget.up.set(camera.worldUp);
 
@@ -30635,7 +31789,7 @@ class CameraControl extends Component {
 
                     case KEY_NUM_2: // Back
 
-                        cameraTarget.eye.set(math.mulVec3Scalar(camera.worldForward, dist, tempVec3a));
+                        cameraTarget.eye.set(math$$1.mulVec3Scalar(camera.worldForward, dist, tempVec3a));
                         cameraTarget.look.set(center);
                         cameraTarget.up.set(camera.worldUp);
 
@@ -30643,7 +31797,7 @@ class CameraControl extends Component {
 
                     case KEY_NUM_3: // Left
 
-                        cameraTarget.eye.set(math.mulVec3Scalar(camera.worldRight, -dist, tempVec3a));
+                        cameraTarget.eye.set(math$$1.mulVec3Scalar(camera.worldRight, -dist, tempVec3a));
                         cameraTarget.look.set(center);
                         cameraTarget.up.set(camera.worldUp);
 
@@ -30651,7 +31805,7 @@ class CameraControl extends Component {
 
                     case KEY_NUM_4: // Front
 
-                        cameraTarget.eye.set(math.mulVec3Scalar(camera.worldForward, -dist, tempVec3a));
+                        cameraTarget.eye.set(math$$1.mulVec3Scalar(camera.worldForward, -dist, tempVec3a));
                         cameraTarget.look.set(center);
                         cameraTarget.up.set(camera.worldUp);
 
@@ -30659,17 +31813,17 @@ class CameraControl extends Component {
 
                     case KEY_NUM_5: // Top
 
-                        cameraTarget.eye.set(math.mulVec3Scalar(camera.worldUp, dist, tempVec3a));
+                        cameraTarget.eye.set(math$$1.mulVec3Scalar(camera.worldUp, dist, tempVec3a));
                         cameraTarget.look.set(center);
-                        cameraTarget.up.set(math.normalizeVec3(math.mulVec3Scalar(camera.worldForward, 1, tempVec3b), tempVec3c));
+                        cameraTarget.up.set(math$$1.normalizeVec3(math$$1.mulVec3Scalar(camera.worldForward, 1, tempVec3b), tempVec3c));
 
                         break;
 
                     case KEY_NUM_6: // Bottom
 
-                        cameraTarget.eye.set(math.mulVec3Scalar(camera.worldUp, -dist, tempVec3a));
+                        cameraTarget.eye.set(math$$1.mulVec3Scalar(camera.worldUp, -dist, tempVec3a));
                         cameraTarget.look.set(center);
-                        cameraTarget.up.set(math.normalizeVec3(math.mulVec3Scalar(camera.worldForward, -1, tempVec3b)));
+                        cameraTarget.up.set(math$$1.normalizeVec3(math$$1.mulVec3Scalar(camera.worldForward, -1, tempVec3b)));
 
                         break;
 
@@ -30738,7 +31892,7 @@ class CameraControl extends Component {
     }
 }
 
-componentClasses[type$24] = CameraControl;
+componentClasses[type$25] = CameraControl;
 
 /**
  A **TorusGeometry** is a parameterized {{#crossLink "Geometry"}}{{/crossLink}} that defines a torus-shaped mesh for attached {{#crossLink "Mesh"}}Meshes{{/crossLink}}.
@@ -30802,7 +31956,7 @@ componentClasses[type$24] = CameraControl;
  @param [cfg.arc=Math.PI / 2.0] {Number} The length of the TorusGeometry's arc in radians, where Math.PI*2 is a closed torus.
  @extends Geometry
  */
-const type$25 = "xeogl.TorusGeometry";
+const type$26 = "xeogl.TorusGeometry";
 
 class TorusGeometry extends Geometry {
 
@@ -30816,7 +31970,7 @@ class TorusGeometry extends Geometry {
      @final
      */
     get type() {
-        return type$25;
+        return type$26;
     }
 
     init(cfg) {
@@ -30941,7 +32095,7 @@ class TorusGeometry extends Geometry {
     }
 }
 
-componentClasses[type$25] = TorusGeometry;
+componentClasses[type$26] = TorusGeometry;
 
 /**
  A **SphereGeometry** is a parameterized {{#crossLink "Geometry"}}{{/crossLink}} that defines a sphere-shaped mesh for attached {{#crossLink "Mesh"}}Meshes{{/crossLink}}.
@@ -30992,7 +32146,7 @@ componentClasses[type$25] = TorusGeometry;
  @param [cfg.lod=1] {Number} Level-of-detail, in range [0..1].
  @extends Geometry
  */
-const type$26 = "xeogl.SphereGeometry";
+const type$27 = "xeogl.SphereGeometry";
 
 class SphereGeometry extends Geometry {
 
@@ -31006,7 +32160,7 @@ class SphereGeometry extends Geometry {
      @final
      */
     get type() {
-        return type$26;
+        return type$27;
     }
 
     init(cfg) {
@@ -31124,7 +32278,7 @@ class SphereGeometry extends Geometry {
     }
 }
 
-componentClasses[type$26] = SphereGeometry;
+componentClasses[type$27] = SphereGeometry;
 
 /**
  An **OBBGeometry** is a {{#crossLink "Geometry"}}{{/crossLink}} that shows the extents of an oriented bounding box (OBB).
@@ -31200,7 +32354,7 @@ componentClasses[type$26] = SphereGeometry;
  containing homogeneous coordinates for the eight corner vertices, ie. each having elements (x,y,z,w).
  @extends Component
  */
-const type$27 = "xeogl.OBBGeometry";
+const type$28 = "xeogl.OBBGeometry";
 
 class OBBGeometry extends Geometry {
 
@@ -31214,7 +32368,7 @@ class OBBGeometry extends Geometry {
      @final
      */
     get type() {
-        return type$27;
+        return type$28;
     }
 
     init(cfg) {
@@ -31304,7 +32458,7 @@ class OBBGeometry extends Geometry {
     }
 }
 
-componentClasses[type$27] = OBBGeometry;
+componentClasses[type$28] = OBBGeometry;
 
 /**
  A **CylinderGeometry** is a parameterized {{#crossLink "Geometry"}}{{/crossLink}} that defines a cylinder-shaped mesh for attached {{#crossLink "Mesh"}}Meshes{{/crossLink}}.
@@ -31361,7 +32515,7 @@ componentClasses[type$27] = OBBGeometry;
  @param [cfg.lod=1] {Number} Level-of-detail, in range [0..1].
  @extends Geometry
  */
-const type$28 = "xeogl.CylinderGeometry";
+const type$29 = "xeogl.CylinderGeometry";
 
 class CylinderGeometry extends Geometry {
 
@@ -31375,7 +32529,7 @@ class CylinderGeometry extends Geometry {
      @final
      */
     get type() {
-        return type$28;
+        return type$29;
     }
 
     init(cfg) {
@@ -31595,7 +32749,7 @@ class CylinderGeometry extends Geometry {
     }
 }
 
-componentClasses[type$28] = CylinderGeometry;
+componentClasses[type$29] = CylinderGeometry;
 
 /**
  A **PlaneGeometry** is a parameterized {{#crossLink "Geometry"}}{{/crossLink}} that defines a plane-shaped mesh for attached {{#crossLink "Mesh"}}Meshes{{/crossLink}}.
@@ -31656,7 +32810,7 @@ componentClasses[type$28] = CylinderGeometry;
  @param [cfg.zSegments=1] {Number} Number of segments on the Z-axis.
  @extends Geometry
  */
-const type$29 = "xeogl.PlaneGeometry";
+const type$30 = "xeogl.PlaneGeometry";
 
 class PlaneGeometry extends Geometry {
 
@@ -31670,7 +32824,7 @@ class PlaneGeometry extends Geometry {
      @final
      */
     get type() {
-        return type$29;
+        return type$30;
     }
 
     init(cfg) {
@@ -31793,7 +32947,7 @@ class PlaneGeometry extends Geometry {
     }
 }
 
-componentClasses[type$29] = PlaneGeometry;
+componentClasses[type$30] = PlaneGeometry;
 
 /**
  An **AmbientLight** defines an ambient light source of fixed intensity and color that affects all {{#crossLink "Mesh"}}Meshes{{/crossLink}}
@@ -31855,7 +33009,7 @@ componentClasses[type$29] = PlaneGeometry;
  @param [cfg.intensity=[1.0]] {Number} The intensity of this AmbientLight, as a factor in range ````[0..1]````.
  @extends Component
  */
-const type$30 = "xeogl.AmbientLight";
+const type$31 = "xeogl.AmbientLight";
 
 class AmbientLight extends Component {
 
@@ -31869,7 +33023,7 @@ class AmbientLight extends Component {
      @final
      */
     get type() {
-        return type$30;
+        return type$31;
     }
 
     init(cfg) {
@@ -31921,7 +33075,7 @@ class AmbientLight extends Component {
     }
 }
 
-componentClasses[type$30] = AmbientLight;
+componentClasses[type$31] = AmbientLight;
 
 /**
  A **PointLight** defines a positional light source that originates from a single point and spreads outward in all directions,
@@ -32008,7 +33162,7 @@ componentClasses[type$30] = AmbientLight;
  @param [cfg.space="view"] {String} The coordinate system this PointLight is defined in - "view" or "world".
  @param [cfg.shadow=false] {Boolean} Flag which indicates if this PointLight casts a shadow.
  */
-const type$31 = "xeogl.PointLight";
+const type$32 = "xeogl.PointLight";
 
 class PointLight extends Component {
 
@@ -32022,7 +33176,7 @@ class PointLight extends Component {
      @final
      */
     get type() {
-        return type$31;
+        return type$32;
     }
 
     init(cfg) {
@@ -32224,7 +33378,7 @@ class PointLight extends Component {
     }
 }
 
-componentClasses[type$31] = PointLight;
+componentClasses[type$32] = PointLight;
 
 /**
  A **SpotLight** defines a positional light source that originates from a single point and eminates in a given direction,
@@ -32310,7 +33464,7 @@ componentClasses[type$31] = PointLight;
  @param [cfg.shadow=false] {Boolean} Flag which indicates if this SpotLight casts a shadow.
  */
 
-const type$32 = "xeogl.SpotLight";
+const type$33 = "xeogl.SpotLight";
 
 class SpotLight extends Component {
 
@@ -32324,7 +33478,7 @@ class SpotLight extends Component {
      @final
      */
     get type() {
-        return type$32;
+        return type$33;
     }
 
     init(cfg) {
@@ -32549,7 +33703,7 @@ class SpotLight extends Component {
     }
 }
 
-componentClasses[type$32] = SpotLight;
+componentClasses[type$33] = SpotLight;
 
 /**
  * @author xeolabs / https://github.com/xeolabs
@@ -32797,7 +33951,7 @@ class Texture2D {
  @param [cfg.encoding="linear"] {String} Encoding format.  See the {{#crossLink "CubeTexture/encoding:property"}}{{/crossLink}} property for more info.
  @extends Component
  */
-const type$33 = "xeogl.CubeTexture";
+const type$34 = "xeogl.CubeTexture";
 
 function ensureImageSizePowerOfTwo$1(image) {
     if (!isPowerOfTwo$1(image.width) || !isPowerOfTwo$1(image.height)) {
@@ -32837,7 +33991,7 @@ class CubeTexture extends Component{
      @final
      */
     get type() {
-        return type$33;
+        return type$34;
     }
 
     init(cfg) {
@@ -32944,7 +34098,7 @@ class CubeTexture extends Component{
     }
 }
 
-componentClasses[type$33] = CubeTexture;
+componentClasses[type$34] = CubeTexture;
 
 /**
  A **LightMap** specifies a cube texture light map.
@@ -32978,7 +34132,7 @@ componentClasses[type$33] = CubeTexture;
  @extends Component
  */
 
-const type$34 = "xeogl.LightMap";
+const type$35 = "xeogl.LightMap";
 
 class LightMap extends CubeTexture{
 
@@ -32992,7 +34146,7 @@ class LightMap extends CubeTexture{
      @final
      */
     get type() {
-        return type$34;
+        return type$35;
     }
 
     init(cfg) {
@@ -33006,7 +34160,7 @@ class LightMap extends CubeTexture{
     }
 }
 
-componentClasses[type$34] = LightMap;
+componentClasses[type$35] = LightMap;
 
 /**
  A **ReflectionMap** specifies a cube texture reflection map.
@@ -33039,7 +34193,7 @@ componentClasses[type$34] = LightMap;
  @param [cfg.encoding="linear"] {String} Encoding format.  See the {{#crossLink "ReflectionMap/encoding:property"}}{{/crossLink}} property for more info.
  @extends Component
  */
-const type$35 = "xeogl.ReflectionMap";
+const type$36 = "xeogl.ReflectionMap";
 
 class ReflectionMap extends CubeTexture {
 
@@ -33053,7 +34207,7 @@ class ReflectionMap extends CubeTexture {
      @final
      */
     get type() {
-        return type$35;
+        return type$36;
     }
 
     init(cfg) {
@@ -33068,7 +34222,7 @@ class ReflectionMap extends CubeTexture {
     }
 }
 
-componentClasses[type$35] = ReflectionMap;
+componentClasses[type$36] = ReflectionMap;
 
 /**
  A **Shadow** defines a shadow cast by a {{#crossLink "DirLight"}}{{/crossLink}} or a {{#crossLink "SpotLight"}}{{/crossLink}}.
@@ -33132,7 +34286,7 @@ componentClasses[type$35] = ReflectionMap;
  @param [cfg.resolution=[1000,1000]] {Uint16Array} Resolution of the texture map for this Shadow.
  @param [cfg.intensity=1.0] {Number} Intensity of this Shadow.
  */
-const type$36 = "xeogl.Shadow";
+const type$37 = "xeogl.Shadow";
 
 class Shadow extends Component {
 
@@ -33146,7 +34300,7 @@ class Shadow extends Component {
      @final
      */
     get type() {
-        return type$36;
+        return type$37;
     }
 
     init(cfg) {
@@ -33223,7 +34377,7 @@ class Shadow extends Component {
     }
 }
 
-componentClasses[type$36] = Shadow;
+componentClasses[type$37] = Shadow;
 
 /**
  A **Group** is an {{#crossLink "Object"}}{{/crossLink}} that groups other Objects.
@@ -33269,7 +34423,7 @@ componentClasses[type$36] = Shadow;
  {{#crossLink "Object/selected:property"}}{{/crossLink}}, {{#crossLink "Object/colorize:property"}}{{/crossLink}} and {{#crossLink "Object/opacity:property"}}{{/crossLink}}.
  @extends Object
  */
-const type$37 = "xeogl.Group";
+const type$38 = "xeogl.Group";
 
  class Group extends xeoglObject{
 
@@ -33283,7 +34437,7 @@ const type$37 = "xeogl.Group";
      @final
      */
     get type() {
-        return type$37;
+        return type$38;
     }
 
     init(cfg) {
@@ -33291,7 +34445,7 @@ const type$37 = "xeogl.Group";
     }
 }
 
-componentClasses[type$37] = Group;
+componentClasses[type$38] = Group;
 
 /**
  A **Model** is a {{#crossLink "Group"}}{{/crossLink}} of {{#crossLink "Component"}}Components{{/crossLink}}.
@@ -33338,7 +34492,7 @@ componentClasses[type$37] = Group;
 
  @extends Group
  */
-const type$38 = "xeogl.Model";
+const type$39 = "xeogl.Model";
 
 class Model extends Group {
 
@@ -33352,7 +34506,7 @@ class Model extends Group {
      @final
      */
     get type() {
-        return type$38;
+        return type$39;
     }
 
     init(cfg) {
@@ -33620,7 +34774,7 @@ class Model extends Group {
     }
 }
 
-componentClasses[type$38] = Model;
+componentClasses[type$39] = Model;
 
 /**
  A **LambertMaterial** is a {{#crossLink "Material"}}{{/crossLink}} that defines the surface appearance of
@@ -33688,7 +34842,7 @@ componentClasses[type$38] = Model;
  @param [cfg.frontface="ccw"] {Boolean} The winding order for {{#crossLink "Geometry"}}Geometry{{/crossLink}} front faces - "cw" for clockwise, or "ccw" for counter-clockwise.
  */
 
-const type$39 = "xeogl.LambertMaterial";
+const type$40 = "xeogl.LambertMaterial";
 
 class LambertMaterial extends Material {
 
@@ -33702,7 +34856,7 @@ class LambertMaterial extends Material {
      @final
      */
     get type() {
-        return type$39;
+        return type$40;
     }
 
     init(cfg) {
@@ -33938,7 +35092,7 @@ class LambertMaterial extends Material {
     }
 }
 
-componentClasses[type$39] = LambertMaterial;
+componentClasses[type$40] = LambertMaterial;
 
 /**
  A **SpecularMaterial** is a physically-based {{#crossLink "Material"}}{{/crossLink}} that defines the surface appearance of
@@ -34231,7 +35385,7 @@ componentClasses[type$39] = LambertMaterial;
  @param [cfg.pointSize=1] {Number} Scalar that controls the size of points for {{#crossLink "Geometry"}}{{/crossLink}} with {{#crossLink "Geometry/primitive:property"}}{{/crossLink}} set to "points".
 
  */
-const type$40 = "xeogl.SpecularMaterial";
+const type$41 = "xeogl.SpecularMaterial";
 const alphaModes$1 = {"opaque": 0, "mask": 1, "blend": 2};
 const alphaModeNames$1 = ["opaque", "mask", "blend"];
 
@@ -34247,7 +35401,7 @@ class SpecularMaterial extends Material {
      @final
      */
     get type() {
-        return type$40;
+        return type$41;
     }
 
     init(cfg) {
@@ -34798,7 +35952,7 @@ class SpecularMaterial extends Material {
     }
 }
 
-componentClasses[type$40] = SpecularMaterial;
+componentClasses[type$41] = SpecularMaterial;
 
 /**
  A **MetallicMaterial** is a physically-based {{#crossLink "Material"}}{{/crossLink}} that defines the surface appearance of
@@ -35101,7 +36255,7 @@ componentClasses[type$40] = SpecularMaterial;
 
 const modes = {"opaque": 0, "mask": 1, "blend": 2};
 const modeNames = ["opaque", "mask", "blend"];
-const type$41 = "xeogl.MetallicMaterial";
+const type$42 = "xeogl.MetallicMaterial";
 
  class MetallicMaterial extends Material {
 
@@ -35115,7 +36269,7 @@ const type$41 = "xeogl.MetallicMaterial";
      @final
      */
     get type() {
-        return type$41;
+        return type$42;
     }
 
     init(cfg) {
@@ -35665,7 +36819,7 @@ const type$41 = "xeogl.MetallicMaterial";
     }
 }
 
-componentClasses[type$41] = MetallicMaterial;
+componentClasses[type$42] = MetallicMaterial;
 
 /**
  A **Texture** specifies a texture map.
@@ -35740,7 +36894,7 @@ componentClasses[type$41] = MetallicMaterial;
  @param [cfg.encoding="linear"] {String} Encoding format.  See the {{#crossLink "Texture/encoding:property"}}{{/crossLink}} property for more info.
  @extends Component
  */
-const type$42 = "xeogl.Texture";
+const type$43 = "xeogl.Texture";
 
 function ensureImageSizePowerOfTwo$2(image) {
     if (!isPowerOfTwo$2(image.width) || !isPowerOfTwo$2(image.height)) {
@@ -35780,7 +36934,7 @@ class Texture extends Component {
      @final
      */
     get type() {
-        return type$42;
+        return type$43;
     }
 
     init(cfg) {
@@ -36174,7 +37328,7 @@ class Texture extends Component {
     }
 }
 
-componentClasses[type$42] = Texture;
+componentClasses[type$43] = Texture;
 
 /**
  A **Fresnel** specifies a Fresnel effect for attached {{#crossLink "PhongMaterial"}}PhongMaterials{{/crossLink}}.
@@ -36234,7 +37388,7 @@ componentClasses[type$42] = Texture;
  @extends Component
  */
 
-const type$43 = "xeogl.Fresnel";
+const type$44 = "xeogl.Fresnel";
 
 class Fresnel extends Component {
 
@@ -36248,7 +37402,7 @@ class Fresnel extends Component {
      @final
      */
     get type() {
-        return type$43;
+        return type$44;
     }
 
     init(cfg) {
@@ -36356,7 +37510,7 @@ class Fresnel extends Component {
     }
 }
 
-componentClasses[type$43] = Fresnel;
+componentClasses[type$44] = Fresnel;
 
 /**
  The xeogl namespace.
@@ -36391,6 +37545,7 @@ exports.CameraFlightAnimation = CameraFlightAnimation;
 exports.Canvas = Canvas;
 exports.Spinner = Spinner;
 exports.Clip = Clip;
+exports.ClipControl = ClipControl;
 exports.CameraControl = CameraControl;
 exports.Geometry = Geometry;
 exports.BoxGeometry = BoxGeometry;
