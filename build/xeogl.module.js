@@ -1,3 +1,10 @@
+/**
+ * xeogl V0.9.0
+ * 
+ * WebGL-based 3D visualization library
+ * http://xeogl.org/
+ * 
+ * Built on 2019-06-21
  * 
  * MIT License
  * Copyright 2019, Lindsay Kay
@@ -27533,12 +27540,12 @@ class Scene extends Component {
         if (target.length === 0) {
             return this.aabb;
         }
-        let xmin = math.MAX_DOUBLE;
-        let ymin = math.MAX_DOUBLE;
-        let zmin = math.MAX_DOUBLE;
-        let xmax = -math.MAX_DOUBLE;
-        let ymax = -math.MAX_DOUBLE;
-        let zmax = -math.MAX_DOUBLE;
+        let xmin = 100000;
+        let ymin = 100000;
+        let zmin = 100000;
+        let xmax = -100000;
+        let ymax = -100000;
+        let zmax = -100000;
         let valid;
         this.withObjects(target, object => {
                 const aabb = object.aabb;
@@ -28957,22 +28964,26 @@ class ClipControl extends Component {
     init(cfg) {
         super.init(cfg);
 
-        this._scene = cfg.scene;
-
+        this._active = true;
+        this._solid = false;
         this._visible = false;
-        this._pos = xeogl.math.vec3();
-        this._baseDir = xeogl.math.vec3();
+        this._clipStartDir = xeogl.math.vec3();
+        this._clipPos = xeogl.math.vec3();
         this._cameraControl = undefined;
 
         // gruppe die alle elemente fuer den ClipController
-        const gumballGroup = (this._gumballGroup = new xeogl.Group(this, {
+        var gumballGroup = (this._gumballGroup = new xeogl.Group(this, {
             id: 'gumballGroup',
-            position: [0, 0, 0]
+            positions: [0, 0, 0]
         }));
 
-        const radius = cfg.radius === undefined ? 100 : cfg.radius;
-        const hoopRadius = radius * 0.6;
-    
+        // set scene and camera of current objet
+        var scene = gumballGroup.scene;
+        var camera = scene.camera;
+
+        var radius = cfg.radius === undefined ? 100 : cfg.radius;
+        var hoopRadius = radius - 40;
+
         // Option for xeogl.Group.addChild(), to prevent child xeogl.Objects from inheriting
         // state from their parent xeogl.Group, such as 'pickable', 'visible', 'collidable' etc.
         // Although, the children's transforms are relative to the xeogl.Group.
@@ -29008,7 +29019,7 @@ class ClipControl extends Component {
                 tubeSegments: 14,
                 arc: (Math.PI * 2.0) / 4.0
             }),
-            axis: new xeogl.CylinderGeometry(this, {
+            axis: new xeogl.CylinderGeometry(scene, {
                 radiusTop: radius / 50,
                 radiusBottom: radius / 50,
                 height: radius,
@@ -29024,14 +29035,14 @@ class ClipControl extends Component {
                 alpha: 0, // Invisible
                 alphaMode: 'blend'
             }),
-            gray: new xeogl.PhongMaterial(this, {
+            gray: new xeogl.PhongMaterial(scene, {
                 diffuse: [0.6, 0.6, 0.6],
                 ambient: [0.0, 0.0, 0.0],
                 specular: [0.6, 0.6, 0.3],
                 shininess: 80,
                 lineWidth: 2
             }),
-            transparentBlue: new xeogl.PhongMaterial(this, {
+            transparentBlue: new xeogl.PhongMaterial(scene, {
                 diffuse: [0.3, 0.3, 1.0],
                 ambient: [0.0, 0.0, 0.0],
                 specular: [0.6, 0.6, 0.3],
@@ -29040,28 +29051,28 @@ class ClipControl extends Component {
                 alpha: 0.8,
                 alphaMode: 'blend'
             }),
-            highlightBlue: new xeogl.EmphasisMaterial(this, {
+            highlightBlue: new xeogl.EmphasisMaterial(scene, {
                 edges: false,
                 fill: true,
                 fillColor: [0, 0, 1],
                 fillAlpha: 0.5,
                 vertices: false
             }),
-            ball: new xeogl.PhongMaterial(this, {
+            ball: new xeogl.PhongMaterial(scene, {
                 diffuse: [0, 0, 1],
                 ambient: [0.0, 0.0, 0.0],
                 specular: [0.6, 0.6, 0.3],
                 shininess: 80,
                 lineWidth: 2
             }),
-            highlightBall: new xeogl.EmphasisMaterial(this, {
+            highlightBall: new xeogl.EmphasisMaterial(scene, {
                 edges: false,
                 fill: true,
                 fillColor: [0.5, 0.5, 0.5],
                 fillAlpha: 0.5,
                 vertices: false
             }),
-            highlightPlane: new xeogl.EmphasisMaterial(this, {
+            highlightPlane: new xeogl.EmphasisMaterial(scene, {
                 edges: true,
                 edgeWidth: 3,
                 fill: false,
@@ -29088,7 +29099,7 @@ class ClipControl extends Component {
                     highlight: true,
                     highlightMaterial: materials.highlightPlane,
                     material: new xeogl.PhongMaterial(this, {
-                        emissive: [0.4, 0.4, 0.4],
+                        emissive: [1, 0, 0],
                         diffuse: [0, 0, 0],
                         lineWidth: 2
                     }),
@@ -29124,7 +29135,7 @@ class ClipControl extends Component {
                         backfaces: true
                     }),
                     pickable: false,
-                    collidable: false,
+                    collidable: true,
                     clippable: false,
                     backfaces: true
                 }),
@@ -29287,7 +29298,7 @@ class ClipControl extends Component {
 
             yGreenArrow: gumballGroup.addChild(
                 new xeogl.Mesh(this, {
-                    id: 'yGreenArrow',
+                    id: 'xGreenArrow',
                     geometry: geometries.arrowHead,
                     material: materials.gray,
                     highlight: true,
@@ -29414,17 +29425,20 @@ class ClipControl extends Component {
             )
         };
 
-        const self = this;
-        const math = xeogl.math;
-
+        this.planeSize = cfg.planeSize;
+        this.autoPlaneSize = cfg.autoPlaneSize;
+        this.pos = cfg.pos;
+        this.dir = cfg.dir;
+        this.color = cfg.color;
+        this.solid = cfg.solid;
         this.clip = cfg.clip;
         this.visible = cfg.visible;
         this.cameraControl = cfg.cameraControl;
 
-        const canvas = this._scene.canvas.canvas;
-        const camera = this._scene.camera;
-        const scene = this._scene;
-        
+        var self = this;
+        var canvas = scene.canvas.canvas;
+        var math = xeogl.math;
+
         var down = false;
         var over = false;
 
@@ -29450,13 +29464,13 @@ class ClipControl extends Component {
         var lastHighlightedMesh;
         var lastShownMesh;
 
-        const getClickCoordsWithinElement = event => {
+        var getClickCoordsWithinElement = event => {
             var coords = new Float32Array(2);
 
             if (!event) {
                 event = window.event;
                 coords[0] = event.x;
-                coords[1] = event.y;
+                coords[a] = event.y;
             } else {
                 var element = event.target;
                 var totalOffsetLeft = 0;
@@ -29473,7 +29487,8 @@ class ClipControl extends Component {
             return coords;
         };
 
-        const localToWorldVec = (localVec, worldVec) => {
+        var localToWorldVec = (localVec, worldVec) => {
+            var math = xeogl.math;
             var mat = math.mat4();
 
             math.quaternionToMat4(self._gumballGroup.quaternion, mat);
@@ -29482,7 +29497,7 @@ class ClipControl extends Component {
             return worldVec;
         };
 
-        const pan = (localAxis, fromMouse, toMouse) => {
+        var pan = (localAxis, fromMouse, toMouse) => {
             var p1 = math.vec3();
             var p2 = math.vec3();
             var worldAxis = math.vec4();
@@ -29502,26 +29517,24 @@ class ClipControl extends Component {
 
             var dot = math.dotVec3(p2, worldAxis);
 
-            self._pos[0] += worldAxis[0] * dot;
-            self._pos[1] += worldAxis[1] * dot;
-            self._pos[2] += worldAxis[2] * dot;
+            self._clipPos[0] += worldAxis[0] * dot;
+            self._clipPos[1] += worldAxis[1] * dot;
+            self._clipPos[2] += worldAxis[2] * dot;
 
-            self._gumballGroup.position = self._pos;
+            self._gumballGroup.position = self._clipPos;
             if (self._attached.clip) {
-                self._attached.clip.pos = self._pos;
+                self._attached.clip.pos = self._clipPos;
             }
         };
 
-        const getTranslationPlane = worldAxis => {
+        var getTranslationPlane = worldAxis => {
             var planeNormal = math.vec3();
 
             // find a best fit to find intersections with
-            var absX = Math.abs(worldAxis[0]);
-            if (absX > Math.abs(worldAxis[1]) && absX > Math.abs(worldAxis[2])) {
+            var absX = Math.abs(worldAxis.x);
+            if (absX > Math.abs(worldAxis.y) && absX > Math.abs(worldAxis.z))
                 math.cross3Vec3(worldAxis, [0, 1, 0], planeNormal);
-            } else {
-                math.cross3Vec3(worldAxis, [1, 0, 0], planeNormal);
-            }
+            else math.cross3Vec3(worldAxis, [1, 0, 0], planeNormal);
 
             math.cross3Vec3(planeNormal, worldAxis, planeNormal);
 
@@ -29529,7 +29542,7 @@ class ClipControl extends Component {
             return planeNormal;
         };
 
-        const rotate = (localAxis, fromMouse, toMouse) => {
+        var rotate = (localAxis, fromMouse, toMouse) => {
             var p1 = math.vec4();
             var p2 = math.vec4();
             var c = math.vec4();
@@ -29538,7 +29551,8 @@ class ClipControl extends Component {
             localToWorldVec(localAxis, worldAxis);
 
             var dot;
-            var hasData = getMouseVectorOnPlane(fromMouse, worldAxis, p1) && getMouseVectorOnPlane(toMouse, worldAxis, p2);
+            var hasData = getMouseVectorOnPlane(fromMouse, worldAxis, p1);
+            hasData = hasData && getMouseVectorOnPlane(toMouse, worldAxis, p2);
 
             if (!hasData) {
                 // find intersections with view plane and project down to origin
@@ -29573,15 +29587,14 @@ class ClipControl extends Component {
             // console.log(incDegrees);
             math.cross3Vec3(p1, p2, c);
             // test orientation of cross with actual axis
-            if (math.dotVec3(c, worldAxis) < 0.0) {
-                incDegrees = -incDegrees;
-            }
+            if (math.dotVec3(c, worldAxis) < 0.0) incDegrees = -incDegrees;
+
             self._gumballGroup.rotate(localAxis, incDegrees);
             rotateClip();
         };
 
         // this returns the vector that points from the gumball origin to where the mouse ray intersects the plane
-        const getMouseVectorOnPlane = (mouse, axis, dest, offset) => {
+        var getMouseVectorOnPlane = (mouse, axis, dest, offset) => {
             var dir = math.vec4([0, 0, 0, 1]);
             var matrix = math.mat4();
 
@@ -29622,7 +29635,7 @@ class ClipControl extends Component {
             return false;
         };
 
-        const rotateClip = () => {
+        var rotateClip = () => {
             var math = xeogl.math;
             var dir = math.vec3();
             var mat = math.mat4();
@@ -29634,7 +29647,7 @@ class ClipControl extends Component {
             }
         };
 
-        const pick = canvasPos => {
+        var pick = canvasPos => {
             var hit = scene.pick({
                 canvasPos: canvasPos
             });
@@ -29716,7 +29729,7 @@ class ClipControl extends Component {
         };
 
         canvas.addEventListener('mousemove', function(e) {
-            if (!self._visible) {
+            if (!self._active) {
                 return;
             }
 
@@ -29741,8 +29754,7 @@ class ClipControl extends Component {
         });
 
         canvas.addEventListener('mousedown', function(e) {
-            e.preventDefault();
-            if (!self._visible) {
+            if (!self._active) {
                 return;
             }
             if (!over) {
@@ -29750,6 +29762,7 @@ class ClipControl extends Component {
             }
             switch (e.which) {
                 case 1: // Left button
+                    
                     down = true;
                     var coords = getClickCoordsWithinElement(e);
 
@@ -29766,8 +29779,21 @@ class ClipControl extends Component {
         });
 
         canvas.addEventListener('mouseup', function(e) {
-            if (!self._visible) {
+            if (!self._active) {
                 return;
+            }
+            switch (e.which) {
+                case 1: // Left button
+                    
+                    break;
+                case 2: // Middle/both buttons
+                    
+                    break;
+                case 3: // Right button
+                    
+                    break;
+                default:
+                    break;
             }
             down = false;
             // reset parent cameraControl to true
@@ -29775,21 +29801,21 @@ class ClipControl extends Component {
         });
 
         canvas.addEventListener('mouseenter', function() {
-            if (!self._visible) {
+            if (!self._active) {
                 return;
             }
             over = true;
         });
 
         canvas.addEventListener('mouseleave', function() {
-            if (!self._visible) {
+            if (!self._active) {
                 return;
             }
             over = false;
         });
 
         canvas.addEventListener('wheel', function(e) {
-            if (!self._visible) {
+            if (!self._active) {
                 return;
             }
             var delta = Math.max(-1, Math.min(1, -e.deltaY * 40));
@@ -29799,7 +29825,7 @@ class ClipControl extends Component {
             e.preventDefault();
         });
 
-        const updateControls = (mouse, oldMouse) => {
+        function updateControls(mouse, oldMouse) {
             if (dragAction === DRAG_ACTIONS.none) {
                 return;
             }
@@ -29827,7 +29853,7 @@ class ClipControl extends Component {
                     rotate(zLocalAxis, oldMouse, mouse);
                     break;
             }
-        };
+        }
     }
 
     set cameraControl(value) {
@@ -29857,6 +29883,107 @@ class ClipControl extends Component {
         return this._attached.clip;
     }
     /**
+     * The width and height of the PlaneHelper plane indicator.
+     *
+     * Values assigned to this property will be overridden by an auto-computed value when
+     * {{#crossLink "PlaneHelper/autoPlaneSize:property"}}{{/crossLink}} is true.
+     *
+     * @property planeSize
+     * @default [1,1]
+     * @type {Float32Array}
+     */
+    set planeSize(value) {
+        (this._planeSize = this._planeSize || xeogl.math.vec2()).set(
+            value || [1, 1]
+        );
+        //this._gumballGroup.scale = [this._planeSize[0], this._planeSize[1], 1.0];
+    }
+
+    get planeSize() {
+        return this._planeSize;
+    }
+
+    /**
+     * Indicates whether this PlaneHelper's {{#crossLink "PlaneHelper/planeSize:property"}}{{/crossLink}} is automatically
+     * generated or not.
+     *
+     * When auto-generated, {{#crossLink "PlaneHelper/planeSize:property"}}{{/crossLink}} will automatically size
+     * to fit within the {{#crossLink "Scene/aabb:property"}}Scene's boundary{{/crossLink}}.
+     *
+     * @property autoPlaneSize
+     * @default false
+     * @type {Boolean}
+     */
+    set autoPlaneSize(value) {
+        value = !!value;
+
+        if (this._autoPlaneSize === value) {
+            return;
+        }
+
+        this._autoPlaneSize = value;
+
+        if (this._autoPlaneSize) {
+            if (!this._onSceneAABB) {
+                this._onSceneAABB = this.scene.on(
+                    'boundary',
+                    function() {
+                        const aabbDiag = xeogl.math.getAABB3Diag(
+                            this.scene.aabb
+                        );
+                        const clipSize = aabbDiag * 0.5;
+                        this.planeSize = [clipSize, clipSize];
+                    },
+                    this
+                );
+            }
+        } else {
+            if (this._onSceneAABB) {
+                this.scene.off(this._onSceneAABB);
+                this._onSceneAABB = null;
+            }
+        }
+    }
+
+    get color() {
+        return this._autoPlaneSize;
+    }
+
+    /**
+     * Emmissive color of this PlaneHelper.
+     *
+     * @property color
+     * @default [0.4,0.4,0.4]
+     * @type {Float32Array}
+     */
+    set color(value) {
+        (this._color = this._color || xeogl.math.vec3()).set(
+            value || [0.4, 0.4, 0.4]
+        );
+        this._display.planeWire.material.emissive = this._color;
+    }
+
+    get color() {
+        return this._color;
+    }
+
+    /**
+     Indicates whether this PlaneHelper is filled with color or just wireframe.
+
+     @property solid
+     @default true
+     @type Boolean
+     */
+    set solid(value) {
+        this._solid = value !== false;
+        this._display.planeSolid.visible = this._solid && this._visible;
+    }
+
+    get solid() {
+        return this._solid;
+    }
+
+    /**
      Indicates whether this PlaneHelper is visible or not.
 
      @property visible
@@ -29881,14 +30008,14 @@ class ClipControl extends Component {
     }
 
     _setGumballPos(xyz) {
-        this._pos.set(xyz);
+        this._clipPos.set(xyz);
         this._gumballGroup.position = xyz;
     }
 
     _setGumballDir(xyz) {
         var zeroVec = new Float32Array([0, 0, 1]);
         var quat = new Float32Array(4);
-        this._baseDir.set(xyz);
+        this._clipStartDir.set(xyz);
         xeogl.math.vec3PairToQuaternion(zeroVec, xyz, quat);
         this._gumballGroup.quaternion = quat;
     }
@@ -30789,11 +30916,7 @@ class CameraControl extends Component {
                 const zsize = aabb[5] - aabb[2];
                 let max = (xsize > ysize ? xsize : ysize);
                 max = (zsize > max ? zsize : max);
-                if (isFinite(max)){
-                    return max / 30;
-                } else {
-                    return 0;
-                }
+                return max / 30;
             }
 
             document.addEventListener("keyDown", function (e) {
@@ -30864,6 +30987,7 @@ class CameraControl extends Component {
                             getCanvasPosFromEvent(e, mousePos);
                             lastX = mousePos[0];
                             lastY = mousePos[1];
+                            break;
                             break;
                         default:
                             break;
@@ -31045,13 +31169,6 @@ class CameraControl extends Component {
                             right = input.keyDown[input.KEY_D];
                             up = input.keyDown[input.KEY_W];
                             down = input.keyDown[input.KEY_X];
-                        } else if (self._keyboardLayout == 'qwertz') {
-                            front = input.keyDown[input.KEY_W];
-                            back = input.keyDown[input.KEY_S];
-                            left = input.keyDown[input.KEY_A];
-                            right = input.keyDown[input.KEY_D];
-                            up = input.keyDown[input.KEY_Y];
-                            down = input.keyDown[input.KEY_X];
                         } else {
                             front = input.keyDown[input.KEY_W];
                             back = input.keyDown[input.KEY_S];
@@ -31062,12 +31179,12 @@ class CameraControl extends Component {
                         }
                         if (front || back || left || right || up || down) {
                             if (down) {
-                                panVy = -elapsed * keyboardPanRate * self._userPanFactor;
+                                panVy += elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (up) {
-                                panVy = elapsed * keyboardPanRate * self._userPanFactor;
+                                panVy -= -elapsed * keyboardPanRate * self._userPanFactor;
                             }
                             if (right) {
-                                panVx = -elapsed * keyboardPanRate * self._userPanFactor;
+                                panVx += -elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (left) {
                                 panVx = elapsed * keyboardPanRate * self._userPanFactor;
                             }
@@ -31342,12 +31459,6 @@ class CameraControl extends Component {
                         self._pivoter.endPivot();
 
                         if (Math.abs(e.clientX - downX) > 3 || Math.abs(e.clientY - downY) > 3) {
-                            return;
-                        }
-
-                        // rightclick on canvas disabled
-                        if (e.button !== 0) {
-                            // maybe show context menu
                             return;
                         }
 
