@@ -30,7 +30,7 @@ class ClipControl extends Component {
         var camera = scene.camera;
 
         var radius = cfg.radius === undefined ? 100 : cfg.radius;
-        var hoopRadius = radius * 0.6;
+        var hoopRadius = radius - 40;
 
         // Option for xeogl.Group.addChild(), to prevent child xeogl.Objects from inheriting
         // state from their parent xeogl.Group, such as 'pickable', 'visible', 'collidable' etc.
