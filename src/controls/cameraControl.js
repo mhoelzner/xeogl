@@ -1166,12 +1166,12 @@ class CameraControl extends Component {
                         }
                         if (front || back || left || right || up || down) {
                             if (down) {
-                                panVy += elapsed * keyboardPanRate * self._userPanFactor;
+                                panVy = -elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (up) {
-                                panVy -= -elapsed * keyboardPanRate * self._userPanFactor;
+                                panVy = elapsed * keyboardPanRate * self._userPanFactor;
                             }
                             if (right) {
-                                panVx += -elapsed * keyboardPanRate * self._userPanFactor;
+                                panVx = -elapsed * keyboardPanRate * self._userPanFactor;
                             } else if (left) {
                                 panVx = elapsed * keyboardPanRate * self._userPanFactor;
                             }
