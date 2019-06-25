@@ -1152,6 +1152,13 @@ class CameraControl extends Component {
                             right = input.keyDown[input.KEY_D];
                             up = input.keyDown[input.KEY_W];
                             down = input.keyDown[input.KEY_X];
+                        } else if (self._keyboardLayout == 'qwertz') {
+                            front = input.keyDown[input.KEY_W];
+                            back = input.keyDown[input.KEY_S];
+                            left = input.keyDown[input.KEY_A];
+                            right = input.keyDown[input.KEY_D];
+                            up = input.keyDown[input.KEY_Y];
+                            down = input.keyDown[input.KEY_X];
                         } else {
                             front = input.keyDown[input.KEY_W];
                             back = input.keyDown[input.KEY_S];
