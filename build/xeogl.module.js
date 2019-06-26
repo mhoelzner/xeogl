@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  * 
- * Built on 2019-06-25
+ * Built on 2019-06-26
  * 
  * MIT License
  * Copyright 2019, Lindsay Kay
@@ -27540,12 +27540,12 @@ class Scene extends Component {
         if (target.length === 0) {
             return this.aabb;
         }
-        let xmin = 100000;
-        let ymin = 100000;
-        let zmin = 100000;
-        let xmax = -100000;
-        let ymax = -100000;
-        let zmax = -100000;
+        let xmin = math.MAX_DOUBLE;
+        let ymin = math.MAX_DOUBLE;
+        let zmin = math.MAX_DOUBLE;
+        let xmax = -math.MAX_DOUBLE;
+        let ymax = -math.MAX_DOUBLE;
+        let zmax = -math.MAX_DOUBLE;
         let valid;
         this.withObjects(target, object => {
                 const aabb = object.aabb;
