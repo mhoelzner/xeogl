@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  * 
- * Built on 2019-06-26
+ * Built on 2019-07-01
  * 
  * MIT License
  * Copyright 2019, Lindsay Kay
@@ -29470,7 +29470,7 @@ class ClipControl extends Component {
             if (!event) {
                 event = window.event;
                 coords[0] = event.x;
-                coords[a] = event.y;
+                coords[1] = event.y;
             } else {
                 var element = event.target;
                 var totalOffsetLeft = 0;
@@ -29532,9 +29532,11 @@ class ClipControl extends Component {
 
             // find a best fit to find intersections with
             var absX = Math.abs(worldAxis.x);
-            if (absX > Math.abs(worldAxis.y) && absX > Math.abs(worldAxis.z))
+            if (absX > Math.abs(worldAxis.y) && absX > Math.abs(worldAxis.z)) {
                 math.cross3Vec3(worldAxis, [0, 1, 0], planeNormal);
-            else math.cross3Vec3(worldAxis, [1, 0, 0], planeNormal);
+            } else {
+                math.cross3Vec3(worldAxis, [1, 0, 0], planeNormal);
+            }
 
             math.cross3Vec3(planeNormal, worldAxis, planeNormal);
 
@@ -29551,8 +29553,7 @@ class ClipControl extends Component {
             localToWorldVec(localAxis, worldAxis);
 
             var dot;
-            var hasData = getMouseVectorOnPlane(fromMouse, worldAxis, p1);
-            hasData = hasData && getMouseVectorOnPlane(toMouse, worldAxis, p2);
+            var hasData = getMouseVectorOnPlane(fromMouse, worldAxis, p1) && getMouseVectorOnPlane(toMouse, worldAxis, p2);
 
             if (!hasData) {
                 // find intersections with view plane and project down to origin
@@ -29587,8 +29588,9 @@ class ClipControl extends Component {
             // console.log(incDegrees);
             math.cross3Vec3(p1, p2, c);
             // test orientation of cross with actual axis
-            if (math.dotVec3(c, worldAxis) < 0.0) incDegrees = -incDegrees;
-
+            if (math.dotVec3(c, worldAxis) < 0.0) {
+                incDegrees = -incDegrees;
+            }
             self._gumballGroup.rotate(localAxis, incDegrees);
             rotateClip();
         };
@@ -29754,6 +29756,7 @@ class ClipControl extends Component {
         });
 
         canvas.addEventListener('mousedown', function(e) {
+            e.preventDefault();
             if (!self._active) {
                 return;
             }
