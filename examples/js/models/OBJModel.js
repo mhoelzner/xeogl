@@ -252,7 +252,7 @@
          */
         static parse(model, objText, mtlText, basePath) {
             if (!objText) {
-                this.warn("load() param expected: objText");
+                console.warn("load() param expected: objText");
                 return;
             }
             var state = parseOBJ(model, objText, null);
@@ -261,7 +261,9 @@
             }
             createMeshes(model, state);
             model.src = null;
-            model.fire("loaded", true, true);
+            xeogl.scheduleTask(function () {
+                model.fire("loaded", true);
+            });
         }
     };
 
