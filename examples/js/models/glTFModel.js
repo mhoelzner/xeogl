@@ -611,6 +611,8 @@
             'MAT4': 16
         };
 
+        const VALID_NUM_DIGITS = 5;
+
         return function (json, src, options, model, ok) {
 
             model.clear();
@@ -644,7 +646,8 @@
                     opacity: model.opacity,
                     edges: model.edges
                 },
-                numObjects: 0
+                numObjects: 0,
+                divideBy: 1
             };
 
             model.scene.loading++; // Disables (re)compilation
@@ -795,12 +798,12 @@
             var accessorsInfo = ctx.json.accessors;
             if (accessorsInfo) {
                 for (var i = 0, len = accessorsInfo.length; i < len; i++) {
-                    loadAccessor(ctx, accessorsInfo[i]);
+                    loadAccessor(ctx, accessorsInfo[i], i);
                 }
             }
         }
 
-        function loadAccessor(ctx, accessorInfo) {
+        function loadAccessor(ctx, accessorInfo, idx) {
             var arraybuffer = ctx.json.bufferViews[accessorInfo.bufferView];
             var itemSize = WEBGL_TYPE_SIZES[accessorInfo.type];
             var TypedArray = WEBGL_COMPONENT_TYPES[accessorInfo.componentType];
@@ -819,9 +822,26 @@
             } else {
                 accessorInfo._typedArray = new TypedArray(arraybuffer._buffer, accessorInfo.byteOffset || 0, accessorInfo.count * itemSize);
                 accessorInfo._itemSize = itemSize;
+
+                if (idx % 3 === 0) {
+                    const divideBy = getDividedBy(accessorInfo._typedArray, VALID_NUM_DIGITS)
+                    if (divideBy > ctx.divideBy) {
+                        ctx.divideBy = divideBy;
+                    }
+                }
             }
         }
 
+         // functions to calculate the number of digits of abolute values in postions array
+        // returns a value on which every postion (x,y,z) has to be devided by to get valid amount
+        // of digits 
+        function getDividedBy(accessor, validDigits) {
+
+            const maxValue = accessor.reduce(function(a,b) { return Math.max(Math.abs(a),Math.abs(b)); });
+            const numDigits = ((Math.log10((maxValue ^ (maxValue >> 31)) - (maxValue >> 31)) | 0) + 1);
+            return numDigits > validDigits ? Math.pow(10,numDigits-validDigits) : 1;
+    
+        }
 
         function loadTextures(ctx) {
             var texturesInfo = ctx.json.textures;
@@ -1167,6 +1187,7 @@
         }
 
         function loadMesh(ctx, meshInfo) {
+
             var json = ctx.json;
             var mesh = [];
             var primitivesInfo = meshInfo.primitives;
@@ -1186,6 +1207,8 @@
                 var geometryCfg;
                 var meshCfg;
                 var geometry;
+
+                const divideBy = ctx.divideBy;
 
                 for (var i = 0, len = primitivesInfo.length; i < len; i++) {
 
@@ -1215,7 +1238,8 @@
                     if (positionsIndex !== null && positionsIndex !== undefined) {
                         accessorInfo = json.accessors[positionsIndex];
                         bufferViewInfo = json.bufferViews[accessorInfo.bufferView];
-                        geometryCfg.positions = accessorInfo._typedArray;
+                        // console.log(accessorInfo._typedArray);
+                        geometryCfg.positions = accessorInfo._typedArray.map(a => a / divideBy);
                     }
 
                     normalsIndex = attributes.NORMAL;

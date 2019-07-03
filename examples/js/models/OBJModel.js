@@ -877,9 +877,23 @@
 // Creates meshes from parsed state
 //--------------------------------------------------------------------------------------------
 
+    // functions to calculate the number of digits of abolute values in postions array
+    // returns a value on which every postion (x,y,z) has to be devided by to get valid amount
+    // of digits 
+    function getDividedBy(positions, validDigits) {
+
+        const maxValue = positions.reduce(function(a,b) { return Math.max(Math.abs(a),Math.abs(b)); });
+        const numDigits = ((Math.log10((maxValue ^ (maxValue >> 31)) - (maxValue >> 31)) | 0) + 1);
+        return numDigits > validDigits ? Math.pow(10,numDigits-validDigits) : 1;
+
+    }
+
     var createMeshes = (function () {
 
         return function (model, state) {
+
+            const VALID_NUM_DIGITS = 5;
+            const divideBy = getDividedBy(state.positions, VALID_NUM_DIGITS);
 
             for (var j = 0, k = state.objects.length; j < k; j++) {
 
@@ -896,7 +910,7 @@
                     primitive: "triangles"
                 };
 
-                geometryCfg.positions = geometry.positions;
+                geometryCfg.positions = geometry.positions.map(p => p / divideBy);
 
                 if (geometry.normals.length > 0) {
                     geometryCfg.normals = geometry.normals;
@@ -950,6 +964,7 @@
 
     function loadFile(url, ok, err) {
         var request = new XMLHttpRequest();
+        request.overrideMimeType('text/plain');
         request.open('GET', url, true);
         request.addEventListener('load', function (event) {
             var response = event.target.response;
