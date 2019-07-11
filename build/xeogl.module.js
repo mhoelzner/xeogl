@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  * 
- * Built on 2019-07-02
+ * Built on 2019-07-11
  * 
  * MIT License
  * Copyright 2019, Lindsay Kay
@@ -30868,7 +30868,6 @@ class CameraControl extends Component {
                             lastX = mousePos[0];
                             lastY = mousePos[1];
                             break;
-                            break;
                         default:
                             break;
                     }
@@ -31346,6 +31345,12 @@ class CameraControl extends Component {
                         self._pivoter.endPivot();
 
                         if (Math.abs(e.clientX - downX) > 3 || Math.abs(e.clientY - downY) > 3) {
+                            return;
+                        }
+
+                        // rightclick on canvas disabled
+                        if (e.button !== 0) {
+                            // maybe show context menu
                             return;
                         }
 

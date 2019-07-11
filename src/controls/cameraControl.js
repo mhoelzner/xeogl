@@ -971,7 +971,6 @@ class CameraControl extends Component {
                             lastX = mousePos[0];
                             lastY = mousePos[1];
                             break;
-                            break;
                         default:
                             break;
                     }
@@ -1455,6 +1454,12 @@ class CameraControl extends Component {
                         self._pivoter.endPivot();
 
                         if (Math.abs(e.clientX - downX) > 3 || Math.abs(e.clientY - downY) > 3) {
+                            return;
+                        }
+
+                        // rightclick on canvas disabled
+                        if (e.button !== 0) {
+                            // maybe show context menu
                             return;
                         }
 
