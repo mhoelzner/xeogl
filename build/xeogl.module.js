@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  * 
- * Built on 2019-07-11
+ * Built on 2019-07-23
  * 
  * MIT License
  * Copyright 2019, Lindsay Kay
