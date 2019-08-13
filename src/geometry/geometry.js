@@ -257,6 +257,10 @@ class Geometry extends Component {
             memoryStats.indices += state.indicesBuf.numItems;
         }
 
+        if (cfg.divideBy) {
+            state.divideBy = cfg.divideBy;
+        }
+
         this._buildHash();
 
         memoryStats.meshes++;
@@ -694,6 +698,17 @@ class Geometry extends Component {
             this._obbDirty = false;
         }
         return this._obb;
+    }
+
+    /**
+     The Geometry's divideBy value.
+
+     @property divideBy
+     @default 1
+     @type Uint16Array
+     */
+    get divideBy() {
+        return this._state.divideBy;
     }
 
     get kdtree() {
