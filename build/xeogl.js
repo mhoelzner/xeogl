@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  * 
- * Built on 2019-07-23
+ * Built on 2019-08-13
  * 
  * MIT License
  * Copyright 2019, Lindsay Kay
@@ -8282,7 +8282,8 @@ class Geometry extends Component {
             uvBuf: null,
             indicesBuf: null,
             indicesBufCombined: null, // Indices into a shared VertexBufs, set when combined == true
-            hash: ""
+            hash: "",
+            divideBy: 1
         });
 
         this._edgeThreshold = cfg.edgeThreshold || 2.0;
