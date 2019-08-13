@@ -149,7 +149,8 @@ class Geometry extends Component {
             uvBuf: null,
             indicesBuf: null,
             indicesBufCombined: null, // Indices into a shared VertexBufs, set when combined == true
-            hash: ""
+            hash: "",
+            divideBy: 1
         });
 
         this._edgeThreshold = cfg.edgeThreshold || 2.0;
