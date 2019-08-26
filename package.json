@@ -45,6 +45,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "grunt": "^1.0.4",
     "gulp": "^3.9.1",
     "gulp-yuidoc": "^0.1.2",
     "rollup": "^0.55.5",

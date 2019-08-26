@@ -1523,9 +1523,13 @@ class CameraControl extends Component {
                                 updatePick();
 
                                 if (hit) {
-                                    self.fire("picked", hit);
-                                    if (pickedSurface) {
-                                        self.fire("pickedSurface", hit);
+                                    if (e.button === 2) {
+                                        self.fire("contextMenu", hit);
+                                    } else {
+                                        self.fire("picked", hit);
+                                        if (pickedSurface) {
+                                            self.fire("pickedSurface", hit);
+                                        }
                                     }
                                 } else {
                                     self.fire("pickedNothing");

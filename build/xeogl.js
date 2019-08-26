@@ -1,11 +1,11 @@
 /**
  * xeogl V0.9.0
- * 
+ *
  * WebGL-based 3D visualization library
  * http://xeogl.org/
- * 
- * Built on 2019-08-13
- * 
+ *
+ * Built on 2019-08-26
+ *
  * MIT License
  * Copyright 2019, Lindsay Kay
  * http://xeolabs.com/
@@ -31436,9 +31436,13 @@ class CameraControl extends Component {
                                 updatePick();
 
                                 if (hit) {
-                                    self.fire("picked", hit);
-                                    if (pickedSurface) {
-                                        self.fire("pickedSurface", hit);
+                                    if (e.button === 2) {
+                                        self.fire("contextMenu", hit);
+                                    } else {
+                                        self.fire("picked", hit);
+                                        if (pickedSurface) {
+                                            self.fire("pickedSurface", hit);
+                                        }
                                     }
                                 } else {
                                     self.fire("pickedNothing");
