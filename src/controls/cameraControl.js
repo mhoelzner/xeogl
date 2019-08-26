@@ -1461,12 +1461,6 @@ class CameraControl extends Component {
                             return;
                         }
 
-                        // rightclick on canvas disabled
-                        if (e.button !== 0) {
-                            // maybe show context menu
-                            return;
-                        }
-
                         if (!self._doublePickFlyTo && !self.hasSubs("doublePicked") && !self.hasSubs("doublePickedSurface") && !self.hasSubs("doublePickedNothing")) {
 
                             //  Avoid the single/double click differentiation timeout
