@@ -1518,6 +1518,7 @@ class CameraControl extends Component {
 
                                 if (hit) {
                                     if (e.button === 2) {
+                                        hit.mousePosition = [e.pageX, e.pageY];
                                         self.fire("contextMenu", hit);
                                     } else {
                                         self.fire("picked", hit);

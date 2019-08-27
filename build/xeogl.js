@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  *
- * Built on 2019-08-26
+ * Built on 2019-08-27
  *
  * MIT License
  * Copyright 2019, Lindsay Kay
@@ -31431,6 +31431,7 @@ class CameraControl extends Component {
 
                                 if (hit) {
                                     if (e.button === 2) {
+                                        hit.mousePosition = [e.pageX, e.pageY];
                                         self.fire("contextMenu", hit);
                                     } else {
                                         self.fire("picked", hit);
