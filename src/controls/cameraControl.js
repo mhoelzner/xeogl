@@ -118,7 +118,8 @@ class CameraControl extends Component {
                 lineWidth: 4
             }),
             visible: false,
-            collidable: false
+            collidable: false,
+            pickable: false
         });
 
         this._pivoter = new (function () { // Pivots the Camera around an arbitrary World-space position

@@ -602,15 +602,15 @@
  @extends Component
  */
 
-import {utils} from '../utils.js';
-import {Component} from '../component.js';
-import {Mesh} from './mesh.js';
-import {AABBGeometry} from '../geometry/aabbGeometry.js';
-import {PhongMaterial} from '../materials/phongMaterial.js';
-import {math} from '../math/math.js';
-import {componentClasses} from "./../componentClasses.js";
+import { utils } from '../utils.js';
+import { Component } from '../component.js';
+import { Mesh } from './mesh.js';
+import { AABBGeometry } from '../geometry/aabbGeometry.js';
+import { PhongMaterial } from '../materials/phongMaterial.js';
+import { math } from '../math/math.js';
+import { componentClasses } from './../componentClasses.js';
 
-const type = "xeogl.Object";
+const type = 'xeogl.Object';
 const angleAxis = new Float32Array(4);
 const q1 = new Float32Array(4);
 const q2 = new Float32Array(4);
@@ -624,8 +624,6 @@ const vecb = new Float32Array(3);
 const identityMat = math.identityMat4();
 
 class xeoglObject extends Component {
-
-
     /**
      JavaScript class name for this Component.
 
@@ -640,7 +638,6 @@ class xeoglObject extends Component {
     }
 
     init(cfg) {
-
         super.init(cfg);
 
         this._guid = cfg.guid;
@@ -745,7 +742,11 @@ class xeoglObject extends Component {
                 this._worldMatrix[i] = localMatrix[i];
             }
         } else {
-            math.mulMat4(this._parent.worldMatrix, localMatrix, this._worldMatrix);
+            math.mulMat4(
+                this._parent.worldMatrix,
+                localMatrix,
+                this._worldMatrix
+            );
         }
         this._worldMatrixDirty = false;
     }
@@ -764,7 +765,7 @@ class xeoglObject extends Component {
 
     _setSubtreeAABBsDirty(object) {
         object._aabbDirty = true;
-        object.fire("boundary", true);
+        object.fire('boundary', true);
         if (object._childList) {
             for (let i = 0, len = object._childList.length; i < len; i++) {
                 this._setSubtreeAABBsDirty(object._childList[i]);
@@ -777,7 +778,7 @@ class xeoglObject extends Component {
         if (this.collidable) {
             for (let object = this; object; object = object._parent) {
                 object._aabbDirty = true;
-                object.fire("boundary", true);
+                object.fire('boundary', true);
             }
         }
     }
@@ -789,7 +790,8 @@ class xeoglObject extends Component {
         }
         if (this._buildMeshAABB) {
             this._buildMeshAABB(this.worldMatrix, this._aabb); // Geometry
-        } else { // Object | Group | Model
+        } else {
+            // Object | Group | Model
             math.collapseAABB3(this._aabb);
             let object;
             for (let i = 0, len = this._childList.length; i < len; i++) {
@@ -829,24 +831,24 @@ class xeoglObject extends Component {
             const objectId = object;
             object = this.scene.objects[objectId];
             if (!object) {
-                this.warn("Object not found: " + utils.inQuotes(objectId));
+                this.warn('Object not found: ' + utils.inQuotes(objectId));
                 return;
             }
         } else if (utils.isObject(object)) {
-            throw "addChild( * ) not implemented";
+            throw 'addChild( * ) not implemented';
             const cfg = object;
             // object = new xeogl.Group(this.scene, cfg);
             if (!object) {
                 return;
             }
         } else {
-            if (!object.isType("xeogl.Object")) {
-                this.error("Not a xeogl.Object: " + object.id);
+            if (!object.isType('xeogl.Object')) {
+                this.error('Not a xeogl.Object: ' + object.id);
                 return;
             }
             if (object._parent) {
                 if (object._parent.id === this.id) {
-                    this.warn("Already a child object: " + object.id);
+                    this.warn('Already a child object: ' + object.id);
                     return;
                 }
                 object._parent.removeChild(object);
@@ -854,7 +856,7 @@ class xeoglObject extends Component {
         }
         const id = object.id;
         if (object.scene.id !== this.scene.id) {
-            this.error("Object not in same Scene: " + object.id);
+            this.error('Object not in same Scene: ' + object.id);
             return;
         }
         delete this.scene.rootObjects[object.id];
@@ -1135,16 +1137,16 @@ class xeoglObject extends Component {
             const objectId = object;
             object = this.scene.objects[objectId];
             if (!object) {
-                this.warn("Group not found: " + utils.inQuotes(objectId));
+                this.warn('Group not found: ' + utils.inQuotes(objectId));
                 return;
             }
         }
         if (object.scene.id !== this.scene.id) {
-            this.error("Group not in same Scene: " + object.id);
+            this.error('Group not in same Scene: ' + object.id);
             return;
         }
         if (this._parent && this._parent.id === object.id) {
-            this.warn("Already a child of Group: " + object.id);
+            this.warn('Already a child of Group: ' + object.id);
             return;
         }
         object.addChild(this);
@@ -1185,7 +1187,7 @@ class xeoglObject extends Component {
      */
     set rotation(value) {
         this._rotation.set(value || [0, 0, 0]);
-        math.eulerToQuaternion(this._rotation, "XYZ", this._quaternion);
+        math.eulerToQuaternion(this._rotation, 'XYZ', this._quaternion);
         this._setLocalMatrixDirty();
         this._setAABBDirty();
         this._renderer.imageDirty();
@@ -1204,7 +1206,7 @@ class xeoglObject extends Component {
      */
     set quaternion(value) {
         this._quaternion.set(value || [0, 0, 0, 1]);
-        math.quaternionToEuler(this._quaternion, "XYZ", this._rotation);
+        math.quaternionToEuler(this._quaternion, 'XYZ', this._rotation);
         this._setLocalMatrixDirty();
         this._setAABBDirty();
         this._renderer.imageDirty();
@@ -1240,12 +1242,16 @@ class xeoglObject extends Component {
      * @type {Float32Array}
      */
     set matrix(value) {
-
         if (!this.__localMatrix) {
             this.__localMatrix = math.identityMat4();
         }
         this.__localMatrix.set(value || identityMat);
-        math.decomposeMat4(this.__localMatrix, this._position, this._quaternion, this._scale);
+        math.decomposeMat4(
+            this.__localMatrix,
+            this._position,
+            this._quaternion,
+            this._scale
+        );
         this._localMatrixDirty = false;
         this._setWorldMatrixDirty();
         this._setAABBDirty();
@@ -1257,7 +1263,12 @@ class xeoglObject extends Component {
             if (!this.__localMatrix) {
                 this.__localMatrix = math.identityMat4();
             }
-            math.composeMat4(this._position, this._quaternion, this._scale, this.__localMatrix);
+            math.composeMat4(
+                this._position,
+                this._quaternion,
+                this._scale,
+                this.__localMatrix
+            );
             this._localMatrixDirty = false;
         }
         return this.__localMatrix;
@@ -1724,7 +1735,8 @@ class xeoglObject extends Component {
                     diffuse: [0.5, 1.0, 0.5],
                     emissive: [0.5, 1.0, 0.5],
                     lineWidth: 2
-                })
+                }),
+                pickable: false
             });
         }
         this._aabbHelper.visible = visible;
@@ -1775,4 +1787,4 @@ class xeoglObject extends Component {
 
 componentClasses[type] = xeoglObject;
 
-export {xeoglObject};
+export { xeoglObject };
