@@ -565,6 +565,8 @@ class ClipControl extends Component {
             if (self._attached.clip) {
                 self._attached.clip.pos = self._pos;
             }
+
+            this.fire('positionChanged', self._pos);
         };
 
         const getTranslationPlane = worldAxis => {
