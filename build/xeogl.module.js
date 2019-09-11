@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  *
- * Built on 2019-08-27
+ * Built on 2019-09-11
  *
  * MIT License
  * Copyright 2019, Lindsay Kay
@@ -23133,7 +23133,7 @@ class Camera extends Component {
         const vec = math.subVec3(this._eye, this._look, tempVec3);
         const lenLook = Math.abs(math.lenVec3(vec, tempVec3b));
         const newLenLook = Math.abs(lenLook + delta);
-        if (newLenLook < 0.5) {
+        if (newLenLook < 0.05) { // 0.5 original
             return;
         }
         const dir = math.normalizeVec3(vec, tempVec3c);
@@ -29585,6 +29585,8 @@ class ClipControl extends Component {
             if (self._attached.clip) {
                 self._attached.clip.pos = self._pos;
             }
+
+            this.fire('positionChanged', self._pos);
         };
 
         const getTranslationPlane = worldAxis => {
