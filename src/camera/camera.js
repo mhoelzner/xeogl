@@ -440,7 +440,7 @@ class Camera extends Component {
         const vec = math.subVec3(this._eye, this._look, tempVec3);
         const lenLook = Math.abs(math.lenVec3(vec, tempVec3b));
         const newLenLook = Math.abs(lenLook + delta);
-        if (newLenLook < 0.5) {
+        if (newLenLook < 0.05) { // 0.5 original
             return;
         }
         const dir = math.normalizeVec3(vec, tempVec3c);
