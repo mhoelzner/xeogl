@@ -18,6 +18,7 @@ class ClipControl extends Component {
         this._pos = xeogl.math.vec3();
         this._baseDir = xeogl.math.vec3();
         this._cameraControl = undefined;
+        this._scale = 1;
 
         // gruppe die alle elemente fuer den ClipController
         const gumballGroup = (this._gumballGroup = new xeogl.Group(this, {
@@ -25,7 +26,7 @@ class ClipControl extends Component {
             position: [0, 0, 0]
         }));
 
-        const radius = cfg.radius === undefined ? 100 : cfg.radius;
+        const radius = cfg.radius === undefined ? 5 : cfg.radius;
         const hoopRadius = radius * 0.6;
     
         // Option for xeogl.Group.addChild(), to prevent child xeogl.Objects from inheriting
@@ -475,6 +476,8 @@ class ClipControl extends Component {
         this.clip = cfg.clip;
         this.visible = cfg.visible;
         this.cameraControl = cfg.cameraControl;
+
+        this.scale = cfg.scale;
 
         const canvas = this._scene.canvas.canvas;
         const camera = this._scene.camera;
@@ -937,6 +940,25 @@ class ClipControl extends Component {
 
     get visible() {
         return this._visible;
+    }
+
+    /**
+     Sets the groups scale factor.
+
+     @property scale
+     @default 1
+     @type number
+     */
+    set scale(value) {
+        if (this._scale === value) {
+            return;
+        }
+        this._scale = value;
+        this._gumballGroup.scale = [this._scale, this._scale, this._scale];
+    }
+
+    get scale() {
+        return this._scale;
     }
 
     _setGumballPos(xyz) {
