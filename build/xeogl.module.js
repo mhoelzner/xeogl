@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  *
- * Built on 2019-09-17
+ * Built on 2019-09-24
  *
  * MIT License
  * Copyright 2019, Lindsay Kay
@@ -23133,7 +23133,12 @@ class Camera extends Component {
         const vec = math.subVec3(this._eye, this._look, tempVec3);
         const lenLook = Math.abs(math.lenVec3(vec, tempVec3b));
         const newLenLook = Math.abs(lenLook + delta);
-        if (newLenLook < 0.05) { // 0.5 original
+        // if zoom in then not close than 0.5
+        // if zoom out enable to zoom out when dist eye look < 0.05
+        if (delta < 0 && newLenLook < 0.5) {
+            return;
+        }
+        if (delta > 0 && newLenLook < 0.05) {
             return;
         }
         const dir = math.normalizeVec3(vec, tempVec3c);
