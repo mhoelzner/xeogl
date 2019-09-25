@@ -83,24 +83,24 @@ class SphereGeometry extends Geometry {
             radius *= -1;
         }
 
-        let heightSegments = cfg.heightSegments || 18;
+        let heightSegments = cfg.heightSegments || 8;
         if (heightSegments < 0) {
             this.warn("negative heightSegments not allowed - will invert");
             heightSegments *= -1;
         }
         heightSegments = Math.floor(lod * heightSegments);
-        if (heightSegments < 18) {
-            heightSegments = 18;
+        if (heightSegments < 8) {
+            heightSegments = 8;
         }
 
-        let widthSegments = cfg.widthSegments || 18;
+        let widthSegments = cfg.widthSegments || 8;
         if (widthSegments < 0) {
             this.warn("negative widthSegments not allowed - will invert");
             widthSegments *= -1;
         }
         widthSegments = Math.floor(lod * widthSegments);
-        if (widthSegments < 18) {
-            widthSegments = 18;
+        if (widthSegments < 8) {
+            widthSegments = 8;
         }
 
         const positions = [];

@@ -149,8 +149,7 @@ class Geometry extends Component {
             uvBuf: null,
             indicesBuf: null,
             indicesBufCombined: null, // Indices into a shared VertexBufs, set when combined == true
-            hash: "",
-            divideBy: 1
+            hash: ""
         });
 
         this._edgeThreshold = cfg.edgeThreshold || 2.0;
@@ -255,10 +254,6 @@ class Geometry extends Component {
         if (state.indices) {
             state.indicesBuf = new ArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, state.indices, state.indices.length, 1, gl.STATIC_DRAW);
             memoryStats.indices += state.indicesBuf.numItems;
-        }
-
-        if (cfg.divideBy) {
-            state.divideBy = cfg.divideBy;
         }
 
         this._buildHash();
@@ -698,17 +693,6 @@ class Geometry extends Component {
             this._obbDirty = false;
         }
         return this._obb;
-    }
-
-    /**
-     The Geometry's divideBy value.
-
-     @property divideBy
-     @default 1
-     @type Uint16Array
-     */
-    get divideBy() {
-        return this._state.divideBy;
     }
 
     get kdtree() {

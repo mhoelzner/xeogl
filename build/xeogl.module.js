@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  *
- * Built on 2019-09-24
+ * Built on 2019-09-25
  *
  * MIT License
  * Copyright 2019, Lindsay Kay
@@ -8276,8 +8276,7 @@ class Geometry extends Component {
             uvBuf: null,
             indicesBuf: null,
             indicesBufCombined: null, // Indices into a shared VertexBufs, set when combined == true
-            hash: "",
-            divideBy: 1
+            hash: ""
         });
 
         this._edgeThreshold = cfg.edgeThreshold || 2.0;
@@ -8382,10 +8381,6 @@ class Geometry extends Component {
         if (state.indices) {
             state.indicesBuf = new ArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, state.indices, state.indices.length, 1, gl.STATIC_DRAW);
             memoryStats$1.indices += state.indicesBuf.numItems;
-        }
-
-        if (cfg.divideBy) {
-            state.divideBy = cfg.divideBy;
         }
 
         this._buildHash();
@@ -8825,17 +8820,6 @@ class Geometry extends Component {
             this._obbDirty = false;
         }
         return this._obb;
-    }
-
-    /**
-     The Geometry's divideBy value.
-
-     @property divideBy
-     @default 1
-     @type Uint16Array
-     */
-    get divideBy() {
-        return this._state.divideBy;
     }
 
     get kdtree() {
@@ -32164,24 +32148,24 @@ class SphereGeometry extends Geometry {
             radius *= -1;
         }
 
-        let heightSegments = cfg.heightSegments || 18;
+        let heightSegments = cfg.heightSegments || 8;
         if (heightSegments < 0) {
             this.warn("negative heightSegments not allowed - will invert");
             heightSegments *= -1;
         }
         heightSegments = Math.floor(lod * heightSegments);
-        if (heightSegments < 18) {
-            heightSegments = 18;
+        if (heightSegments < 8) {
+            heightSegments = 8;
         }
 
-        let widthSegments = cfg.widthSegments || 18;
+        let widthSegments = cfg.widthSegments || 8;
         if (widthSegments < 0) {
             this.warn("negative widthSegments not allowed - will invert");
             widthSegments *= -1;
         }
         widthSegments = Math.floor(lod * widthSegments);
-        if (widthSegments < 18) {
-            widthSegments = 18;
+        if (widthSegments < 8) {
+            widthSegments = 8;
         }
 
         const positions = [];
