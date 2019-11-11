@@ -1,11 +1,11 @@
 /**
  * xeogl V0.9.0
- * 
+ *
  * WebGL-based 3D visualization library
  * http://xeogl.org/
- * 
+ *
  * Built on 2019-11-11
- * 
+ *
  * MIT License
  * Copyright 2019, Lindsay Kay
  * http://xeolabs.com/
@@ -32151,6 +32151,8 @@ class MeasureControl extends Component {
 
                     self._cameraControl.active = true;
 
+                    self.active = false;
+
                     this.fire('measurementDone', self._distance);
                 default:
                     break;
@@ -32278,14 +32280,6 @@ class MeasureControl extends Component {
     }
 
     destroy() {
-        for (var id in this._display) {
-            if (this._display.hasOwnProperty(id)) {
-                this._display[id].destroy();
-            }
-        }
-
-        this._measurementGroup.destroy();
-
         this.active = false;
 
         this.cameraControl.active = true;
