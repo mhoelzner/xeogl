@@ -990,12 +990,8 @@ class Scene extends Component {
     _addComponent(component) {
         if (component.id) { // Manual ID
             if (this.components[component.id]) {
-                // this.error("Component " + utils.inQuotes(component.id) + " already exists in Scene - ignoring ID, will randomly-generate instead");
-                // component.id = null;
-                const intitialComponentID = component.id;
-                while (this.components[component.id]) {
-                    component.id = intitialComponentID + '?|?' + math.createUUID();
-                }
+                //this.error("Component " + utils.inQuotes(component.id) + " already exists in Scene - ignoring ID, will randomly-generate instead");
+                component.id = null;
             }
         }
         if (!component.id) { // Auto ID

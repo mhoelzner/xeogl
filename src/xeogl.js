@@ -35,6 +35,7 @@ export { Spinner } from './canvas/spinner.js';
 export { Clip } from './clipping/clip.js';
 export { ClipControl } from './clipping/clipControl';
 export { CameraControl } from './controls/cameraControl.js';
+export { MeasureControl } from './controls/measureControl.js';
 export { Geometry } from './geometry/geometry.js';
 export { BoxGeometry } from './geometry/boxGeometry.js';
 export { TorusGeometry } from './geometry/torusGeometry.js';

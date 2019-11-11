@@ -1,11 +1,11 @@
 /**
  * xeogl V0.9.0
- *
+ * 
  * WebGL-based 3D visualization library
  * http://xeogl.org/
- *
- * Built on 2019-09-25
- *
+ * 
+ * Built on 2019-11-11
+ * 
  * MIT License
  * Copyright 2019, Lindsay Kay
  * http://xeolabs.com/
@@ -26377,12 +26377,8 @@ class Scene extends Component {
     _addComponent(component) {
         if (component.id) { // Manual ID
             if (this.components[component.id]) {
-                // this.error("Component " + utils.inQuotes(component.id) + " already exists in Scene - ignoring ID, will randomly-generate instead");
-                // component.id = null;
-                const intitialComponentID = component.id;
-                while (this.components[component.id]) {
-                    component.id = intitialComponentID + '?|?' + math.createUUID();
-                }
+                //this.error("Component " + utils.inQuotes(component.id) + " already exists in Scene - ignoring ID, will randomly-generate instead");
+                component.id = null;
             }
         }
         if (!component.id) { // Auto ID
@@ -31865,6 +31861,445 @@ class CameraControl extends Component {
 
 componentClasses[type$25] = CameraControl;
 
+const type$26 = 'xeogl.MeasureControl';
+
+class MeasureControl extends Component {
+    get type() {
+        return type$26;
+    }
+
+    init(cfg) {
+        super.init(cfg);
+
+        this._scene = cfg.scene;
+        this._color = cfg.color || [1, 0, 0];
+        this._cameraControl = undefined;
+        this._visible = true;
+        this._active = true;
+
+        this._distance = 0;
+
+        this._measurementPoints = [false, false, false];
+
+        const measurementGroup = (this._measurementGroup = new xeogl.Group(
+            this,
+            {
+                id: 'measurementGroup',
+                position: [0, 0, 0],
+                scale: [1, 1, 1],
+                aabbVisible: false
+            }
+        ));
+
+        var geometries = {
+            startPoint: new xeogl.Geometry(this, {
+                primitive: 'points',
+                positions: [0, 0, 0],
+                indices: [0]
+            }),
+
+            endPoint: new xeogl.Geometry(this, {
+                primitive: 'points',
+                positions: [0, 0, 0],
+                indices: [0]
+            }),
+
+            line: new xeogl.Geometry(this, {
+                primitive: 'lines',
+                positions: [0, 0, 0, 0, 0, 0],
+                indices: [0, 1]
+            })
+        };
+
+        var materials = {
+            lineMaterial: new xeogl.PhongMaterial(this, {
+                emissive: this._color,
+                ambient: [0.0, 0.0, 0.0],
+                specular: [0.6, 0.6, 0.3],
+                shininess: 80,
+                lineWidth: 4
+            }),
+
+            startPointMaterial: new xeogl.PhongMaterial(this, {
+                emissive: this._color,
+                ambient: [0.0, 0.0, 0.0],
+                specular: [0.6, 0.6, 0.3],
+                shininess: 80,
+                pointSize: 10
+            }),
+
+            endPointMaterial: new xeogl.PhongMaterial(this, {
+                emissive: this._color,
+                ambient: [0.0, 0.0, 0.0],
+                specular: [0.6, 0.6, 0.3],
+                shininess: 80,
+                pointSize: 10
+            })
+        };
+
+        this._display = {
+            startPoint: measurementGroup.addChild(
+                new xeogl.Mesh(this, {
+                    geometry: geometries.startPoint,
+                    material: materials.startPointMaterial,
+                    pickable: false,
+                    collidable: true,
+                    clippable: true
+                })
+            ),
+            endPoint: measurementGroup.addChild(
+                new xeogl.Mesh(this, {
+                    geometry: geometries.endPoint,
+                    material: materials.endPointMaterial,
+                    pickable: false,
+                    collidable: true,
+                    clippable: true
+                })
+            ),
+            measurementLine: measurementGroup.addChild(
+                new xeogl.Mesh(this, {
+                    geometry: geometries.line,
+                    material: materials.lineMaterial,
+                    pickable: false,
+                    collidable: true,
+                    clippable: true
+                })
+            )
+        };
+
+        const self = this;
+        const math = xeogl.math;
+        this.cameraControl = cfg.cameraControl;
+
+        const canvas = this._scene.canvas.canvas;
+        const scene = this._scene;
+
+        const MEASURE_ACTIONS = {
+            none: -1,
+            startPoint: 0,
+            line: 1,
+            endPoint: 2
+        };
+
+        var nextMeasureAction = MEASURE_ACTIONS.startPoint;
+        var measureAction = MEASURE_ACTIONS.none;
+
+        const pick = coords => {
+            var hit = scene.pick({
+                canvasPos: coords,
+                pickSurface: true // <<------ This causes picking to find the intersection point on the mesh
+            });
+
+            if (hit) {
+                if (hit.hasOwnProperty('worldPos')) {
+                    const newWorldPos = Array.from(hit.worldPos);
+
+                    switch (measureAction) {
+                        case MEASURE_ACTIONS.startPoint:
+                            self._measurementPoints[0] = newWorldPos;
+                            nextMeasureAction = MEASURE_ACTIONS.line;
+                            break;
+
+                        case MEASURE_ACTIONS.line:
+                            self._measurementPoints[1] = newWorldPos;
+                            nextMeasureAction = MEASURE_ACTIONS.endPoint;
+                            break;
+
+                        case MEASURE_ACTIONS.endPoint:
+                            self._measurementPoints[2] = newWorldPos;
+                            nextMeasureAction = MEASURE_ACTIONS.none;
+
+                        default:
+                            break;
+                    }
+
+                    return true;
+                }
+            } else {
+                switch (measureAction) {
+                    case MEASURE_ACTIONS.startPoint:
+                        nextMeasureAction = MEASURE_ACTIONS.startPoint;
+                        break;
+
+                    case MEASURE_ACTIONS.line:
+                        nextMeasureAction = MEASURE_ACTIONS.line;
+                        break;
+
+                    case MEASURE_ACTIONS.endPoint:
+                        nextMeasureAction = MEASURE_ACTIONS.endPoint;
+                        break;
+
+                    default:
+                        break;
+                }
+
+                return false;
+            }
+        };
+
+        const getClickCoordsWithinElement = event => {
+            var coords = new Float32Array(2);
+
+            if (!event) {
+                event = window.event;
+                coords[0] = event.x;
+                coords[1] = event.y;
+            } else {
+                var element = event.target;
+                var totalOffsetLeft = 0;
+                var totalOffsetTop = 0;
+
+                while (element.offsetParent) {
+                    totalOffsetLeft += element.offsetLeft;
+                    totalOffsetTop += element.offsetTop;
+                    element = element.offsetParent;
+                }
+                coords[0] = event.pageX - totalOffsetLeft;
+                coords[1] = event.pageY - totalOffsetTop;
+            }
+            return coords;
+        };
+
+        canvas.addEventListener('mousemove', function(e) {
+            if (!self._active) {
+                return;
+            }
+
+            if (measureAction !== MEASURE_ACTIONS.line) {
+                return;
+            }
+
+            var coords = getClickCoordsWithinElement(e);
+
+            pick(coords);
+
+            updateControls();
+        });
+
+        canvas.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            if (!self._active) {
+                return;
+            }
+            switch (e.which) {
+                case 1: // Left button
+                    measureAction = nextMeasureAction;
+                    var coords = getClickCoordsWithinElement(e);
+                    const success = pick(coords);
+                    if (success) {
+                        updateControls();
+
+                        measureAction = nextMeasureAction;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        });
+
+        canvas.addEventListener('mouseup', function(e) {
+            if (!self._active) {
+                return;
+            }
+            // reset parent cameraControl to true
+            self._cameraControl.active = true;
+        });
+
+        const updateControls = () => {
+            if (measureAction === MEASURE_ACTIONS.none) {
+                return;
+            }
+
+            self._cameraControl.active = false;
+
+            switch (measureAction) {
+                case MEASURE_ACTIONS.startPoint:
+                    self._display.startPoint.geometry.positions =
+                        self._measurementPoints[0];
+                    break;
+
+                case MEASURE_ACTIONS.line:
+                    self._display.measurementLine.geometry.positions = [
+                        self._measurementPoints[0][0],
+                        self._measurementPoints[0][1],
+                        self._measurementPoints[0][2],
+                        self._measurementPoints[1][0],
+                        self._measurementPoints[1][1],
+                        self._measurementPoints[1][2]
+                    ];
+
+                    self._distance = calcDist(
+                        self._measurementPoints[0],
+                        self._measurementPoints[1]
+                    );
+
+                    this.fire('distanceChanged', self._distance);
+
+                    break;
+
+                case MEASURE_ACTIONS.endPoint:
+                    self._display.endPoint.geometry.positions =
+                        self._measurementPoints[2];
+
+                    self._distance = calcDist(
+                        self._measurementPoints[0],
+                        self._measurementPoints[2]
+                    );
+
+                    displayVectorGeometry();
+
+                    self._cameraControl.active = true;
+
+                    this.fire('measurementDone', self._distance);
+                default:
+                    break;
+            }
+        };
+
+        const calcDist = (p1, p2) => {
+            const tempVec3a = math.vec3([0, 0, 0]);
+            return Math.abs(math.lenVec3(math.subVec3(p1, p2, tempVec3a)));
+        };
+
+        const calcCenterOfLine = (v1, v2, middle = 0.5) => {
+            const tempVec3a = math.vec3([0, 0, 0]);
+            const tempVec3b = math.vec3([0, 0, 0]);
+            const tempVec3c = math.vec3([0, 0, 0]);
+            const tempVec3d = math.vec3([0, 0, 0]);
+
+            const dist = calcDist(v1, v2);
+
+            const subVec = math.subVec3(v2, v1, tempVec3a);
+            const norm = math.normalizeVec3(subVec, tempVec3b);
+            return math.addVec3(
+                math.mulVec3Scalar(norm, dist * middle, tempVec3c),
+                v1,
+                tempVec3d
+            );
+        };
+
+        const displayVectorGeometry = () => {
+            const distPretty = parseFloat(
+                Math.round(this._distance * 100) / 100
+            ).toFixed(2);
+            this._display.measurementText = measurementGroup.addChild(
+                new xeogl.Mesh(this, {
+                    geometry: new xeogl.VectorTextGeometry(this, {
+                        text: '~' + distPretty + 'm',
+                        size: 1.5
+                    }),
+                    material: materials.lineMaterial,
+                    pickable: false,
+                    collidable: false,
+                    visible: true,
+                    position: calcCenterOfLine(
+                        self._measurementPoints[0],
+                        self._measurementPoints[1],
+                        0.45
+                    ),
+                    billboard: 'spherical'
+                })
+            );
+        };
+    }
+
+    set cameraControl(value) {
+        this._cameraControl = value;
+    }
+
+    get cameraControl() {
+        return this._cameraControl;
+    }
+
+    /**
+     Indicates whether this PlaneHelper is visible or not.
+
+     @property active
+     @default true
+     @type Boolean
+     */
+    set active(value) {
+        value = !!value;
+        if (this._active === value) {
+            return;
+        }
+        this._active = value;
+    }
+
+    get active() {
+        return this._active;
+    }
+
+    /**
+     Indicates whether this PlaneHelper is visible or not.
+
+     @property visible
+     @default true
+     @type Boolean
+     */
+    set visible(value) {
+        value = !!value;
+        if (this._visible === value) {
+            return;
+        }
+        this._visible = value;
+        for (var id in this._display) {
+            if (this._display.hasOwnProperty(id)) {
+                this._display[id].visible = value;
+            }
+        }
+    }
+
+    get visible() {
+        return this._visible;
+    }
+
+    /**
+     Distance between two set points
+
+     @property distance
+     @default 0.0
+     @type Float
+     */
+    get distance() {
+        return this._distance;
+    }
+
+    /**
+     Distance between two set points
+
+     @property aabb
+     @final
+     @type {Float32Array}
+    */
+    get aabb() {
+        return this._measurementGroup.aabb;
+    }
+
+    destroy() {
+        for (var id in this._display) {
+            if (this._display.hasOwnProperty(id)) {
+                this._display[id].destroy();
+            }
+        }
+
+        this._measurementGroup.destroy();
+
+        this.active = false;
+
+        this.cameraControl.active = true;
+
+        super.destroy();
+
+        if (this._onSceneAABB) {
+            this.scene.off(this._onSceneAABB);
+        }
+    }
+}
+
+componentClasses[type$26] = MeasureControl;
+
 /**
  A **TorusGeometry** is a parameterized {{#crossLink "Geometry"}}{{/crossLink}} that defines a torus-shaped mesh for attached {{#crossLink "Mesh"}}Meshes{{/crossLink}}.
 
@@ -31927,7 +32362,7 @@ componentClasses[type$25] = CameraControl;
  @param [cfg.arc=Math.PI / 2.0] {Number} The length of the TorusGeometry's arc in radians, where Math.PI*2 is a closed torus.
  @extends Geometry
  */
-const type$26 = "xeogl.TorusGeometry";
+const type$27 = "xeogl.TorusGeometry";
 
 class TorusGeometry extends Geometry {
 
@@ -31941,7 +32376,7 @@ class TorusGeometry extends Geometry {
      @final
      */
     get type() {
-        return type$26;
+        return type$27;
     }
 
     init(cfg) {
@@ -32066,7 +32501,7 @@ class TorusGeometry extends Geometry {
     }
 }
 
-componentClasses[type$26] = TorusGeometry;
+componentClasses[type$27] = TorusGeometry;
 
 /**
  A **SphereGeometry** is a parameterized {{#crossLink "Geometry"}}{{/crossLink}} that defines a sphere-shaped mesh for attached {{#crossLink "Mesh"}}Meshes{{/crossLink}}.
@@ -32117,7 +32552,7 @@ componentClasses[type$26] = TorusGeometry;
  @param [cfg.lod=1] {Number} Level-of-detail, in range [0..1].
  @extends Geometry
  */
-const type$27 = "xeogl.SphereGeometry";
+const type$28 = "xeogl.SphereGeometry";
 
 class SphereGeometry extends Geometry {
 
@@ -32131,7 +32566,7 @@ class SphereGeometry extends Geometry {
      @final
      */
     get type() {
-        return type$27;
+        return type$28;
     }
 
     init(cfg) {
@@ -32249,7 +32684,7 @@ class SphereGeometry extends Geometry {
     }
 }
 
-componentClasses[type$27] = SphereGeometry;
+componentClasses[type$28] = SphereGeometry;
 
 /**
  An **OBBGeometry** is a {{#crossLink "Geometry"}}{{/crossLink}} that shows the extents of an oriented bounding box (OBB).
@@ -32325,7 +32760,7 @@ componentClasses[type$27] = SphereGeometry;
  containing homogeneous coordinates for the eight corner vertices, ie. each having elements (x,y,z,w).
  @extends Component
  */
-const type$28 = "xeogl.OBBGeometry";
+const type$29 = "xeogl.OBBGeometry";
 
 class OBBGeometry extends Geometry {
 
@@ -32339,7 +32774,7 @@ class OBBGeometry extends Geometry {
      @final
      */
     get type() {
-        return type$28;
+        return type$29;
     }
 
     init(cfg) {
@@ -32429,7 +32864,7 @@ class OBBGeometry extends Geometry {
     }
 }
 
-componentClasses[type$28] = OBBGeometry;
+componentClasses[type$29] = OBBGeometry;
 
 /**
  A **CylinderGeometry** is a parameterized {{#crossLink "Geometry"}}{{/crossLink}} that defines a cylinder-shaped mesh for attached {{#crossLink "Mesh"}}Meshes{{/crossLink}}.
@@ -32486,7 +32921,7 @@ componentClasses[type$28] = OBBGeometry;
  @param [cfg.lod=1] {Number} Level-of-detail, in range [0..1].
  @extends Geometry
  */
-const type$29 = "xeogl.CylinderGeometry";
+const type$30 = "xeogl.CylinderGeometry";
 
 class CylinderGeometry extends Geometry {
 
@@ -32500,7 +32935,7 @@ class CylinderGeometry extends Geometry {
      @final
      */
     get type() {
-        return type$29;
+        return type$30;
     }
 
     init(cfg) {
@@ -32720,7 +33155,7 @@ class CylinderGeometry extends Geometry {
     }
 }
 
-componentClasses[type$29] = CylinderGeometry;
+componentClasses[type$30] = CylinderGeometry;
 
 /**
  A **PlaneGeometry** is a parameterized {{#crossLink "Geometry"}}{{/crossLink}} that defines a plane-shaped mesh for attached {{#crossLink "Mesh"}}Meshes{{/crossLink}}.
@@ -32781,7 +33216,7 @@ componentClasses[type$29] = CylinderGeometry;
  @param [cfg.zSegments=1] {Number} Number of segments on the Z-axis.
  @extends Geometry
  */
-const type$30 = "xeogl.PlaneGeometry";
+const type$31 = "xeogl.PlaneGeometry";
 
 class PlaneGeometry extends Geometry {
 
@@ -32795,7 +33230,7 @@ class PlaneGeometry extends Geometry {
      @final
      */
     get type() {
-        return type$30;
+        return type$31;
     }
 
     init(cfg) {
@@ -32918,7 +33353,7 @@ class PlaneGeometry extends Geometry {
     }
 }
 
-componentClasses[type$30] = PlaneGeometry;
+componentClasses[type$31] = PlaneGeometry;
 
 /**
  An **AmbientLight** defines an ambient light source of fixed intensity and color that affects all {{#crossLink "Mesh"}}Meshes{{/crossLink}}
@@ -32980,7 +33415,7 @@ componentClasses[type$30] = PlaneGeometry;
  @param [cfg.intensity=[1.0]] {Number} The intensity of this AmbientLight, as a factor in range ````[0..1]````.
  @extends Component
  */
-const type$31 = "xeogl.AmbientLight";
+const type$32 = "xeogl.AmbientLight";
 
 class AmbientLight extends Component {
 
@@ -32994,7 +33429,7 @@ class AmbientLight extends Component {
      @final
      */
     get type() {
-        return type$31;
+        return type$32;
     }
 
     init(cfg) {
@@ -33046,7 +33481,7 @@ class AmbientLight extends Component {
     }
 }
 
-componentClasses[type$31] = AmbientLight;
+componentClasses[type$32] = AmbientLight;
 
 /**
  A **PointLight** defines a positional light source that originates from a single point and spreads outward in all directions,
@@ -33133,7 +33568,7 @@ componentClasses[type$31] = AmbientLight;
  @param [cfg.space="view"] {String} The coordinate system this PointLight is defined in - "view" or "world".
  @param [cfg.shadow=false] {Boolean} Flag which indicates if this PointLight casts a shadow.
  */
-const type$32 = "xeogl.PointLight";
+const type$33 = "xeogl.PointLight";
 
 class PointLight extends Component {
 
@@ -33147,7 +33582,7 @@ class PointLight extends Component {
      @final
      */
     get type() {
-        return type$32;
+        return type$33;
     }
 
     init(cfg) {
@@ -33349,7 +33784,7 @@ class PointLight extends Component {
     }
 }
 
-componentClasses[type$32] = PointLight;
+componentClasses[type$33] = PointLight;
 
 /**
  A **SpotLight** defines a positional light source that originates from a single point and eminates in a given direction,
@@ -33435,7 +33870,7 @@ componentClasses[type$32] = PointLight;
  @param [cfg.shadow=false] {Boolean} Flag which indicates if this SpotLight casts a shadow.
  */
 
-const type$33 = "xeogl.SpotLight";
+const type$34 = "xeogl.SpotLight";
 
 class SpotLight extends Component {
 
@@ -33449,7 +33884,7 @@ class SpotLight extends Component {
      @final
      */
     get type() {
-        return type$33;
+        return type$34;
     }
 
     init(cfg) {
@@ -33674,7 +34109,7 @@ class SpotLight extends Component {
     }
 }
 
-componentClasses[type$33] = SpotLight;
+componentClasses[type$34] = SpotLight;
 
 /**
  * @author xeolabs / https://github.com/xeolabs
@@ -33922,7 +34357,7 @@ class Texture2D {
  @param [cfg.encoding="linear"] {String} Encoding format.  See the {{#crossLink "CubeTexture/encoding:property"}}{{/crossLink}} property for more info.
  @extends Component
  */
-const type$34 = "xeogl.CubeTexture";
+const type$35 = "xeogl.CubeTexture";
 
 function ensureImageSizePowerOfTwo$1(image) {
     if (!isPowerOfTwo$1(image.width) || !isPowerOfTwo$1(image.height)) {
@@ -33962,7 +34397,7 @@ class CubeTexture extends Component{
      @final
      */
     get type() {
-        return type$34;
+        return type$35;
     }
 
     init(cfg) {
@@ -34069,7 +34504,7 @@ class CubeTexture extends Component{
     }
 }
 
-componentClasses[type$34] = CubeTexture;
+componentClasses[type$35] = CubeTexture;
 
 /**
  A **LightMap** specifies a cube texture light map.
@@ -34103,7 +34538,7 @@ componentClasses[type$34] = CubeTexture;
  @extends Component
  */
 
-const type$35 = "xeogl.LightMap";
+const type$36 = "xeogl.LightMap";
 
 class LightMap extends CubeTexture{
 
@@ -34117,7 +34552,7 @@ class LightMap extends CubeTexture{
      @final
      */
     get type() {
-        return type$35;
+        return type$36;
     }
 
     init(cfg) {
@@ -34131,7 +34566,7 @@ class LightMap extends CubeTexture{
     }
 }
 
-componentClasses[type$35] = LightMap;
+componentClasses[type$36] = LightMap;
 
 /**
  A **ReflectionMap** specifies a cube texture reflection map.
@@ -34164,7 +34599,7 @@ componentClasses[type$35] = LightMap;
  @param [cfg.encoding="linear"] {String} Encoding format.  See the {{#crossLink "ReflectionMap/encoding:property"}}{{/crossLink}} property for more info.
  @extends Component
  */
-const type$36 = "xeogl.ReflectionMap";
+const type$37 = "xeogl.ReflectionMap";
 
 class ReflectionMap extends CubeTexture {
 
@@ -34178,7 +34613,7 @@ class ReflectionMap extends CubeTexture {
      @final
      */
     get type() {
-        return type$36;
+        return type$37;
     }
 
     init(cfg) {
@@ -34193,7 +34628,7 @@ class ReflectionMap extends CubeTexture {
     }
 }
 
-componentClasses[type$36] = ReflectionMap;
+componentClasses[type$37] = ReflectionMap;
 
 /**
  A **Shadow** defines a shadow cast by a {{#crossLink "DirLight"}}{{/crossLink}} or a {{#crossLink "SpotLight"}}{{/crossLink}}.
@@ -34257,7 +34692,7 @@ componentClasses[type$36] = ReflectionMap;
  @param [cfg.resolution=[1000,1000]] {Uint16Array} Resolution of the texture map for this Shadow.
  @param [cfg.intensity=1.0] {Number} Intensity of this Shadow.
  */
-const type$37 = "xeogl.Shadow";
+const type$38 = "xeogl.Shadow";
 
 class Shadow extends Component {
 
@@ -34271,7 +34706,7 @@ class Shadow extends Component {
      @final
      */
     get type() {
-        return type$37;
+        return type$38;
     }
 
     init(cfg) {
@@ -34348,7 +34783,7 @@ class Shadow extends Component {
     }
 }
 
-componentClasses[type$37] = Shadow;
+componentClasses[type$38] = Shadow;
 
 /**
  A **Group** is an {{#crossLink "Object"}}{{/crossLink}} that groups other Objects.
@@ -34394,7 +34829,7 @@ componentClasses[type$37] = Shadow;
  {{#crossLink "Object/selected:property"}}{{/crossLink}}, {{#crossLink "Object/colorize:property"}}{{/crossLink}} and {{#crossLink "Object/opacity:property"}}{{/crossLink}}.
  @extends Object
  */
-const type$38 = "xeogl.Group";
+const type$39 = "xeogl.Group";
 
  class Group extends xeoglObject{
 
@@ -34408,7 +34843,7 @@ const type$38 = "xeogl.Group";
      @final
      */
     get type() {
-        return type$38;
+        return type$39;
     }
 
     init(cfg) {
@@ -34416,7 +34851,7 @@ const type$38 = "xeogl.Group";
     }
 }
 
-componentClasses[type$38] = Group;
+componentClasses[type$39] = Group;
 
 /**
  A **Model** is a {{#crossLink "Group"}}{{/crossLink}} of {{#crossLink "Component"}}Components{{/crossLink}}.
@@ -34463,7 +34898,7 @@ componentClasses[type$38] = Group;
 
  @extends Group
  */
-const type$39 = "xeogl.Model";
+const type$40 = "xeogl.Model";
 
 class Model extends Group {
 
@@ -34477,7 +34912,7 @@ class Model extends Group {
      @final
      */
     get type() {
-        return type$39;
+        return type$40;
     }
 
     init(cfg) {
@@ -34745,7 +35180,7 @@ class Model extends Group {
     }
 }
 
-componentClasses[type$39] = Model;
+componentClasses[type$40] = Model;
 
 /**
  A **LambertMaterial** is a {{#crossLink "Material"}}{{/crossLink}} that defines the surface appearance of
@@ -34813,7 +35248,7 @@ componentClasses[type$39] = Model;
  @param [cfg.frontface="ccw"] {Boolean} The winding order for {{#crossLink "Geometry"}}Geometry{{/crossLink}} front faces - "cw" for clockwise, or "ccw" for counter-clockwise.
  */
 
-const type$40 = "xeogl.LambertMaterial";
+const type$41 = "xeogl.LambertMaterial";
 
 class LambertMaterial extends Material {
 
@@ -34827,7 +35262,7 @@ class LambertMaterial extends Material {
      @final
      */
     get type() {
-        return type$40;
+        return type$41;
     }
 
     init(cfg) {
@@ -35063,7 +35498,7 @@ class LambertMaterial extends Material {
     }
 }
 
-componentClasses[type$40] = LambertMaterial;
+componentClasses[type$41] = LambertMaterial;
 
 /**
  A **SpecularMaterial** is a physically-based {{#crossLink "Material"}}{{/crossLink}} that defines the surface appearance of
@@ -35356,7 +35791,7 @@ componentClasses[type$40] = LambertMaterial;
  @param [cfg.pointSize=1] {Number} Scalar that controls the size of points for {{#crossLink "Geometry"}}{{/crossLink}} with {{#crossLink "Geometry/primitive:property"}}{{/crossLink}} set to "points".
 
  */
-const type$41 = "xeogl.SpecularMaterial";
+const type$42 = "xeogl.SpecularMaterial";
 const alphaModes$1 = {"opaque": 0, "mask": 1, "blend": 2};
 const alphaModeNames$1 = ["opaque", "mask", "blend"];
 
@@ -35372,7 +35807,7 @@ class SpecularMaterial extends Material {
      @final
      */
     get type() {
-        return type$41;
+        return type$42;
     }
 
     init(cfg) {
@@ -35923,7 +36358,7 @@ class SpecularMaterial extends Material {
     }
 }
 
-componentClasses[type$41] = SpecularMaterial;
+componentClasses[type$42] = SpecularMaterial;
 
 /**
  A **MetallicMaterial** is a physically-based {{#crossLink "Material"}}{{/crossLink}} that defines the surface appearance of
@@ -36226,7 +36661,7 @@ componentClasses[type$41] = SpecularMaterial;
 
 const modes = {"opaque": 0, "mask": 1, "blend": 2};
 const modeNames = ["opaque", "mask", "blend"];
-const type$42 = "xeogl.MetallicMaterial";
+const type$43 = "xeogl.MetallicMaterial";
 
  class MetallicMaterial extends Material {
 
@@ -36240,7 +36675,7 @@ const type$42 = "xeogl.MetallicMaterial";
      @final
      */
     get type() {
-        return type$42;
+        return type$43;
     }
 
     init(cfg) {
@@ -36790,7 +37225,7 @@ const type$42 = "xeogl.MetallicMaterial";
     }
 }
 
-componentClasses[type$42] = MetallicMaterial;
+componentClasses[type$43] = MetallicMaterial;
 
 /**
  A **Texture** specifies a texture map.
@@ -36865,7 +37300,7 @@ componentClasses[type$42] = MetallicMaterial;
  @param [cfg.encoding="linear"] {String} Encoding format.  See the {{#crossLink "Texture/encoding:property"}}{{/crossLink}} property for more info.
  @extends Component
  */
-const type$43 = "xeogl.Texture";
+const type$44 = "xeogl.Texture";
 
 function ensureImageSizePowerOfTwo$2(image) {
     if (!isPowerOfTwo$2(image.width) || !isPowerOfTwo$2(image.height)) {
@@ -36905,7 +37340,7 @@ class Texture extends Component {
      @final
      */
     get type() {
-        return type$43;
+        return type$44;
     }
 
     init(cfg) {
@@ -37299,7 +37734,7 @@ class Texture extends Component {
     }
 }
 
-componentClasses[type$43] = Texture;
+componentClasses[type$44] = Texture;
 
 /**
  A **Fresnel** specifies a Fresnel effect for attached {{#crossLink "PhongMaterial"}}PhongMaterials{{/crossLink}}.
@@ -37359,7 +37794,7 @@ componentClasses[type$43] = Texture;
  @extends Component
  */
 
-const type$44 = "xeogl.Fresnel";
+const type$45 = "xeogl.Fresnel";
 
 class Fresnel extends Component {
 
@@ -37373,7 +37808,7 @@ class Fresnel extends Component {
      @final
      */
     get type() {
-        return type$44;
+        return type$45;
     }
 
     init(cfg) {
@@ -37481,7 +37916,7 @@ class Fresnel extends Component {
     }
 }
 
-componentClasses[type$44] = Fresnel;
+componentClasses[type$45] = Fresnel;
 
 /**
  The xeogl namespace.
@@ -37500,4 +37935,4 @@ const _isString = utils.isString; // Backward compat
 const _apply = utils.apply; // Backward compat
 const _isNumeric = utils.isNumeric;
 
-export { scenes, getDefaultScene, setDefaultScene, scheduleTask, clear, _isString, _apply, _isNumeric, WEBGL_INFO, stats, math, Component, CameraFlightAnimation, Canvas, Spinner, Clip, ClipControl, CameraControl, Geometry, BoxGeometry, TorusGeometry, SphereGeometry, OBBGeometry, AABBGeometry, CylinderGeometry, PlaneGeometry, Input, AmbientLight, DirLight, PointLight, SpotLight, CubeTexture, LightMap, ReflectionMap, Shadow, Model, Mesh, Group, xeoglObject as Object, Material, PhongMaterial, LambertMaterial, SpecularMaterial, MetallicMaterial, EmphasisMaterial, EdgeMaterial, OutlineMaterial, Texture, Fresnel, Viewport, Camera, Frustum, Ortho, Perspective, CustomProjection, Scene };
+export { scenes, getDefaultScene, setDefaultScene, scheduleTask, clear, _isString, _apply, _isNumeric, WEBGL_INFO, stats, math, Component, CameraFlightAnimation, Canvas, Spinner, Clip, ClipControl, CameraControl, MeasureControl, Geometry, BoxGeometry, TorusGeometry, SphereGeometry, OBBGeometry, AABBGeometry, CylinderGeometry, PlaneGeometry, Input, AmbientLight, DirLight, PointLight, SpotLight, CubeTexture, LightMap, ReflectionMap, Shadow, Model, Mesh, Group, xeoglObject as Object, Material, PhongMaterial, LambertMaterial, SpecularMaterial, MetallicMaterial, EmphasisMaterial, EdgeMaterial, OutlineMaterial, Texture, Fresnel, Viewport, Camera, Frustum, Ortho, Perspective, CustomProjection, Scene };
