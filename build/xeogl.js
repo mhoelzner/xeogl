@@ -1,11 +1,11 @@
 /**
  * xeogl V0.9.0
- *
+ * 
  * WebGL-based 3D visualization library
  * http://xeogl.org/
- *
- * Built on 2019-11-11
- *
+ * 
+ * Built on 2019-11-12
+ * 
  * MIT License
  * Copyright 2019, Lindsay Kay
  * http://xeolabs.com/
@@ -32159,7 +32159,14 @@ class MeasureControl extends Component {
 
                     self.active = false;
 
-                    this.fire('measurementDone', self._distance);
+                    const distances = {
+                        dLength: self._distance,
+                        xLength: Math.abs(self._measurementPoints[0][0] - self._measurementPoints[2][0]),
+                        yLength: Math.abs(self._measurementPoints[0][1] - self._measurementPoints[2][1]),
+                        zLength: Math.abs(self._measurementPoints[0][2] - self._measurementPoints[2][2])
+                    };
+
+                    this.fire('measurementDone', distances);
                 default:
                     break;
             }

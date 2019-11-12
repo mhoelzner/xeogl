@@ -293,7 +293,14 @@ class MeasureControl extends Component {
 
                     self.active = false;
 
-                    this.fire('measurementDone', self._distance);
+                    const distances = {
+                        dLength: self._distance,
+                        xLength: Math.abs(self._measurementPoints[0][0] - self._measurementPoints[2][0]),
+                        yLength: Math.abs(self._measurementPoints[0][1] - self._measurementPoints[2][1]),
+                        zLength: Math.abs(self._measurementPoints[0][2] - self._measurementPoints[2][2])
+                    }
+
+                    this.fire('measurementDone', distances);
                 default:
                     break;
             }
