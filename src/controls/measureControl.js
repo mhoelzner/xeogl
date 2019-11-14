@@ -1,5 +1,9 @@
-import { Component } from "../component.js";
-import { componentClasses } from "./../componentClasses.js";
+import {
+  Component
+} from "../component.js";
+import {
+  componentClasses
+} from "./../componentClasses.js";
 
 const type = "xeogl.MeasureControl";
 
@@ -16,10 +20,20 @@ class MeasureControl extends Component {
     this._cameraControl = undefined;
     this._visible = true;
     this._active = true;
+    this._scale = [1, 1, 1];
 
     this._distance = 0;
 
-    this._measurementPoints = [false, false, false];
+    this._measurementPoints = [{
+      coords: [],
+      mesh: undefined
+    }, {
+      coords: [],
+      mesh: undefined
+    }, {
+      coords: [],
+      mesh: undefined
+    }];
 
     const measurementGroup = (this._measurementGroup = new xeogl.Group(this, {
       id: "measurementGroup",
@@ -111,6 +125,8 @@ class MeasureControl extends Component {
     const math = xeogl.math;
     this.cameraControl = cfg.cameraControl;
 
+    this.scale = cfg.scale;
+
     const canvas = this._scene.canvas.canvas;
     const scene = this._scene;
 
@@ -133,20 +149,24 @@ class MeasureControl extends Component {
       if (hit) {
         if (hit.hasOwnProperty("worldPos")) {
           const newWorldPos = Array.from(hit.worldPos);
+          newWorldPos[2] = newWorldPos[2] / this._scale[2];
 
           switch (measureAction) {
             case MEASURE_ACTIONS.startPoint:
-              self._measurementPoints[0] = newWorldPos;
+              self._measurementPoints[0].coords = newWorldPos;
+              self._measurementPoints[0].mesh = hit.mesh;
               nextMeasureAction = MEASURE_ACTIONS.line;
               break;
 
             case MEASURE_ACTIONS.line:
-              self._measurementPoints[1] = newWorldPos;
+              self._measurementPoints[1].coords = newWorldPos;
+              self._measurementPoints[1].mesh = hit.mesh;
               nextMeasureAction = MEASURE_ACTIONS.endPoint;
               break;
 
             case MEASURE_ACTIONS.endPoint:
-              self._measurementPoints[2] = newWorldPos;
+              self._measurementPoints[2].coords = newWorldPos;
+              self._measurementPoints[2].mesh = hit.mesh;
               nextMeasureAction = MEASURE_ACTIONS.none;
 
             default:
@@ -200,7 +220,7 @@ class MeasureControl extends Component {
       return coords;
     };
 
-    canvas.addEventListener("mousemove", function(e) {
+    canvas.addEventListener("mousemove", function (e) {
       if (!self._active) {
         return;
       }
@@ -216,7 +236,7 @@ class MeasureControl extends Component {
       updateControls();
     });
 
-    canvas.addEventListener("mousedown", function(e) {
+    canvas.addEventListener("mousedown", function (e) {
       e.preventDefault();
       if (!self._active) {
         return;
@@ -238,7 +258,7 @@ class MeasureControl extends Component {
       }
     });
 
-    canvas.addEventListener("mouseup", function(e) {
+    canvas.addEventListener("mouseup", function (e) {
       if (!self._active) {
         return;
       }
@@ -257,23 +277,23 @@ class MeasureControl extends Component {
         case MEASURE_ACTIONS.startPoint:
           self._display.startPoint.visible = true;
           self._display.startPoint.geometry.positions =
-            self._measurementPoints[0];
+            self._measurementPoints[0].coords;
           break;
 
         case MEASURE_ACTIONS.line:
           self._display.measurementLine.visible = true;
           self._display.measurementLine.geometry.positions = [
-            self._measurementPoints[0][0],
-            self._measurementPoints[0][1],
-            self._measurementPoints[0][2],
-            self._measurementPoints[1][0],
-            self._measurementPoints[1][1],
-            self._measurementPoints[1][2]
+            self._measurementPoints[0].coords[0],
+            self._measurementPoints[0].coords[1],
+            self._measurementPoints[0].coords[2],
+            self._measurementPoints[1].coords[0],
+            self._measurementPoints[1].coords[1],
+            self._measurementPoints[1].coords[2]
           ];
 
           self._distance = calcDist(
-            self._measurementPoints[0],
-            self._measurementPoints[1]
+            self._measurementPoints[0].coords,
+            self._measurementPoints[1].coords
           );
 
           this.fire("distanceChanged", self._distance);
@@ -283,11 +303,11 @@ class MeasureControl extends Component {
         case MEASURE_ACTIONS.endPoint:
           self._display.endPoint.visible = true;
           self._display.endPoint.geometry.positions =
-            self._measurementPoints[2];
+            self._measurementPoints[2].coords;
 
           self._distance = calcDist(
-            self._measurementPoints[0],
-            self._measurementPoints[2]
+            self._measurementPoints[0].coords,
+            self._measurementPoints[2].coords
           );
 
           displayVectorGeometry();
@@ -296,20 +316,12 @@ class MeasureControl extends Component {
 
           self.active = false;
 
-          const distances = {
-            dLength: self._distance,
-            xLength: Math.abs(
-              self._measurementPoints[0][0] - self._measurementPoints[2][0]
-            ),
-            yLength: Math.abs(
-              self._measurementPoints[0][1] - self._measurementPoints[2][1]
-            ),
-            zLength: Math.abs(
-              self._measurementPoints[0][2] - self._measurementPoints[2][2]
-            )
-          };
+          const result = {
+            startPoint: self._measurementPoints[0],
+            endPoint: self._measurementPoints[2]
+          }
 
-          this.fire("measurementDone", distances);
+          this.fire("measurementDone", result);
           break;
 
         default:
@@ -354,8 +366,8 @@ class MeasureControl extends Component {
           collidable: false,
           visible: true,
           position: calcCenterOfLine(
-            self._measurementPoints[0],
-            self._measurementPoints[1],
+            self._measurementPoints[0].coords,
+            self._measurementPoints[2].coords,
             0.45
           ),
           billboard: "spherical"
@@ -427,6 +439,23 @@ class MeasureControl extends Component {
   }
 
   /**
+    Sets the groups scale factor.
+
+    @property scale
+    @default [1,1,1]
+    @type {Float32Array}
+    */
+  set scale(value) {
+    this._scale = (value || [1, 1, 1]);
+
+    this._measurementGroup.scale = this._scale;
+  }
+
+  get scale() {
+    return this._scale;
+  }
+
+  /**
      Distance between two set points
 
      @property aabb
@@ -452,4 +481,6 @@ class MeasureControl extends Component {
 
 componentClasses[type] = MeasureControl;
 
-export { MeasureControl };
+export {
+  MeasureControl
+};
