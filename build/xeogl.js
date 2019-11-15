@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  * 
- * Built on 2019-11-14
+ * Built on 2019-11-15
  * 
  * MIT License
  * Copyright 2019, Lindsay Kay
@@ -32217,11 +32217,12 @@ class MeasureControl extends Component {
       const distPretty = parseFloat(
         Math.round(this._distance * 100) / 100
       ).toFixed(2);
+      const textSize = this._distance / 30;
       this._display.measurementText = measurementGroup.addChild(
         new xeogl.Mesh(this, {
           geometry: new xeogl.VectorTextGeometry(this, {
             text: "~" + distPretty + "m",
-            size: 1.5
+            size: textSize >= 0.25 ? textSize : 0.25
           }),
           material: materials.lineMaterial,
           pickable: false,
