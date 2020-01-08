@@ -73,10 +73,18 @@
  @extends Component
  */
 
-import {utils} from '../utils.js';
-import {tasks} from '../tasks.js';
-import {Geometry} from './geometry.js';
-import {componentClasses} from "./../componentClasses.js";
+import {
+    utils
+} from '../utils.js';
+import {
+    tasks
+} from '../tasks.js';
+import {
+    Geometry
+} from './geometry.js';
+import {
+    componentClasses
+} from "./../componentClasses.js";
 
 const type = "xeogl.AABBGeometry";
 
@@ -150,7 +158,9 @@ class AABBGeometry extends Geometry {
                     }
                     geometryDirty = true;
                     tasks.scheduleTask(function () {
-                        self._setPositionsFromAABB(self._attached.target.aabb);
+                        if (self._attached.target !== undefined) {
+                            self._setPositionsFromAABB(self._attached.target.aabb);
+                        }
                         geometryDirty = false;
                     });
                 }
@@ -201,4 +211,6 @@ class AABBGeometry extends Geometry {
 
 componentClasses[type] = AABBGeometry;
 
-export{AABBGeometry};
+export {
+    AABBGeometry
+};

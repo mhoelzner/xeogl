@@ -4,10 +4,10 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  * 
- * Built on 2019-11-15
+ * Built on 2020-01-08
  * 
  * MIT License
- * Copyright 2019, Lindsay Kay
+ * Copyright 2020, Lindsay Kay
  * http://xeolabs.com/
  */
 
@@ -9364,7 +9364,9 @@ class AABBGeometry extends Geometry {
                     }
                     geometryDirty = true;
                     tasks.scheduleTask(function () {
-                        self._setPositionsFromAABB(self._attached.target.aabb);
+                        if (self._attached.target !== undefined) {
+                            self._setPositionsFromAABB(self._attached.target.aabb);
+                        }
                         geometryDirty = false;
                     });
                 }
