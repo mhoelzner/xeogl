@@ -1,11 +1,11 @@
 /**
  * xeogl V0.9.0
- * 
+ *
  * WebGL-based 3D visualization library
  * http://xeogl.org/
- * 
- * Built on 2020-01-08
- * 
+ *
+ * Built on 2020-03-03
+ *
  * MIT License
  * Copyright 2020, Lindsay Kay
  * http://xeolabs.com/
@@ -12075,7 +12075,7 @@ class xeoglObject extends Component {
         }
         if (this._childList.length) {
             // Clone the _childList before iterating it, so our children don't mess us up when calling removeChild().
-            const tempChildList = this._childList.splice();
+            const tempChildList = this._childList.slice();
             let object;
             for (let i = 0, len = tempChildList.length; i < len; i++) {
                 object = tempChildList[i];
