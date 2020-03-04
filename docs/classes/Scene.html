@@ -54,9 +54,13 @@
             
                 <li><a href="../classes/AxisHelper.html">AxisHelper</a></li>
             
+                <li><a href="../classes/BIMServerModel.html">BIMServerModel</a></li>
+            
                 <li><a href="../classes/BoxGeometry.html">BoxGeometry</a></li>
             
                 <li><a href="../classes/BuildableModel.html">BuildableModel</a></li>
+            
+                <li><a href="../classes/Button.html">Button</a></li>
             
                 <li><a href="../classes/Camera.html">Camera</a></li>
             
@@ -73,6 +77,8 @@
                 <li><a href="../classes/Canvas.html">Canvas</a></li>
             
                 <li><a href="../classes/Clip.html">Clip</a></li>
+            
+                <li><a href="../classes/ClipControl.html">ClipControl</a></li>
             
                 <li><a href="../classes/ClipHelper.html">ClipHelper</a></li>
             
@@ -287,7 +293,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1</code></a>
+            Defined in: <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1</code></a>
         </div>
     
 
@@ -374,7 +380,7 @@ teapotMesh.ghosted = true;
 var phongMaterials = scene.types["xeogl.PhongMaterial"];
 var teapotMaterial = phongMaterials["myMaterial"];
 teapotMaterial.diffuse = [0,1,0]; // Change to green</code></pre>
-<p>See Object, <a href="../classes/Group.html" class="crosslink">Group</a> and <a href="../classes/Model.html" class="crosslink">Model</a>
+<p>See <a href="../classes/Object.html" class="crosslink">Object</a>, <a href="../classes/Group.html" class="crosslink">Group</a> and <a href="../classes/Model.html" class="crosslink">Model</a>
 for how to create and access more sophisticated content.</p>
 <h3 id="controlling-the-camera">Controlling the camera</h3>
 <p>Use the Scene&#39;s <a href="../classes/Camera.html" class="crosslink">Camera</a> to control the current viewpoint and projection:</p>
@@ -479,11 +485,11 @@ if (hit) {
 <pre class="code prettyprint"><code class="lang-javascript">scene.on("boundary", function() {
     var aabb = scene.aabb;
 });</code></pre>
-<p>Getting the AABB of the Object with the given IDs:</p>
+<p>Getting the AABB of the <a href="../classes/Object.html" class="crosslink">Objects</a> with the given IDs:</p>
 <pre class="code prettyprint"><code class="lang-JavaScript">scene.getAABB(); // Gets collective boundary of all Mesh Objects in the scene
 scene.getAABB("saw"); // Gets boundary of an Object
 scene.getAABB(["saw", "gearbox"]); // Gets collective boundary of two Objects</code></pre>
-<p>See <a href="../classes/Scene.html#method_getAABB" class="crosslink">Scene#getAABB()</a> and Object for more info on querying and tracking boundaries.</p>
+<p>See <a href="../classes/Scene.html#method_getAABB" class="crosslink">Scene#getAABB()</a> and <a href="../classes/Object.html" class="crosslink">Object</a> for more info on querying and tracking boundaries.</p>
 <h3 id="managing-the-viewport">Managing the viewport</h3>
 <p>The Scene&#39;s <a href="../classes/Viewport.html" class="crosslink">Viewport</a> component manages the WebGL viewport:</p>
 <pre class="code prettyprint"><code class="lang-javascript">var viewport = scene.viewport
@@ -597,7 +603,7 @@ leave that enabled:</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1</code></a>
         
         </p>
 
@@ -620,7 +626,7 @@ leave that enabled:</p>
                 <li class="param">
                     
                         <code class="param-name optional">[cfg]</code>
-                        <span class="type">Object</span>
+                        <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -1550,7 +1556,7 @@ canvas before each pass (true) or just before the first pass (false).</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2217"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2217</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2213"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2213</code></a>
         
         </p>
 
@@ -1609,7 +1615,7 @@ canvas before each pass (true) or just before the first pass (false).</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2253"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2253</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2249"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2249</code></a>
         
         </p>
 
@@ -1667,7 +1673,7 @@ canvas before each pass (true) or just before the first pass (false).</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2238"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2238</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2234"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2234</code></a>
         
         </p>
 
@@ -1738,7 +1744,7 @@ canvas before each pass (true) or just before the first pass (false).</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l895"><code>P:\__Hoelzner\libs\xeogl\src\component.js:895</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l896"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:896</code></a>
         
         </p>
 
@@ -1836,7 +1842,7 @@ canvas before each pass (true) or just before the first pass (false).</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l1004"><code>P:\__Hoelzner\libs\xeogl\src\component.js:1004</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l1005"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:1005</code></a>
         
         </p>
 
@@ -1905,7 +1911,7 @@ defaults that this component overrode on them.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l582"><code>P:\__Hoelzner\libs\xeogl\src\component.js:582</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l583"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:583</code></a>
         
         </p>
 
@@ -2009,7 +2015,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l406"><code>P:\__Hoelzner\libs\xeogl\src\component.js:406</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l407"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:407</code></a>
         
         </p>
 
@@ -2051,7 +2057,7 @@ any subsequent notifications on the event as they are made.</p>
                 <li class="param">
                     
                         <code class="param-name">value</code>
-                        <span class="type">Object</span>
+                        <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
                     
 
                     
@@ -2140,7 +2146,7 @@ any subsequent notifications on the event as they are made.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2136"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2136</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2132"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2132</code></a>
         
         </p>
 
@@ -2151,7 +2157,7 @@ any subsequent notifications on the event as they are made.</p>
     </div>
 
     <div class="description">
-        <p>Returns the collective axis-aligned bounding box of the Object, specified by their IDs, GUIDs and/or entity types.</p>
+        <p>Returns the collective axis-aligned bounding box of the <a href="../classes/Object.html" class="crosslink">Objects</a>, specified by their IDs, GUIDs and/or entity types.</p>
 <p>When no arguments are given, returns the total boundary of all objects in the scene.</p>
 <p>Only <a href="../classes/Mesh.html" class="crosslink">Meshes</a> with <a href="../classes/Mesh.html#property_collidable" class="crosslink">collidable</a>
 set <code>true</code> are included in the boundary.</p>
@@ -2180,7 +2186,7 @@ scene.getAABB(["saw#0.1", "surface", "support"]); // Get collective boundary an 
                     
 
                     <div class="param-description">
-                        <p>{Array} Array of  Object IDs, GUIDs or entity types.</p>
+                        <p>{Array} Array of  <a href="../classes/Object.html" class="crosslink">Object</a> IDs, GUIDs or entity types.</p>
 
                     </div>
 
@@ -2257,7 +2263,7 @@ scene.getAABB(["saw#0.1", "surface", "support"]); // Get collective boundary an 
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l533"><code>P:\__Hoelzner\libs\xeogl\src\component.js:533</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l534"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:534</code></a>
         
         </p>
 
@@ -2364,7 +2370,7 @@ scene.getAABB(["saw#0.1", "surface", "support"]); // Get collective boundary an 
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l370"><code>P:\__Hoelzner\libs\xeogl\src\component.js:370</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l371"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:371</code></a>
         
         </p>
 
@@ -2480,7 +2486,7 @@ myRotate.isType(xeogl.Mesh); // Returns false, because xeogl.Rotate does not (ev
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l544"><code>P:\__Hoelzner\libs\xeogl\src\component.js:544</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l545"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:545</code></a>
         
         </p>
 
@@ -2572,7 +2578,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l487"><code>P:\__Hoelzner\libs\xeogl\src\component.js:487</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l488"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:488</code></a>
         
         </p>
 
@@ -2678,7 +2684,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l445"><code>P:\__Hoelzner\libs\xeogl\src\component.js:445</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l446"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:446</code></a>
         
         </p>
 
@@ -2735,7 +2741,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
                 <li class="param">
                     
                         <code class="param-name optional">[scope=this]</code>
-                        <span class="type">Object</span>
+                        <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -2827,7 +2833,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l512"><code>P:\__Hoelzner\libs\xeogl\src\component.js:512</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l513"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:513</code></a>
         
         </p>
 
@@ -2885,7 +2891,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
                 <li class="param">
                     
                         <code class="param-name optional">[scope=this]</code>
-                        <span class="type">Object</span>
+                        <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -2958,7 +2964,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1797"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1797</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1793"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1793</code></a>
         
         </p>
 
@@ -3219,7 +3225,7 @@ method comments for description.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1216"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1216</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1212"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1212</code></a>
         
         </p>
 
@@ -3322,7 +3328,7 @@ since the last render.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2409"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2409</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2405"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2405</code></a>
         
         </p>
 
@@ -3333,7 +3339,7 @@ since the last render.</p>
     </div>
 
     <div class="description">
-        <p>Colorizes a batch of Object, specified by their IDs, GUIDs and/or entity types.</p>
+        <p>Colorizes a batch of <a href="../classes/Object.html" class="crosslink">Objects</a>, specified by their IDs, GUIDs and/or entity types.</p>
 
     </div>
 
@@ -3352,7 +3358,7 @@ since the last render.</p>
                     
 
                     <div class="param-description">
-                        <p>Array of  Object IDs, GUIDs or entity types.</p>
+                        <p>Array of  <a href="../classes/Object.html" class="crosslink">Object</a> IDs, GUIDs or entity types.</p>
 
                     </div>
 
@@ -3362,7 +3368,7 @@ since the last render.</p>
                 <li class="param">
                     
                         <code class="param-name optional">[colorize=(1,1,1)]</code>
-                        <span class="type">Object</span>
+                        <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -3441,7 +3447,7 @@ since the last render.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2371"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2371</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2367"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2367</code></a>
         
         </p>
 
@@ -3452,7 +3458,7 @@ since the last render.</p>
     </div>
 
     <div class="description">
-        <p>Shows or hides wireeframe edges for batch of Object, specified by their IDs, GUIDs and/or entity types.</p>
+        <p>Shows or hides wireeframe edges for batch of <a href="../classes/Object.html" class="crosslink">Objects</a>, specified by their IDs, GUIDs and/or entity types.</p>
 
     </div>
 
@@ -3471,7 +3477,7 @@ since the last render.</p>
                     
 
                     <div class="param-description">
-                        <p>Array of  Object IDs, GUIDs or entity types.</p>
+                        <p>Array of  <a href="../classes/Object.html" class="crosslink">Object</a> IDs, GUIDs or entity types.</p>
 
                     </div>
 
@@ -3507,7 +3513,7 @@ since the last render.</p>
                     
                         <span class="type">Boolean</span>:
                     
-                    <p>True if any Object changed edges state, else false if all updates were redundant and not applied.</p>
+                    <p>True if any <a href="../classes/Object.html" class="crosslink">Objects</a> changed edges state, else false if all updates were redundant and not applied.</p>
 
                 
             </div>
@@ -3573,7 +3579,7 @@ since the last render.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2349"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2349</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2345"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2345</code></a>
         
         </p>
 
@@ -3584,7 +3590,7 @@ since the last render.</p>
     </div>
 
     <div class="description">
-        <p>Ghosts or un-ghosts a batch of Object, specified by their IDs, GUIDs and/or entity types.</p>
+        <p>Ghosts or un-ghosts a batch of <a href="../classes/Object.html" class="crosslink">Objects</a>, specified by their IDs, GUIDs and/or entity types.</p>
 <p>Each Object indicates its ghosted status in its <a href="../classes/Object.html#property_ghosted" class="crosslink">ghosted</a> property.</p>
 <p>Each ghosted Object is registered in the <a href="../classes/Scene.html" class="crosslink">Scene</a>&#39;s
 <a href="../classes/Scene.html#property_ghostedEntities" class="crosslink">ghostedEntities</a> map when its <a href="../classes/Object.html#property_entityType" class="crosslink">entityType</a>
@@ -3607,7 +3613,7 @@ is assigned a value.</p>
                     
 
                     <div class="param-description">
-                        <p>Array of  Object IDs, GUIDs or entity types.</p>
+                        <p>Array of  <a href="../classes/Object.html" class="crosslink">Object</a> IDs, GUIDs or entity types.</p>
 
                     </div>
 
@@ -3643,7 +3649,7 @@ is assigned a value.</p>
                     
                         <span class="type">Boolean</span>:
                     
-                    <p>True if any Object changed ghosted state, else false if all updates were redundant and not applied.</p>
+                    <p>True if any <a href="../classes/Object.html" class="crosslink">Objects</a> changed ghosted state, else false if all updates were redundant and not applied.</p>
 
                 
             </div>
@@ -3709,7 +3715,7 @@ is assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2327"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2327</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2323"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2323</code></a>
         
         </p>
 
@@ -3720,7 +3726,7 @@ is assigned a value.</p>
     </div>
 
     <div class="description">
-        <p>Highlights or de-highlights a batch of Object, specified by their IDs, GUIDs and/or entity types.</p>
+        <p>Highlights or de-highlights a batch of <a href="../classes/Object.html" class="crosslink">Objects</a>, specified by their IDs, GUIDs and/or entity types.</p>
 <p>Each Object indicates its highlight status in its <a href="../classes/Object.html#property_highlighted" class="crosslink">highlighted</a> property.</p>
 <p>Each highlighted Object is registered in the <a href="../classes/Scene.html" class="crosslink">Scene</a>&#39;s
 <a href="../classes/Scene.html#property_highlightedEntities" class="crosslink">highlightedEntities</a> map while its <a href="../classes/Object.html#property_entityType" class="crosslink">entityType</a>
@@ -3743,7 +3749,7 @@ is assigned a value.</p>
                     
 
                     <div class="param-description">
-                        <p>Array of  Object IDs, GUIDs or entity types.</p>
+                        <p>Array of  <a href="../classes/Object.html" class="crosslink">Object</a> IDs, GUIDs or entity types.</p>
 
                     </div>
 
@@ -3779,7 +3785,7 @@ is assigned a value.</p>
                     
                         <span class="type">Boolean</span>:
                     
-                    <p>True if any Object changed highlighted state, else false if all updates were redundant and not applied.</p>
+                    <p>True if any <a href="../classes/Object.html" class="crosslink">Objects</a> changed highlighted state, else false if all updates were redundant and not applied.</p>
 
                 
             </div>
@@ -3841,7 +3847,7 @@ is assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2422"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2422</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2418"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2418</code></a>
         
         </p>
 
@@ -3852,7 +3858,7 @@ is assigned a value.</p>
     </div>
 
     <div class="description">
-        <p>Updates opacities of a batch of Object, specified by their IDs, GUIDs and/or entity types.</p>
+        <p>Updates opacities of a batch of <a href="../classes/Object.html" class="crosslink">Objects</a>, specified by their IDs, GUIDs and/or entity types.</p>
 
     </div>
 
@@ -3871,7 +3877,7 @@ is assigned a value.</p>
                     
 
                     <div class="param-description">
-                        <p>Array of  Object IDs, GUIDs or entity types.</p>
+                        <p>Array of  <a href="../classes/Object.html" class="crosslink">Object</a> IDs, GUIDs or entity types.</p>
 
                     </div>
 
@@ -3881,7 +3887,7 @@ is assigned a value.</p>
                 <li class="param">
                     
                         <code class="param-name optional">[opacity=1]</code>
-                        <span class="type">Object</span>
+                        <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -3960,7 +3966,7 @@ is assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2387"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2387</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2383"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2383</code></a>
         
         </p>
 
@@ -3971,7 +3977,7 @@ is assigned a value.</p>
     </div>
 
     <div class="description">
-        <p>Shows or hides an outline around a batch of Object, specified by their IDs, GUIDs and/or entity types.</p>
+        <p>Shows or hides an outline around a batch of <a href="../classes/Object.html" class="crosslink">Objects</a>, specified by their IDs, GUIDs and/or entity types.</p>
 <p>Each Object indicates its outlined status in its <a href="../classes/Object.html#property_outlined" class="crosslink">outlined</a> property.</p>
 <p>Each outlined Object is registered in the <a href="../classes/Scene.html" class="crosslink">Scene</a>&#39;s
 Scene/outlinedEntities:property map when its <a href="../classes/Object.html#property_entityType" class="crosslink">entityType</a>
@@ -3994,7 +4000,7 @@ is assigned a value.</p>
                     
 
                     <div class="param-description">
-                        <p>Array of  Object IDs, GUIDs or entity types.</p>
+                        <p>Array of  <a href="../classes/Object.html" class="crosslink">Object</a> IDs, GUIDs or entity types.</p>
 
                     </div>
 
@@ -4030,7 +4036,7 @@ is assigned a value.</p>
                     
                         <span class="type">Boolean</span>:
                     
-                    <p>True if any Object changed outlined state, else false if all updates were redundant and not applied.</p>
+                    <p>True if any <a href="../classes/Object.html" class="crosslink">Objects</a> changed outlined state, else false if all updates were redundant and not applied.</p>
 
                 
             </div>
@@ -4096,7 +4102,7 @@ is assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2435"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2435</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2431"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2431</code></a>
         
         </p>
 
@@ -4107,7 +4113,7 @@ is assigned a value.</p>
     </div>
 
     <div class="description">
-        <p>Sets a batch of Object pickable or unpickable, specified by their IDs, GUIDs and/or entity types.</p>
+        <p>Sets a batch of <a href="../classes/Object.html" class="crosslink">Objects</a> pickable or unpickable, specified by their IDs, GUIDs and/or entity types.</p>
 <p>Picking is done via calls to <a href="../classes/Scene.html#method_pick" class="crosslink">Scene#pick()</a>.</p>
 
     </div>
@@ -4127,7 +4133,7 @@ is assigned a value.</p>
                     
 
                     <div class="param-description">
-                        <p>Array of  Object IDs, GUIDs or entity types.</p>
+                        <p>Array of  <a href="../classes/Object.html" class="crosslink">Object</a> IDs, GUIDs or entity types.</p>
 
                     </div>
 
@@ -4163,7 +4169,7 @@ is assigned a value.</p>
                     
                         <span class="type">Boolean</span>:
                     
-                    <p>True if any Object changed pickable state, else false if all updates were redundant and not applied.</p>
+                    <p>True if any <a href="../classes/Object.html" class="crosslink">Objects</a> changed pickable state, else false if all updates were redundant and not applied.</p>
 
                 
             </div>
@@ -4229,7 +4235,7 @@ is assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2305"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2305</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2301"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2301</code></a>
         
         </p>
 
@@ -4240,7 +4246,7 @@ is assigned a value.</p>
     </div>
 
     <div class="description">
-        <p>Selects or de-selects a batch of Object, specified by their IDs, GUIDs and/or entity types.</p>
+        <p>Selects or de-selects a batch of <a href="../classes/Object.html" class="crosslink">Objects</a>, specified by their IDs, GUIDs and/or entity types.</p>
 <p>Each Object indicates its selected status in its <a href="../classes/Object.html#property_selected" class="crosslink">selected</a> property.</p>
 <p>Each selected Object is registered in the <a href="../classes/Scene.html" class="crosslink">Scene</a>&#39;s
 <a href="../classes/Scene.html#property_selectedEntities" class="crosslink">selectedEntities</a> map while its <a href="../classes/Object.html#property_entityType" class="crosslink">entityType</a>
@@ -4263,7 +4269,7 @@ is assigned a value.</p>
                     
 
                     <div class="param-description">
-                        <p>Array of  Object IDs, GUIDs or entity types.</p>
+                        <p>Array of  <a href="../classes/Object.html" class="crosslink">Object</a> IDs, GUIDs or entity types.</p>
 
                     </div>
 
@@ -4299,7 +4305,7 @@ is assigned a value.</p>
                     
                         <span class="type">Boolean</span>:
                     
-                    <p>True if any Object changed selection state, else false if all updates were redundant and not applied.</p>
+                    <p>True if any <a href="../classes/Object.html" class="crosslink">Objects</a> changed selection state, else false if all updates were redundant and not applied.</p>
 
                 
             </div>
@@ -4365,7 +4371,7 @@ is assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2287"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2287</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2283"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2283</code></a>
         
         </p>
 
@@ -4376,7 +4382,7 @@ is assigned a value.</p>
     </div>
 
     <div class="description">
-        <p>Culls or unculls a batch of Object, specified by their IDs, GUIDs and/or entity types.</p>
+        <p>Culls or unculls a batch of <a href="../classes/Object.html" class="crosslink">Objects</a>, specified by their IDs, GUIDs and/or entity types.</p>
 <p>Each Object indicates its culled status in its Object/visibility:property property.</p>
 
     </div>
@@ -4396,7 +4402,7 @@ is assigned a value.</p>
                     
 
                     <div class="param-description">
-                        <p>Array of  Object IDs, GUIDs or entity types.</p>
+                        <p>Array of  <a href="../classes/Object.html" class="crosslink">Object</a> IDs, GUIDs or entity types.</p>
 
                     </div>
 
@@ -4432,7 +4438,7 @@ is assigned a value.</p>
                     
                         <span class="type">Boolean</span>:
                     
-                    <p>True if any Object changed culled state, else false if all updates were redundant and not applied.</p>
+                    <p>True if any <a href="../classes/Object.html" class="crosslink">Objects</a> changed culled state, else false if all updates were redundant and not applied.</p>
 
                 
             </div>
@@ -4498,7 +4504,7 @@ is assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2265"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2265</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2261"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2261</code></a>
         
         </p>
 
@@ -4509,7 +4515,7 @@ is assigned a value.</p>
     </div>
 
     <div class="description">
-        <p>Shows or hides a batch of Object, specified by their IDs, GUIDs and/or entity types.</p>
+        <p>Shows or hides a batch of <a href="../classes/Object.html" class="crosslink">Objects</a>, specified by their IDs, GUIDs and/or entity types.</p>
 <p>Each Object indicates its visibility status in its Object/visibility:property property.</p>
 <p>Each visible Object is registered in the <a href="../classes/Scene.html" class="crosslink">Scene</a>&#39;s
 <a href="../classes/Scene.html#property_visibleEntities" class="crosslink">visibleEntities</a> map while its <a href="../classes/Object.html#property_entityType" class="crosslink">entityType</a>
@@ -4532,7 +4538,7 @@ is assigned a value.</p>
                     
 
                     <div class="param-description">
-                        <p>Array of  Object IDs, GUIDs or entity types.</p>
+                        <p>Array of  <a href="../classes/Object.html" class="crosslink">Object</a> IDs, GUIDs or entity types.</p>
 
                     </div>
 
@@ -4568,7 +4574,7 @@ is assigned a value.</p>
                     
                         <span class="type">Boolean</span>:
                     
-                    <p>True if any Object changed visibility, else false if all updates were redundant and not applied.</p>
+                    <p>True if any <a href="../classes/Object.html" class="crosslink">Objects</a> changed visibility, else false if all updates were redundant and not applied.</p>
 
                 
             </div>
@@ -4621,7 +4627,7 @@ is assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l565"><code>P:\__Hoelzner\libs\xeogl\src\component.js:565</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l566"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:566</code></a>
         
         </p>
 
@@ -4722,7 +4728,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l2453"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:2453</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l2449"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:2449</code></a>
         
         </p>
 
@@ -4733,7 +4739,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
     </div>
 
     <div class="description">
-        <p>Iterates with a callback over Object, specified by their IDs, GUIDs and/or entity types.</p>
+        <p>Iterates with a callback over <a href="../classes/Object.html" class="crosslink">Objects</a>, specified by their IDs, GUIDs and/or entity types.</p>
 
     </div>
 
@@ -4752,7 +4758,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
                     
 
                     <div class="param-description">
-                        <p>One or more Object IDs, GUIDs or entity types.</p>
+                        <p>One or more <a href="../classes/Object.html" class="crosslink">Object</a> IDs, GUIDs or entity types.</p>
 
                     </div>
 
@@ -4820,7 +4826,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1728"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1728</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1724"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1724</code></a>
         
         </p>
 
@@ -4869,7 +4875,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1697"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1697</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1693"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1693</code></a>
         
         </p>
 
@@ -4916,7 +4922,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l699"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:699</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l699"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:699</code></a>
         
         </p>
 
@@ -4963,7 +4969,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1708"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1708</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1704"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1704</code></a>
         
         </p>
 
@@ -5008,7 +5014,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1458"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1458</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1454"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1454</code></a>
         
         </p>
 
@@ -5058,7 +5064,7 @@ canvas before each pass (true) or just before the first pass (false).</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l662"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:662</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l662"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:662</code></a>
         
         </p>
 
@@ -5105,7 +5111,7 @@ canvas before each pass (true) or just before the first pass (false).</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l644"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:644</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l644"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:644</code></a>
         
         </p>
 
@@ -5147,7 +5153,7 @@ canvas before each pass (true) or just before the first pass (false).</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l315"><code>P:\__Hoelzner\libs\xeogl\src\component.js:315</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l316"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:316</code></a>
         
         </p>
 
@@ -5194,7 +5200,7 @@ canvas before each pass (true) or just before the first pass (false).</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1642"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1642</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1638"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1638</code></a>
         
         </p>
 
@@ -5246,7 +5252,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l551"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:551</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l551"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:551</code></a>
         
         </p>
 
@@ -5256,7 +5262,7 @@ other properties initialised to their default values.</p>
     </div>
 
     <div class="description">
-        <p>Object in this Scene that have entity types, mapped to their IDs.</p>
+        <p><a href="../classes/Object.html" class="crosslink">Objects</a> in this Scene that have entity types, mapped to their IDs.</p>
 <p>Each Object is registered in this map when its <a href="../classes/Object.html#property_entityType" class="crosslink">entityType</a> is
 assigned a value.</p>
 
@@ -5295,7 +5301,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1342"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1342</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1338"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1338</code></a>
         
         </p>
 
@@ -5342,7 +5348,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1316"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1316</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1312"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1312</code></a>
         
         </p>
 
@@ -5389,7 +5395,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1329"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1329</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1325"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1325</code></a>
         
         </p>
 
@@ -5436,7 +5442,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l539"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:539</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l539"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:539</code></a>
         
         </p>
 
@@ -5446,7 +5452,7 @@ assigned a value.</p>
     </div>
 
     <div class="description">
-        <p>For each entity type, a map of IDs to Object of that entity type.</p>
+        <p>For each entity type, a map of IDs to <a href="../classes/Object.html" class="crosslink">Objects</a> of that entity type.</p>
 <p>Each Object is registered in this map when its <a href="../classes/Object.html#property_entityType" class="crosslink">entityType</a> is
 assigned a value.</p>
 
@@ -5483,7 +5489,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1479"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1479</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1475"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1475</code></a>
         
         </p>
 
@@ -5530,7 +5536,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1499"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1499</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1495"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1495</code></a>
         
         </p>
 
@@ -5577,7 +5583,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1519"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1519</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1515"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1515</code></a>
         
         </p>
 
@@ -5626,7 +5632,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1539"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1539</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1535"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1535</code></a>
         
         </p>
 
@@ -5676,7 +5682,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l575"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:575</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l575"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:575</code></a>
         
         </p>
 
@@ -5686,7 +5692,7 @@ assigned a value.</p>
     </div>
 
     <div class="description">
-        <p>Ghosted entity Object within this Scene, mapped to their IDs.</p>
+        <p>Ghosted entity <a href="../classes/Object.html" class="crosslink">Objects</a> within this Scene, mapped to their IDs.</p>
 <p>Each Object is registered in this map when its <a href="../classes/Object.html#property_ghosted" class="crosslink">ghosted</a> property is true and its
 <a href="../classes/Object.html#property_entityType" class="crosslink">entityType</a> is assigned a value.</p>
 
@@ -5725,7 +5731,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1368"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1368</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1364"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1364</code></a>
         
         </p>
 
@@ -5772,7 +5778,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1579"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1579</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1575"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1575</code></a>
         
         </p>
 
@@ -5824,7 +5830,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l527"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:527</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l527"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:527</code></a>
         
         </p>
 
@@ -5834,7 +5840,7 @@ other properties initialised to their default values.</p>
     </div>
 
     <div class="description">
-        <p>Object in this Scene that have GUIDs, mapped to their GUIDs.</p>
+        <p><a href="../classes/Object.html" class="crosslink">Objects</a> in this Scene that have GUIDs, mapped to their GUIDs.</p>
 <p>Each Object is registered in this map when its <a href="../classes/Object.html#property_guid" class="crosslink">guid</a> is
 assigned a value.</p>
 
@@ -5873,7 +5879,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l587"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:587</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l587"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:587</code></a>
         
         </p>
 
@@ -5883,7 +5889,7 @@ assigned a value.</p>
     </div>
 
     <div class="description">
-        <p>Highlighted entity Object within this Scene, mapped to their IDs.</p>
+        <p>Highlighted entity <a href="../classes/Object.html" class="crosslink">Objects</a> within this Scene, mapped to their IDs.</p>
 <p>Each Object is registered in this map when its <a href="../classes/Object.html#property_highlighted" class="crosslink">highlighted</a> property is true and its
 <a href="../classes/Object.html#property_entityType" class="crosslink">entityType</a> is assigned a value.</p>
 
@@ -5922,7 +5928,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1381"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1381</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1377"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1377</code></a>
         
         </p>
 
@@ -5969,7 +5975,7 @@ assigned a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1600"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1600</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1596"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1596</code></a>
         
         </p>
 
@@ -6018,7 +6024,7 @@ HighlightMaterial by default.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l306"><code>P:\__Hoelzner\libs\xeogl\src\component.js:306</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l307"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:307</code></a>
         
         </p>
 
@@ -6065,7 +6071,7 @@ HighlightMaterial by default.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l883"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:883</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l883"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:883</code></a>
         
         </p>
 
@@ -6112,7 +6118,7 @@ HighlightMaterial by default.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l681"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:681</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l681"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:681</code></a>
         
         </p>
 
@@ -6159,7 +6165,7 @@ HighlightMaterial by default.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l671"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:671</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l671"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:671</code></a>
         
         </p>
 
@@ -6207,7 +6213,7 @@ HighlightMaterial by default.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l491"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:491</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l491"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:491</code></a>
         
         </p>
 
@@ -6254,7 +6260,7 @@ HighlightMaterial by default.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1558"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1558</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1554"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1554</code></a>
         
         </p>
 
@@ -6306,7 +6312,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l623"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:623</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l623"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:623</code></a>
         
         </p>
 
@@ -6330,7 +6336,7 @@ other properties initialised to their default values.</p>
                 
                     <div id="property_metadata" class="property item inherited">
     <h3 class="name"><code>metadata</code></h3>
-    <span class="type">Object</span>
+    <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
 
     
 
@@ -6348,7 +6354,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l298"><code>P:\__Hoelzner\libs\xeogl\src\component.js:298</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l299"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:299</code></a>
         
         </p>
 
@@ -6392,7 +6398,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l357"><code>P:\__Hoelzner\libs\xeogl\src\component.js:357</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l358"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:358</code></a>
         
         </p>
 
@@ -6440,7 +6446,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l509"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:509</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l509"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:509</code></a>
         
         </p>
 
@@ -6487,7 +6493,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l518"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:518</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l518"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:518</code></a>
         
         </p>
 
@@ -6497,7 +6503,7 @@ other properties initialised to their default values.</p>
     </div>
 
     <div class="description">
-        <p>The Object in this Scene, mapped to their IDs.</p>
+        <p>The <a href="../classes/Object.html" class="crosslink">Objects</a> in this Scene, mapped to their IDs.</p>
 
     </div>
 
@@ -6534,7 +6540,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1666"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1666</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1662"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1662</code></a>
         
         </p>
 
@@ -6584,7 +6590,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1432"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1432</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1428"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1428</code></a>
         
         </p>
 
@@ -6633,7 +6639,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l690"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:690</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l690"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:690</code></a>
         
         </p>
 
@@ -6680,7 +6686,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l653"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:653</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l653"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:653</code></a>
         
         </p>
 
@@ -6690,7 +6696,7 @@ other properties initialised to their default values.</p>
     </div>
 
     <div class="description">
-        <p>The root Object in this Scene, mapped to their IDs.</p>
+        <p>The root <a href="../classes/Object.html" class="crosslink">Objects</a> in this Scene, mapped to their IDs.</p>
 
     </div>
 
@@ -6724,7 +6730,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l249"><code>P:\__Hoelzner\libs\xeogl\src\component.js:249</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l250"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:250</code></a>
         
         </p>
 
@@ -6771,7 +6777,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l599"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:599</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l599"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:599</code></a>
         
         </p>
 
@@ -6781,7 +6787,7 @@ other properties initialised to their default values.</p>
     </div>
 
     <div class="description">
-        <p>Selected entity Object within this Scene, mapped to their IDs.</p>
+        <p>Selected entity <a href="../classes/Object.html" class="crosslink">Objects</a> within this Scene, mapped to their IDs.</p>
 <p>Each Object is registered in this map when its <a href="../classes/Object.html#property_selected" class="crosslink">selected</a> property is true and its
 <a href="../classes/Object.html#property_entityType" class="crosslink">entityType</a> is assigned a value.</p>
 
@@ -6820,7 +6826,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1394"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1394</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1390"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1390</code></a>
         
         </p>
 
@@ -6867,7 +6873,7 @@ other properties initialised to their default values.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1621"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1621</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1617"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1617</code></a>
         
         </p>
 
@@ -6917,7 +6923,7 @@ SelectedMaterial by default.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1407"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1407</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1403"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1403</code></a>
         
         </p>
 
@@ -6966,7 +6972,7 @@ SelectedMaterial by default.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l500"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:500</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l500"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:500</code></a>
         
         </p>
 
@@ -7013,7 +7019,7 @@ SelectedMaterial by default.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l470"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:470</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l470"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:470</code></a>
         
         </p>
 
@@ -7061,7 +7067,7 @@ SelectedMaterial by default.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l634"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:634</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l634"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:634</code></a>
         
         </p>
 
@@ -7109,7 +7115,7 @@ IDs to <a href="../classes/Component.html" class="crosslink">Components</a> inst
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1686"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1686</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1682"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1682</code></a>
         
         </p>
 
@@ -7156,7 +7162,7 @@ IDs to <a href="../classes/Component.html" class="crosslink">Components</a> inst
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l563"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:563</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l563"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:563</code></a>
         
         </p>
 
@@ -7166,7 +7172,7 @@ IDs to <a href="../classes/Component.html" class="crosslink">Components</a> inst
     </div>
 
     <div class="description">
-        <p>Visible entity Object within this Scene, mapped to their IDs.</p>
+        <p>Visible entity <a href="../classes/Object.html" class="crosslink">Objects</a> within this Scene, mapped to their IDs.</p>
 <p>Each Object is registered in this map when its <a href="../classes/Object.html#property_visible" class="crosslink">visible</a> property is true and its
 <a href="../classes/Object.html#property_entityType" class="crosslink">entityType</a> is assigned a value.</p>
 
@@ -7205,7 +7211,7 @@ IDs to <a href="../classes/Component.html" class="crosslink">Components</a> inst
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1355"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1355</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1351"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1351</code></a>
         
         </p>
 
@@ -7257,7 +7263,7 @@ IDs to <a href="../classes/Component.html" class="crosslink">Components</a> inst
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l1070"><code>P:\__Hoelzner\libs\xeogl\src\component.js:1070</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l1073"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:1073</code></a>
         
         </p>
 
@@ -7301,7 +7307,7 @@ IDs to <a href="../classes/Component.html" class="crosslink">Components</a> inst
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l457"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:457</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l457"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:457</code></a>
         
         </p>
 
@@ -7369,7 +7375,7 @@ IDs to <a href="../classes/Component.html" class="crosslink">Components</a> inst
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l451"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:451</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l451"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:451</code></a>
         
         </p>
 
@@ -7437,7 +7443,7 @@ IDs to <a href="../classes/Component.html" class="crosslink">Components</a> inst
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1262"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1262</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1258"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1258</code></a>
         
         </p>
 
@@ -7521,7 +7527,7 @@ IDs to <a href="../classes/Component.html" class="crosslink">Components</a> inst
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l1275"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:1275</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l1271"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:1271</code></a>
         
         </p>
 
@@ -7605,7 +7611,7 @@ IDs to <a href="../classes/Component.html" class="crosslink">Components</a> inst
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_scene_scene.js.html#l463"><code>P:\__Hoelzner\libs\xeogl\src\scene\scene.js:463</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_scene_scene.js.html#l463"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;scene&#x2F;scene.js:463</code></a>
         
         </p>
 

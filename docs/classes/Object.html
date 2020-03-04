@@ -54,9 +54,13 @@
             
                 <li><a href="../classes/AxisHelper.html">AxisHelper</a></li>
             
+                <li><a href="../classes/BIMServerModel.html">BIMServerModel</a></li>
+            
                 <li><a href="../classes/BoxGeometry.html">BoxGeometry</a></li>
             
                 <li><a href="../classes/BuildableModel.html">BuildableModel</a></li>
+            
+                <li><a href="../classes/Button.html">Button</a></li>
             
                 <li><a href="../classes/Camera.html">Camera</a></li>
             
@@ -73,6 +77,8 @@
                 <li><a href="../classes/Canvas.html">Canvas</a></li>
             
                 <li><a href="../classes/Clip.html">Clip</a></li>
+            
+                <li><a href="../classes/ClipControl.html">ClipControl</a></li>
             
                 <li><a href="../classes/ClipHelper.html">ClipHelper</a></li>
             
@@ -287,7 +293,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1</code></a>
+            Defined in: <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1</code></a>
         </div>
     
 
@@ -427,8 +433,8 @@ find those Objects within their Scene using their GUIDs, like this:</p>
 <pre class="code prettyprint"><code class="lang-javascript">var redLeg = scene.guidObjects["5782d454-9f06-4d71-aff1-78c597eacbfb"];
 var greenLeg = scene.guidObjects["c37e421f-5440-4ce1-9b4c-9bd06d8ab5ed"];</code></pre>
 <h3 id="updating-objects">Updating Objects</h3>
-<p>As mentioned earlier, property updates on a <a href="../classes/Group.html" class="crosslink">Group</a> Object will apply recursively to all
-sub-Objects within it, eventually updating the <a href="../classes/Mesh.html" class="crosslink">Mesh</a> Object at the leaves.</p>
+<p>As mentioned earlier, property updates on a <a href="../classes/Group.html" class="crosslink">Group</a> <a href="../classes/Object.html" class="crosslink">Object</a> will apply recursively to all
+sub-Objects within it, eventually updating the <a href="../classes/Mesh.html" class="crosslink">Mesh</a> <a href="../classes/Object.html" class="crosslink">Objects</a> at the leaves.</p>
 <p>These properties, defined in Object, are:</p>
 <ul>
 <li><a href="../classes/Object.html#property_visible" class="crosslink">visible</a></li>
@@ -465,7 +471,7 @@ the table Group, has updated the collective boundary of the whole table.</p>
 <p>Just for fun, let&#39;s fit the view to the table top:</p>
 <pre class="code prettyprint"><code class="lang-javascript">var cameraFlight = new xeogl.CameraFlightAnimation(); // Fit the boundary in view
 cameraFlight.flyTo(tableTopMesh.aabb);</code></pre>
-<p>Those boundaries will automatically update whenever we add or remove child Object or <a href="../classes/Mesh.html" class="crosslink">Meshes</a>, or update child <a href="../classes/Mesh.html" class="crosslink">Meshes</a>&#39; <a href="../classes/Geometry.html" class="crosslink">Geometries</a>
+<p>Those boundaries will automatically update whenever we add or remove child <a href="../classes/Object.html" class="crosslink">Objects</a> or <a href="../classes/Mesh.html" class="crosslink">Meshes</a>, or update child <a href="../classes/Mesh.html" class="crosslink">Meshes</a>&#39; <a href="../classes/Geometry.html" class="crosslink">Geometries</a>
 or modeling transforms.</p>
 <p>Let&#39;s follow the table top wherever it goes:</p>
 <pre class="code prettyprint"><code class="lang-javascript">tableTopMesh.on("boundary", function() {
@@ -751,7 +757,7 @@ entities non-hierarchical.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1</code></a>
         
         </p>
 
@@ -868,7 +874,7 @@ entities non-hierarchical.</p>
                             <li class="param">
                                 
                                     <code class="param-name optional">[parent]</code>
-                                    <span class="type">Object</span>
+                                    <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
@@ -1738,7 +1744,7 @@ entities non-hierarchical.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l895"><code>P:\__Hoelzner\libs\xeogl\src\component.js:895</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l896"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:896</code></a>
         
         </p>
 
@@ -1836,7 +1842,7 @@ entities non-hierarchical.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l1004"><code>P:\__Hoelzner\libs\xeogl\src\component.js:1004</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l1005"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:1005</code></a>
         
         </p>
 
@@ -1905,7 +1911,7 @@ defaults that this component overrode on them.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l582"><code>P:\__Hoelzner\libs\xeogl\src\component.js:582</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l583"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:583</code></a>
         
         </p>
 
@@ -2009,7 +2015,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l406"><code>P:\__Hoelzner\libs\xeogl\src\component.js:406</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l407"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:407</code></a>
         
         </p>
 
@@ -2051,7 +2057,7 @@ any subsequent notifications on the event as they are made.</p>
                 <li class="param">
                     
                         <code class="param-name">value</code>
-                        <span class="type">Object</span>
+                        <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
                     
 
                     
@@ -2137,7 +2143,7 @@ any subsequent notifications on the event as they are made.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l533"><code>P:\__Hoelzner\libs\xeogl\src\component.js:533</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l534"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:534</code></a>
         
         </p>
 
@@ -2244,7 +2250,7 @@ any subsequent notifications on the event as they are made.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l370"><code>P:\__Hoelzner\libs\xeogl\src\component.js:370</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l371"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:371</code></a>
         
         </p>
 
@@ -2360,7 +2366,7 @@ myRotate.isType(xeogl.Mesh); // Returns false, because xeogl.Rotate does not (ev
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l544"><code>P:\__Hoelzner\libs\xeogl\src\component.js:544</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l545"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:545</code></a>
         
         </p>
 
@@ -2452,7 +2458,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l487"><code>P:\__Hoelzner\libs\xeogl\src\component.js:487</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l488"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:488</code></a>
         
         </p>
 
@@ -2558,7 +2564,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l445"><code>P:\__Hoelzner\libs\xeogl\src\component.js:445</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l446"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:446</code></a>
         
         </p>
 
@@ -2615,7 +2621,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
                 <li class="param">
                     
                         <code class="param-name optional">[scope=this]</code>
-                        <span class="type">Object</span>
+                        <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -2707,7 +2713,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l512"><code>P:\__Hoelzner\libs\xeogl\src\component.js:512</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l513"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:513</code></a>
         
         </p>
 
@@ -2765,7 +2771,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
                 <li class="param">
                     
                         <code class="param-name optional">[scope=this]</code>
-                        <span class="type">Object</span>
+                        <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
                         <span class="flag optional" title="This parameter is optional.">optional</span>
                     
 
@@ -2834,7 +2840,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l886"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:886</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l886"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:886</code></a>
         
         </p>
 
@@ -2858,7 +2864,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
                 <li class="param">
                     
                         <code class="param-name">object</code>
-                        <span class="type">Object</span>
+                        <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
                     
 
                     
@@ -2916,7 +2922,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l908"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:908</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l908"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:908</code></a>
         
         </p>
 
@@ -2984,7 +2990,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l928"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:928</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l928"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:928</code></a>
         
         </p>
 
@@ -3076,7 +3082,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l949"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:949</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l949"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:949</code></a>
         
         </p>
 
@@ -3168,7 +3174,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l967"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:967</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l967"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:967</code></a>
         
         </p>
 
@@ -3260,7 +3266,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l977"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:977</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l977"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:977</code></a>
         
         </p>
 
@@ -3352,7 +3358,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l987"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:987</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l987"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:987</code></a>
         
         </p>
 
@@ -3450,7 +3456,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l997"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:997</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l997"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:997</code></a>
         
         </p>
 
@@ -3558,7 +3564,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1024"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1024</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1024"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1024</code></a>
         
         </p>
 
@@ -3650,7 +3656,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1014"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1014</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1014"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1014</code></a>
         
         </p>
 
@@ -3742,7 +3748,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1034"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1034</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1034"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1034</code></a>
         
         </p>
 
@@ -3831,7 +3837,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l565"><code>P:\__Hoelzner\libs\xeogl\src\component.js:565</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l566"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:566</code></a>
         
         </p>
 
@@ -3916,7 +3922,7 @@ parent <a href="../classes/Scene.html" class="crosslink">Scene</a>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1352"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1352</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1352"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1352</code></a>
         
         </p>
 
@@ -3963,7 +3969,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1707"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1707</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1707"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1707</code></a>
         
         </p>
 
@@ -4010,7 +4016,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1669"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1669</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1669"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1669</code></a>
         
         </p>
 
@@ -4059,7 +4065,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1369"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1369</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1369"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1369</code></a>
         
         </p>
 
@@ -4106,7 +4112,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1110"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1110</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1110"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1110</code></a>
         
         </p>
 
@@ -4116,7 +4122,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
     </div>
 
     <div class="description">
-        <p>IDs of child Object.</p>
+        <p>IDs of child <a href="../classes/Object.html" class="crosslink">Objects</a>.</p>
 
     </div>
 
@@ -4153,7 +4159,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1099"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1099</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1099"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1099</code></a>
         
         </p>
 
@@ -4163,7 +4169,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
     </div>
 
     <div class="description">
-        <p>Child Object mapped to their IDs.</p>
+        <p>Child <a href="../classes/Object.html" class="crosslink">Objects</a> mapped to their IDs.</p>
 
     </div>
 
@@ -4200,7 +4206,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1088"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1088</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1088"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1088</code></a>
         
         </p>
 
@@ -4210,7 +4216,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
     </div>
 
     <div class="description">
-        <p>Array of child Object.</p>
+        <p>Array of child <a href="../classes/Object.html" class="crosslink">Objects</a>.</p>
 
     </div>
 
@@ -4245,7 +4251,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1531"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1531</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1531"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1531</code></a>
         
         </p>
 
@@ -4293,7 +4299,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1552"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1552</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1552"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1552</code></a>
         
         </p>
 
@@ -4340,7 +4346,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1592"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1592</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1592"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1592</code></a>
         
         </p>
 
@@ -4387,7 +4393,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1509"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1509</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1509"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1509</code></a>
         
         </p>
 
@@ -4433,7 +4439,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l315"><code>P:\__Hoelzner\libs\xeogl\src\component.js:315</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l316"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:316</code></a>
         
         </p>
 
@@ -4478,7 +4484,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1490"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1490</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1490"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1490</code></a>
         
         </p>
 
@@ -4527,7 +4533,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1059"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1059</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1059"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1059</code></a>
         
         </p>
 
@@ -4575,7 +4581,7 @@ axis-aligned volume, ie. <code>[xmin, ymin,zmin,xmax,ymax, zmax]</code>.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1438"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1438</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1438"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1438</code></a>
         
         </p>
 
@@ -4627,7 +4633,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1044"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1044</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1044"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1044</code></a>
         
         </p>
 
@@ -4674,7 +4680,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1412"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1412</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1412"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1412</code></a>
         
         </p>
 
@@ -4723,7 +4729,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l306"><code>P:\__Hoelzner\libs\xeogl\src\component.js:306</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l307"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:307</code></a>
         
         </p>
 
@@ -4768,7 +4774,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1235"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1235</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1235"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1235</code></a>
         
         </p>
 
@@ -4794,7 +4800,7 @@ is set to a value.</p>
                 
                     <div id="property_metadata" class="property item inherited">
     <h3 class="name"><code>metadata</code></h3>
-    <span class="type">Object</span>
+    <span class="type"><a href="../classes/Object.html" class="crosslink">Object</a></span>
 
     
 
@@ -4812,7 +4818,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l298"><code>P:\__Hoelzner\libs\xeogl\src\component.js:298</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l299"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:299</code></a>
         
         </p>
 
@@ -4856,7 +4862,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l357"><code>P:\__Hoelzner\libs\xeogl\src\component.js:357</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l358"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:358</code></a>
         
         </p>
 
@@ -4904,7 +4910,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1077"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1077</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1077"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1077</code></a>
         
         </p>
 
@@ -4914,7 +4920,7 @@ is set to a value.</p>
     </div>
 
     <div class="description">
-        <p>Number of child Object.</p>
+        <p>Number of child <a href="../classes/Object.html" class="crosslink">Objects</a>.</p>
 
     </div>
 
@@ -4949,7 +4955,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1623"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1623</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1623"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1623</code></a>
         
         </p>
 
@@ -4997,7 +5003,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1650"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1650</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1650"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1650</code></a>
         
         </p>
 
@@ -5044,7 +5050,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1124"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1124</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1124"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1124</code></a>
         
         </p>
 
@@ -5091,7 +5097,7 @@ Group/Model&#39;s Group/addChild:method method.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1571"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1571</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1571"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1571</code></a>
         
         </p>
 
@@ -5139,7 +5145,7 @@ Group/Model&#39;s Group/addChild:method method.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1161"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1161</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1161"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1161</code></a>
         
         </p>
 
@@ -5186,7 +5192,7 @@ Group/Model&#39;s Group/addChild:method method.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1198"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1198</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1198"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1198</code></a>
         
         </p>
 
@@ -5233,7 +5239,7 @@ Group/Model&#39;s Group/addChild:method method.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1688"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1688</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1688"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1688</code></a>
         
         </p>
 
@@ -5280,7 +5286,7 @@ Group/Model&#39;s Group/addChild:method method.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1179"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1179</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1179"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1179</code></a>
         
         </p>
 
@@ -5327,7 +5333,7 @@ Group/Model&#39;s Group/addChild:method method.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1217"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1217</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1217"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1217</code></a>
         
         </p>
 
@@ -5373,7 +5379,7 @@ Group/Model&#39;s Group/addChild:method method.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l249"><code>P:\__Hoelzner\libs\xeogl\src\component.js:249</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l250"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:250</code></a>
         
         </p>
 
@@ -5418,7 +5424,7 @@ Group/Model&#39;s Group/addChild:method method.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1464"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1464</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1464"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1464</code></a>
         
         </p>
 
@@ -5470,7 +5476,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l629"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:629</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l629"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:629</code></a>
         
         </p>
 
@@ -5516,7 +5522,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1383"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1383</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1383"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1383</code></a>
         
         </p>
 
@@ -5568,7 +5574,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1266"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1266</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1266"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1266</code></a>
         
         </p>
 
@@ -5613,7 +5619,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_objects_object.js.html#l1279"><code>P:\__Hoelzner\libs\xeogl\src\objects\object.js:1279</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_objects_object.js.html#l1279"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;objects&#x2F;object.js:1279</code></a>
         
         </p>
 
@@ -5667,7 +5673,7 @@ is set to a value.</p>
             
         
         
-        <a href="../files/P:___Hoelzner_libs_xeogl_src_component.js.html#l1070"><code>P:\__Hoelzner\libs\xeogl\src\component.js:1070</code></a>
+        <a href="../files/_home_lindsay_xeolabs_xeogl-next_xeogl_src_component.js.html#l1073"><code>&#x2F;home&#x2F;lindsay&#x2F;xeolabs&#x2F;xeogl-next&#x2F;xeogl&#x2F;src&#x2F;component.js:1073</code></a>
         
         </p>
 
