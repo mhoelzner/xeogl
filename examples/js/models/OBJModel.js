@@ -142,16 +142,12 @@
  @extends Model
  */
 {
-
     xeogl.OBJModel = class xeoglOBJModel extends xeogl.Model {
-
-
         init(cfg) {
             super.init(cfg);
             this._src = null;
             this.src = cfg.src;
         }
-
 
         /**
          Path to a Wavefront OBJ file.
@@ -167,7 +163,6 @@
          @type String
          */
         set src(value) {
-
             if (!value) {
                 return;
             }
@@ -177,14 +172,15 @@
                 return;
             }
 
-            if (value === this._src) { // Already loaded this OBJModel
+            if (value === this._src) {
+                // Already loaded this OBJModel
 
                 /**
                  Fired whenever this OBJModel has finished loading components from the OBJ file
                  specified by {{#crossLink "OBJModel/src:property"}}{{/crossLink}}.
                  @event loaded
                  */
-                this.fire("loaded", true, true);
+                this.fire('loaded', true, true);
 
                 return;
             }
@@ -200,13 +196,12 @@
              @event src
              @param value The property's new value
              */
-            this.fire("src", this._src);
+            this.fire('src', this._src);
         }
 
         get src() {
             return this._src;
         }
-
 
         /**
          * Loads OBJ and MTL from file(s) into a {{#crossLink "Model"}}{{/crossLink}}.
@@ -218,19 +213,17 @@
          * @param {Function} [ok] Completion callback.
          */
         static load(model, src, ok) {
-
             var spinner = model.scene.canvas.spinner;
             spinner.processes++;
 
             loadOBJ(model, src, function (state) {
                 loadMTLs(model, state, function () {
-
-                    createMeshes(model, state);
+                    createMeshesOBJ(model, state);
 
                     spinner.processes--;
 
                     xeogl.scheduleTask(function () {
-                        model.fire("loaded", true);
+                        model.fire('loaded', true);
                     });
 
                     if (ok) {
@@ -251,48 +244,72 @@
          * @param {String} [basePath] Base path for external resources.
          */
         static parse(model, objText, mtlText, basePath) {
+            var spinner = model.scene.canvas.spinner;
+            spinner.processes++;
+
             if (!objText) {
-                console.warn("load() param expected: objText");
+                console.warn('load() param expected: objText');
                 return;
             }
             var state = parseOBJ(model, objText, null);
             if (mtlText) {
                 parseMTL(model, mtlText, basePath);
             }
-            createMeshes(model, state);
+            createMeshesOBJ(model, state);
+
+            spinner.processes--;
+
             model.src = null;
             xeogl.scheduleTask(function () {
-                model.fire("loaded", true);
+                model.fire('loaded', true);
             });
         }
     };
 
-//--------------------------------------------------------------------------------------------
-// Loads OBJ
-//
-// Parses OBJ into an intermediate state object. The object will contain geometry data
-// and material IDs from which meshes can be created later. The object will also
-// contain a list of filenames of the MTL files referenced by the OBJ, is any.
-//
-// Originally based on the THREE.js OBJ and MTL loaders:
-//
-// https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/OBJLoader.js
-// https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/MTLLoader.js
-//--------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------
+    // Loads OBJ
+    //
+    // Parses OBJ into an intermediate state object. The object will contain geometry data
+    // and material IDs from which meshes can be created later. The object will also
+    // contain a list of filenames of the MTL files referenced by the OBJ, is any.
+    //
+    // Originally based on the THREE.js OBJ and MTL loaders:
+    //
+    // https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/OBJLoader.js
+    // https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/MTLLoader.js
+    //--------------------------------------------------------------------------------------------
+
+    String.prototype.hashCode = function (seed = 0) {
+        let h1 = 0xdeadbeef ^ seed,
+            h2 = 0x41c6ce57 ^ seed;
+        for (let i = 0, ch; i < this.length; i++) {
+            ch = this.charCodeAt(i);
+            h1 = Math.imul(h1 ^ ch, 2654435761);
+            h2 = Math.imul(h2 ^ ch, 1597334677);
+        }
+        h1 =
+            Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^
+            Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+        h2 =
+            Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
+            Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+        return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+    };
 
     var loadOBJ = function (model, url, ok) {
-
-        loadFile(url, function (text) {
+        loadFile(
+            url,
+            function (text) {
                 var state = parseOBJ(model, text, url);
                 ok(state);
             },
             function (error) {
                 model.error(error);
-            });
+            }
+        );
     };
 
     var parseOBJ = (function () {
-
         const regexp = {
             // v float float float
             vertex_pattern: /^v\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
@@ -319,8 +336,7 @@
         };
 
         return function (model, text, url) {
-
-            url = url || ""
+            url = url || '';
 
             var state = {
                 src: url,
@@ -333,7 +349,7 @@
                 materialLibraries: {}
             };
 
-            startObject(state, "", false);
+            startObject(state, '', false);
 
             // Parts of this parser logic are derived from the THREE.js OBJ loader:
             // https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/OBJLoader.js
@@ -344,15 +360,16 @@
             }
 
             var lines = text.split('\n');
-            var line = '', lineFirstChar = '', lineSecondChar = '';
+            var line = '',
+                lineFirstChar = '',
+                lineSecondChar = '';
             var lineLength = 0;
             var result = [];
 
             // Faster to just trim left side of the line. Use if available.
-            var trimLeft = ( typeof ''.trimLeft === 'function' );
+            var trimLeft = typeof ''.trimLeft === 'function';
 
             for (var i = 0, l = lines.length; i < l; i++) {
-
                 line = lines[i];
 
                 line = trimLeft ? line.trimLeft() : line.trim();
@@ -370,11 +387,12 @@
                 }
 
                 if (lineFirstChar === 'v') {
-
                     lineSecondChar = line.charAt(1);
 
-                    if (lineSecondChar === ' ' && ( result = regexp.vertex_pattern.exec(line) ) !== null) {
-
+                    if (
+                        lineSecondChar === ' ' &&
+                        (result = regexp.vertex_pattern.exec(line)) !== null
+                    ) {
                         // 0                  1      2      3
                         // ['v 1.0 2.0 3.0', '1.0', '2.0', '3.0']
 
@@ -383,9 +401,10 @@
                             parseFloat(result[2]),
                             parseFloat(result[3])
                         );
-
-                    } else if (lineSecondChar === 'n' && ( result = regexp.normal_pattern.exec(line) ) !== null) {
-
+                    } else if (
+                        lineSecondChar === 'n' &&
+                        (result = regexp.normal_pattern.exec(line)) !== null
+                    ) {
                         // 0                   1      2      3
                         // ['vn 1.0 2.0 3.0', '1.0', '2.0', '3.0']
 
@@ -394,9 +413,10 @@
                             parseFloat(result[2]),
                             parseFloat(result[3])
                         );
-
-                    } else if (lineSecondChar === 't' && ( result = regexp.uv_pattern.exec(line) ) !== null) {
-
+                    } else if (
+                        lineSecondChar === 't' &&
+                        (result = regexp.uv_pattern.exec(line)) !== null
+                    ) {
                         // 0               1      2
                         // ['vt 0.1 0.2', '0.1', '0.2']
 
@@ -404,73 +424,108 @@
                             parseFloat(result[1]),
                             parseFloat(result[2])
                         );
-
                     } else {
-
-                        model.error('Unexpected vertex/normal/uv line: \'' + line + '\'');
+                        model.error(
+                            "Unexpected vertex/normal/uv line: '" + line + "'"
+                        );
                         return;
                     }
-
                 } else if (lineFirstChar === 'f') {
-
-                    if (( result = regexp.face_vertex_uv_normal.exec(line) ) !== null) {
-
+                    if (
+                        (result = regexp.face_vertex_uv_normal.exec(line)) !==
+                        null
+                    ) {
                         // f vertex/uv/normal vertex/uv/normal vertex/uv/normal
                         // 0                        1    2    3    4    5    6    7    8    9   10         11         12
                         // ['f 1/1/1 2/2/2 3/3/3', '1', '1', '1', '2', '2', '2', '3', '3', '3', undefined, undefined, undefined]
 
-                        addFace(state,
-                            result[1], result[4], result[7], result[10],
-                            result[2], result[5], result[8], result[11],
-                            result[3], result[6], result[9], result[12]
+                        addFace(
+                            state,
+                            result[1],
+                            result[4],
+                            result[7],
+                            result[10],
+                            result[2],
+                            result[5],
+                            result[8],
+                            result[11],
+                            result[3],
+                            result[6],
+                            result[9],
+                            result[12]
                         );
-
-                    } else if (( result = regexp.face_vertex_uv.exec(line) ) !== null) {
-
+                    } else if (
+                        (result = regexp.face_vertex_uv.exec(line)) !== null
+                    ) {
                         // f vertex/uv vertex/uv vertex/uv
                         // 0                  1    2    3    4    5    6   7          8
                         // ['f 1/1 2/2 3/3', '1', '1', '2', '2', '3', '3', undefined, undefined]
 
-                        addFace(state,
-                            result[1], result[3], result[5], result[7],
-                            result[2], result[4], result[6], result[8]
+                        addFace(
+                            state,
+                            result[1],
+                            result[3],
+                            result[5],
+                            result[7],
+                            result[2],
+                            result[4],
+                            result[6],
+                            result[8]
                         );
-
-                    } else if (( result = regexp.face_vertex_normal.exec(line) ) !== null) {
-
+                    } else if (
+                        (result = regexp.face_vertex_normal.exec(line)) !== null
+                    ) {
                         // f vertex//normal vertex//normal vertex//normal
                         // 0                     1    2    3    4    5    6   7          8
                         // ['f 1//1 2//2 3//3', '1', '1', '2', '2', '3', '3', undefined, undefined]
 
-                        addFace(state,
-                            result[1], result[3], result[5], result[7],
-                            undefined, undefined, undefined, undefined,
-                            result[2], result[4], result[6], result[8]
+                        addFace(
+                            state,
+                            result[1],
+                            result[3],
+                            result[5],
+                            result[7],
+                            undefined,
+                            undefined,
+                            undefined,
+                            undefined,
+                            result[2],
+                            result[4],
+                            result[6],
+                            result[8]
                         );
-
-                    } else if (( result = regexp.face_vertex.exec(line) ) !== null) {
-
+                    } else if (
+                        (result = regexp.face_vertex.exec(line)) !== null
+                    ) {
                         // f vertex vertex vertex
                         // 0            1    2    3   4
                         // ['f 1 2 3', '1', '2', '3', undefined]
 
-                        addFace(state, result[1], result[2], result[3], result[4]);
+                        addFace(
+                            state,
+                            result[1],
+                            result[2],
+                            result[3],
+                            result[4]
+                        );
                     } else {
-                        model.error('Unexpected face line: \'' + line + '\'');
+                        model.error("Unexpected face line: '" + line + "'");
                         return;
                     }
-
                 } else if (lineFirstChar === 'l') {
-
-                    var lineParts = line.substring(1).trim().split(' ');
-                    var lineVertices = [], lineUVs = [];
+                    var lineParts = line
+                        .substring(1)
+                        .trim()
+                        .split(' ');
+                    var lineVertices = [],
+                        lineUVs = [];
 
                     if (line.indexOf('/') === -1) {
-
                         lineVertices = lineParts;
-
                     } else {
-                        for (var li = 0, llen = lineParts.length; li < llen; li++) {
+                        for (
+                            var li = 0, llen = lineParts.length; li < llen; li++
+                        ) {
                             var parts = lineParts[li].split('/');
                             if (parts[0] !== '') {
                                 lineVertices.push(parts[0]);
@@ -481,44 +536,39 @@
                         }
                     }
                     addLineGeometry(state, lineVertices, lineUVs);
-
-                } else if (( result = regexp.object_pattern.exec(line) ) !== null) {
-
+                } else if (
+                    (result = regexp.object_pattern.exec(line)) !== null
+                ) {
                     // o object_name
                     // or
                     // g group_name
 
                     var id = result[0].substr(1).trim();
                     startObject(state, id, true);
-
                 } else if (regexp.material_use_pattern.test(line)) {
-
                     // material
 
                     var id = line.substring(7).trim();
                     state.object.material.id = id;
-
                 } else if (regexp.material_library_pattern.test(line)) {
-
                     // mtl file
 
                     state.materialLibraries[line.substring(7).trim()] = true;
-
-                } else if (( result = regexp.smoothing_pattern.exec(line) ) !== null) {
-
+                } else if (
+                    (result = regexp.smoothing_pattern.exec(line)) !== null
+                ) {
                     // smooth shading
 
                     var value = result[1].trim().toLowerCase();
-                    state.object.material.smooth = ( value === '1' || value === 'on' );
-
+                    state.object.material.smooth =
+                        value === '1' || value === 'on';
                 } else {
-
                     // Handle null terminated files without exception
                     if (line === '\0') {
                         continue;
                     }
 
-                    model.error('Unexpected line: \'' + line + '\'');
+                    model.error("Unexpected line: '" + line + "'");
                     return;
                 }
             }
@@ -528,13 +578,13 @@
 
         function getBasePath(src) {
             var n = src.lastIndexOf('/');
-            return (n === -1) ? src : src.substring(0, n + 1);
+            return n === -1 ? src : src.substring(0, n + 1);
         }
 
         function startObject(state, id, fromDeclaration) {
             if (state.object && state.object.fromDeclaration === false) {
                 state.object.id = id;
-                state.object.fromDeclaration = ( fromDeclaration !== false );
+                state.object.fromDeclaration = fromDeclaration !== false;
                 return;
             }
             state.object = {
@@ -548,24 +598,24 @@
                     id: '',
                     smooth: true
                 },
-                fromDeclaration: ( fromDeclaration !== false )
+                fromDeclaration: fromDeclaration !== false
             };
             state.objects.push(state.object);
         }
 
         function parseVertexIndex(value, len) {
             var index = parseInt(value, 10);
-            return ( index >= 0 ? index - 1 : index + len / 3 ) * 3;
+            return (index >= 0 ? index - 1 : index + len / 3) * 3;
         }
 
         function parseNormalIndex(value, len) {
             var index = parseInt(value, 10);
-            return ( index >= 0 ? index - 1 : index + len / 3 ) * 3;
+            return (index >= 0 ? index - 1 : index + len / 3) * 3;
         }
 
         function parseUVIndex(value, len) {
             var index = parseInt(value, 10);
-            return ( index >= 0 ? index - 1 : index + len / 2 ) * 2;
+            return (index >= 0 ? index - 1 : index + len / 2) * 2;
         }
 
         function addVertex(state, a, b, c) {
@@ -630,7 +680,6 @@
             var id;
             if (d === undefined) {
                 addVertex(state, ia, ib, ic);
-
             } else {
                 id = parseVertexIndex(d, vLen);
                 addVertex(state, ia, ib, id);
@@ -638,7 +687,6 @@
             }
 
             if (ua !== undefined) {
-
                 var uvLen = state.uv.length;
 
                 ia = parseUVIndex(ua, uvLen);
@@ -647,7 +695,6 @@
 
                 if (d === undefined) {
                     addUV(state, ia, ib, ic);
-
                 } else {
                     id = parseUVIndex(ud, uvLen);
                     addUV(state, ia, ib, id);
@@ -656,7 +703,6 @@
             }
 
             if (na !== undefined) {
-
                 // Normals are many times the same. If so, skip function call and parseInt.
 
                 var nLen = state.normals.length;
@@ -667,9 +713,7 @@
 
                 if (d === undefined) {
                     addNormal(state, ia, ib, ic);
-
                 } else {
-
                     id = parseNormalIndex(nd, nLen);
                     addNormal(state, ia, ib, id);
                     addNormal(state, ib, ic, id);
@@ -678,7 +722,6 @@
         }
 
         function addLineGeometry(state, positions, uv) {
-
             state.object.geometry.type = 'Line';
 
             var vLen = state.positions.length;
@@ -694,15 +737,16 @@
         }
     })();
 
-//--------------------------------------------------------------------------------------------
-// Loads MTL files listed in parsed state
-//--------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------
+    // Loads MTL files listed in parsed state
+    //--------------------------------------------------------------------------------------------
 
     function loadMTLs(model, state, ok) {
         var basePath = state.basePath;
         var srcList = Object.keys(state.materialLibraries);
         var numToLoad = srcList.length;
         if (numToLoad === 0) {
+            // if no mtl file is specified
             ok();
         }
         for (var i = 0, len = numToLoad; i < len; i++) {
@@ -714,30 +758,31 @@
         }
     }
 
-//--------------------------------------------------------------------------------------------
-// Loads an MTL file
-//--------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------
+    // Loads an MTL file
+    //--------------------------------------------------------------------------------------------
 
     var loadMTL = function (model, basePath, src, ok) {
-        loadFile(src, function (text) {
+        loadFile(
+            src,
+            function (text) {
                 parseMTL(model, text, basePath);
                 ok();
             },
             function (error) {
                 model.error(error);
                 ok();
-            });
+            }
+        );
     };
 
     var parseMTL = (function () {
-
         var delimiter_pattern = /\s+/;
 
         return function (model, mtlText, basePath) {
-
             var lines = mtlText.split('\n');
             var materialCfg = {
-                id: "Default"
+                id: 'Default'
             };
             var needCreate = false;
             var line;
@@ -746,27 +791,26 @@
             var value;
             var alpha;
 
-            basePath = basePath || "";
+            basePath = basePath || '';
 
             for (var i = 0; i < lines.length; i++) {
-
                 line = lines[i].trim();
 
-                if (line.length === 0 || line.charAt(0) === '#') { // Blank line or comment ignore
+                if (line.length === 0 || line.charAt(0) === '#') {
+                    // Blank line or comment ignore
                     continue;
                 }
 
                 pos = line.indexOf(' ');
 
-                key = ( pos >= 0 ) ? line.substring(0, pos) : line;
+                key = pos >= 0 ? line.substring(0, pos) : line;
                 key = key.toLowerCase();
 
-                value = ( pos >= 0 ) ? line.substring(pos + 1) : '';
+                value = pos >= 0 ? line.substring(pos + 1) : '';
                 value = value.trim();
 
                 switch (key.toLowerCase()) {
-
-                    case "newmtl": // New material
+                    case 'newmtl': // New material
                         //if (needCreate) {
                         createMaterial(model, materialCfg);
                         //}
@@ -790,20 +834,34 @@
 
                     case 'map_kd':
                         if (!materialCfg.diffuseMap) {
-                            materialCfg.diffuseMap = createTexture(model, basePath, value, "sRGB");
+                            materialCfg.diffuseMap = createTexture(
+                                model,
+                                basePath,
+                                value,
+                                'sRGB'
+                            );
                         }
                         break;
 
                     case 'map_ks':
                         if (!materialCfg.specularMap) {
-                            materialCfg.specularMap = createTexture(model, basePath, value, "linear");
+                            materialCfg.specularMap = createTexture(
+                                model,
+                                basePath,
+                                value,
+                                'linear'
+                            );
                         }
                         break;
 
                     case 'map_bump':
                     case 'bump':
                         if (!materialCfg.normalMap) {
-                            materialCfg.normalMap = createTexture(model, basePath, value);
+                            materialCfg.normalMap = createTexture(
+                                model,
+                                basePath,
+                                value
+                            );
                         }
                         break;
 
@@ -815,7 +873,7 @@
                         alpha = parseFloat(value);
                         if (alpha < 1) {
                             materialCfg.alpha = alpha;
-                            materialCfg.alphaMode = "blend";
+                            materialCfg.alphaMode = 'blend';
                         }
                         break;
 
@@ -823,12 +881,12 @@
                         alpha = parseFloat(value);
                         if (alpha > 0) {
                             materialCfg.alpha = 1 - alpha;
-                            materialCfg.alphaMode = "blend";
+                            materialCfg.alphaMode = 'blend';
                         }
                         break;
 
                     default:
-                    // model.error("Unrecognized token: " + key);
+                        // model.error("Unrecognized token: " + key);
                 }
             }
 
@@ -847,17 +905,23 @@
             }
             pos = items.indexOf('-s');
             if (pos >= 0) {
-                textureCfg.scale = [parseFloat(items[pos + 1]), parseFloat(items[pos + 2])];
+                textureCfg.scale = [
+                    parseFloat(items[pos + 1]),
+                    parseFloat(items[pos + 2])
+                ];
                 items.splice(pos, 4); // we expect 3 parameters here!
             }
             pos = items.indexOf('-o');
             if (pos >= 0) {
-                textureCfg.translate = [parseFloat(items[pos + 1]), parseFloat(items[pos + 2])];
+                textureCfg.translate = [
+                    parseFloat(items[pos + 1]),
+                    parseFloat(items[pos + 2])
+                ];
                 items.splice(pos, 4); // we expect 3 parameters here!
             }
             textureCfg.src = basePath + items.join(' ').trim();
             textureCfg.flipY = true;
-            textureCfg.encoding = encoding || "linear";
+            textureCfg.encoding = encoding || 'linear';
             //textureCfg.wrapS = self.wrap;
             //textureCfg.wrapT = self.wrap;
             var texture = new xeogl.Texture(model, textureCfg);
@@ -873,35 +937,86 @@
             var ss = value.split(delimiter_pattern, 3);
             return [parseFloat(ss[0]), parseFloat(ss[1]), parseFloat(ss[2])];
         }
-
     })();
-//--------------------------------------------------------------------------------------------
-// Creates meshes from parsed state
-//--------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------
+    // Creates meshes from parsed state
+    //--------------------------------------------------------------------------------------------
 
-    // functions to calculate the number of digits of abolute values in postions array
-    // returns a value on which every postion (x,y,z) has to be devided by to get valid amount
-    // of digits 
-    function getDividedBy(positions, validDigits) {
+    // function to calculate the common subtraction values for every coordinate (x, y)
+    function getSubtractionValues(positions, validDigits) {
+        const deltas = [0, 0];
 
-        const maxValue = positions.reduce(function(a,b) { return Math.max(Math.abs(a),Math.abs(b)); });
-        const numDigits = ((Math.log10((maxValue ^ (maxValue >> 31)) - (maxValue >> 31)) | 0) + 1);
-        return numDigits > validDigits ? Math.pow(10,numDigits-validDigits) : 1;
+        function getDigits(number) {
+            return (
+                (Math.log10((number ^ (number >> 31)) - (number >> 31)) | 0) + 1
+            );
+        }
 
+        function arrayMinMax(items) {
+            var minMaxArray = items.reduce(function (r, n) {
+                r[0] = !r[0] ? n : Math.min(r[0], n);
+                r[1] = !r[1] ? n : Math.max(r[1], n);
+                return r;
+            }, []);
+
+            return minMaxArray;
+        }
+
+        function calcCommonDelta(minMaxArray) {
+            let numDigits = getDigits(minMaxArray[0]);
+            let delta = 0;
+            while (numDigits > validDigits) {
+                const divide = Math.pow(10, numDigits - 1);
+                const min = Math.floor(minMaxArray[0] / divide);
+                const max = Math.floor(minMaxArray[1] / divide);
+                if (min === max) {
+                    delta += min * divide;
+                    minMaxArray[0] -= min * divide;
+                    minMaxArray[1] -= min * divide;
+                    numDigits -= 1;
+                } else {
+                    break;
+                }
+            }
+            return delta;
+        }
+
+        let rArray = positions.filter((c, i) => {
+            return i % 3 === 0;
+        });
+        let hArray = positions.filter((c, i) => {
+            return i % 3 === 1;
+        });
+
+        let minMaxR = arrayMinMax(rArray);
+        let minMaxH = arrayMinMax(hArray);
+        const numDigitsMinR = getDigits(minMaxR[0]);
+        const numDigitsMaxR = getDigits(minMaxR[1]);
+        const numDigitsMinH = getDigits(minMaxH[0]);
+        const numDigitsMaxH = getDigits(minMaxH[1]);
+
+        if (numDigitsMinR === numDigitsMaxR) {
+            deltas[0] = calcCommonDelta(minMaxR);
+        }
+        if (numDigitsMinH === numDigitsMaxH) {
+            deltas[1] = calcCommonDelta(minMaxH);
+        }
+
+        return deltas;
     }
 
-    var createMeshes = (function () {
-
+    var createMeshesOBJ = (function () {
         return function (model, state) {
-
             const VALID_NUM_DIGITS = 5;
-            const divideBy = getDividedBy(state.positions, VALID_NUM_DIGITS);
+            const subtractWith = getSubtractionValues(
+                state.positions,
+                VALID_NUM_DIGITS
+            );
 
             for (var j = 0, k = state.objects.length; j < k; j++) {
-
                 var object = state.objects[j];
                 var geometry = object.geometry;
-                var isLine = ( geometry.type === 'Line' );
+                let seed = 0;
 
                 if (geometry.positions.length === 0) {
                     // Skip o/g line declarations that did not follow with any faces
@@ -909,10 +1024,18 @@
                 }
 
                 var geometryCfg = {
-                    primitive: "triangles"
+                    primitive: 'triangles'
                 };
 
-                geometryCfg.positions = geometry.positions.map(p => p / divideBy);
+                geometryCfg.positions = geometry.positions.map((p, i) => {
+                    if (i % 3 === 0) {
+                        return p - subtractWith[0];
+                    }
+                    if (i % 3 === 1) {
+                        return p - subtractWith[1];
+                    }
+                    return p;
+                });
 
                 if (geometry.normals.length > 0) {
                     geometryCfg.normals = geometry.normals;
@@ -935,10 +1058,15 @@
 
                 var materialId = object.material.id;
                 var material;
-                if (materialId && materialId !== "") {
+                if (materialId && materialId !== '') {
                     material = model.scene.components[materialId];
-                    if (!material) {
-                        model.error("Material not found: " + materialId);
+                    if (material) {
+                        if (material.diffuseMap !== undefined) {
+                            // to mask texture surface when images are mapped
+                            material.alphaMode = 'mask';
+                        }
+                    } else {
+                        model.error('Material not found: ' + materialId);
                     }
                 } else {
                     material = new xeogl.PhongMaterial(model, {
@@ -949,14 +1077,43 @@
                     model._addComponent(material);
                 }
 
+                var ghostMaterial = new xeogl.EmphasisMaterial(model, {
+                    edges: true,
+                    edgeAlpha: 1.0,
+                    edgeColor: material ? material.diffuse : [0.6, 0.6, 0.6],
+                    edgeWidth: 2,
+                    vertices: true,
+                    vertexAlpha: 1.0,
+                    vertexColor: material ? material.diffuse : [0.6, 0.6, 0.6],
+                    vertexSize: 4,
+                    fill: true,
+                    fillColor: material ? material.diffuse : [0.6, 0.6, 0.6],
+                    fillAlpha: 1.0
+                });
+
                 // material.emissive = [Math.random(), Math.random(), Math.random()];
 
-                var mesh = new xeogl.Mesh(model, {
-                    id: model.id + "#" + object.id,
+                let meshId = object.id.hashCode(seed);
+                while (
+                    xeogl.getDefaultScene().components[meshId + '_' + seed]
+                ) {
+                    seed += 1;
+                    meshId = object.id.hashCode(seed);
+                }
+
+                const mesh = new xeogl.Mesh(model, {
+                    id: meshId + '_' + seed,
                     geometry: xeoGeometry,
                     material: material,
-                    pickable: true
+                    ghostMaterial: ghostMaterial,
+                    pickable: true,
+                    meta: {
+                        name: object.id,
+                        seed: seed
+                    }
                 });
+
+                model.subtractWith = subtractWith;
 
                 model.addChild(mesh);
                 model._addComponent(mesh);
@@ -967,32 +1124,44 @@
     function loadFile(url, ok, err) {
         var request = new XMLHttpRequest();
         request.overrideMimeType('text/plain');
-        request.open('GET', url, true);
-        request.addEventListener('load', function (event) {
-            var response = event.target.response;
-            if (this.status === 200) {
-                if (ok) {
-                    ok(response);
+        request.open(
+            'GET',
+            url + (/\?/.test(url) ? '&' : '?') + new Date().getTime(),
+            true
+        );
+        request.addEventListener(
+            'load',
+            function (event) {
+                var response = event.target.response;
+                if (this.status === 200) {
+                    if (ok) {
+                        ok(response);
+                    }
+                } else if (this.status === 0) {
+                    // Some browsers return HTTP Status 0 when using non-http protocol
+                    // e.g. 'file://' or 'data://'. Handle as success.
+                    console.warn('loadFile: HTTP Status 0 received.');
+                    if (ok) {
+                        ok(response);
+                    }
+                } else {
+                    if (err) {
+                        err(event);
+                    }
                 }
-            } else if (this.status === 0) {
-                // Some browsers return HTTP Status 0 when using non-http protocol
-                // e.g. 'file://' or 'data://'. Handle as success.
-                console.warn('loadFile: HTTP Status 0 received.');
-                if (ok) {
-                    ok(response);
-                }
-            } else {
+            },
+            false
+        );
+
+        request.addEventListener(
+            'error',
+            function (event) {
                 if (err) {
                     err(event);
                 }
-            }
-        }, false);
-
-        request.addEventListener('error', function (event) {
-            if (err) {
-                err(event);
-            }
-        }, false);
+            },
+            false
+        );
         request.send(null);
     }
 }

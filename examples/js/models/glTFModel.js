@@ -345,9 +345,7 @@
  */
 {
     xeogl.GLTFModel = class xeoglGLTFModel extends xeogl.Model {
-
         init(cfg) {
-
             super.init(cfg); // Call xeogl.Model._init()
 
             this._src = null;
@@ -362,7 +360,6 @@
             this.loaded = cfg.loaded;
             this.src = cfg.src;
         }
-
 
         /**
          Array of all the root {{#crossLink "Object"}}Objects{{/crossLink}} in this GLTFModel.
@@ -426,13 +423,14 @@
                 this.error("Value for 'src' should be a string");
                 return;
             }
-            if (value === this._src) { // Already loaded this GLTFModel
+            if (value === this._src) {
+                // Already loaded this GLTFModel
                 /**
                  Fired whenever this GLTFModel has finished loading components from the glTF file
                  specified by {{#crossLink "GLTFModel/src:property"}}{{/crossLink}}.
                  @event loaded
                  */
-                this.fire("loaded", true, true);
+                this.fire('loaded', true, true);
                 return;
             }
             this.clear();
@@ -460,16 +458,20 @@
         static load(model, src, options, ok, error) {
             var spinner = model.scene.canvas.spinner;
             spinner.processes++;
-            loadGLTF(model, src, options, function () {
+            loadGLTF(
+                model,
+                src,
+                options,
+                function() {
                     spinner.processes--;
-                    xeogl.scheduleTask(function () {
-                        model.fire("loaded", true, true);
+                    xeogl.scheduleTask(function() {
+                        model.fire('loaded', true, true);
                     });
                     if (ok) {
                         ok();
                     }
                 },
-                function (msg) {
+                function(msg) {
                     spinner.processes--;
                     model.error(msg);
                     if (error) {
@@ -481,8 +483,9 @@
                      @event error
                      @param msg {String} Description of the error
                      */
-                    model.fire("error", msg);
-                });
+                    model.fire('error', msg);
+                }
+            );
         }
 
         /**
@@ -500,33 +503,40 @@
             options = options || {};
             var spinner = model.scene.canvas.spinner;
             spinner.processes++;
-            parseGLTF(gltf, "", options, model, function () {
+            parseGLTF(
+                gltf,
+                '',
+                options,
+                model,
+                function() {
                     spinner.processes--;
-                    model.fire("loaded", true, true);
+                    model.fire('loaded', true, true);
                     if (ok) {
                         ok();
                     }
                 },
-                function (msg) {
+                function(msg) {
                     spinner.processes--;
                     model.error(msg);
-                    model.fire("error", msg);
+                    model.fire('error', msg);
                     if (error) {
                         error(msg);
                     }
-                });
+                }
+            );
         }
     };
 
-//--------------------------------------------------------------------------------------------
-// Loads glTF V2.0
-//--------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------
+    // Loads glTF V2.0
+    //--------------------------------------------------------------------------------------------
 
-    var loadGLTF = (function () {
-
-        return function (model, src, options, ok, error) {
-
-            loadJSON(src, function (response) { // OK
+    var loadGLTF = (function() {
+        return function(model, src, options, ok, error) {
+            loadJSON(
+                src,
+                function(response) {
+                    // OK
                     var json;
                     try {
                         json = JSON.parse(response);
@@ -536,60 +546,68 @@
                     options.basePath = getBasePath(src);
                     parseGLTF(json, src, options, model, ok, error);
                 },
-                error);
+                error
+            );
         };
 
         function loadJSON(url, ok, err) {
             var request = new XMLHttpRequest();
-            request.overrideMimeType("application/json");
+            request.overrideMimeType('application/json');
             request.open('GET', url, true);
-            request.addEventListener('load', function (event) {
-                var response = event.target.response;
-                if (this.status === 200) {
-                    if (ok) {
-                        ok(response);
+            request.addEventListener(
+                'load',
+                function(event) {
+                    var response = event.target.response;
+                    if (this.status === 200) {
+                        if (ok) {
+                            ok(response);
+                        }
+                    } else if (this.status === 0) {
+                        // Some browsers return HTTP Status 0 when using non-http protocol
+                        // e.g. 'file://' or 'data://'. Handle as success.
+                        console.warn('loadFile: HTTP Status 0 received.');
+                        if (ok) {
+                            ok(response);
+                        }
+                    } else {
+                        if (err) {
+                            err(event);
+                        }
                     }
-                } else if (this.status === 0) {
-                    // Some browsers return HTTP Status 0 when using non-http protocol
-                    // e.g. 'file://' or 'data://'. Handle as success.
-                    console.warn('loadFile: HTTP Status 0 received.');
-                    if (ok) {
-                        ok(response);
-                    }
-                } else {
+                },
+                false
+            );
+
+            request.addEventListener(
+                'error',
+                function(event) {
                     if (err) {
                         err(event);
                     }
-                }
-            }, false);
-
-            request.addEventListener('error', function (event) {
-                if (err) {
-                    err(event);
-                }
-            }, false);
+                },
+                false
+            );
             request.send(null);
         }
 
         function getBasePath(src) {
-            var i = src.lastIndexOf("/");
-            return (i !== 0) ? src.substring(0, i + 1) : "";
+            var i = src.lastIndexOf('/');
+            return i !== 0 ? src.substring(0, i + 1) : '';
         }
     })();
 
-    var parseGLTF = (function () {
-
+    var parseGLTF = (function() {
         const WebGLConstants = {
-            34963: 'ELEMENT_ARRAY_BUFFER',  //0x8893
-            34962: 'ARRAY_BUFFER',          //0x8892
-            5123: 'UNSIGNED_SHORT',         //0x1403
-            5126: 'FLOAT',                  //0x1406
-            4: 'TRIANGLES',                 //0x0004
-            35678: 'SAMPLER_2D',            //0x8B5E
-            35664: 'FLOAT_VEC2',            //0x8B50
-            35665: 'FLOAT_VEC3',            //0x8B51
-            35666: 'FLOAT_VEC4',            //0x8B52
-            35676: 'FLOAT_MAT4'             //0x8B5C
+            34963: 'ELEMENT_ARRAY_BUFFER', //0x8893
+            34962: 'ARRAY_BUFFER', //0x8892
+            5123: 'UNSIGNED_SHORT', //0x1403
+            5126: 'FLOAT', //0x1406
+            4: 'TRIANGLES', //0x0004
+            35678: 'SAMPLER_2D', //0x8B5E
+            35664: 'FLOAT_VEC2', //0x8B50
+            35665: 'FLOAT_VEC3', //0x8B51
+            35666: 'FLOAT_VEC4', //0x8B52
+            35676: 'FLOAT_MAT4' //0x8B5C
         };
 
         const WEBGL_COMPONENT_TYPES = {
@@ -602,19 +620,18 @@
         };
 
         const WEBGL_TYPE_SIZES = {
-            'SCALAR': 1,
-            'VEC2': 2,
-            'VEC3': 3,
-            'VEC4': 4,
-            'MAT2': 4,
-            'MAT3': 9,
-            'MAT4': 16
+            SCALAR: 1,
+            VEC2: 2,
+            VEC3: 3,
+            VEC4: 4,
+            MAT2: 4,
+            MAT3: 9,
+            MAT4: 16
         };
 
         const VALID_NUM_DIGITS = 5;
 
-        return function (json, src, options, model, ok) {
-
+        return function(json, src, options, model, ok) {
             model.clear();
 
             var ctx = {
@@ -652,8 +669,7 @@
 
             model.scene.loading++; // Disables (re)compilation
 
-            loadBuffers(ctx, function () {
-
+            loadBuffers(ctx, function() {
                 loadBufferViews(ctx);
                 loadAccessors(ctx);
                 if (!ctx.lambertMaterials) {
@@ -676,16 +692,21 @@
             if (buffers) {
                 var numToLoad = buffers.length;
                 for (var i = 0, len = buffers.length; i < len; i++) {
-                    loadBuffer(ctx, buffers[i], function () {
-                        if (--numToLoad === 0) {
-                            ok();
+                    loadBuffer(
+                        ctx,
+                        buffers[i],
+                        function() {
+                            if (--numToLoad === 0) {
+                                ok();
+                            }
+                        },
+                        function(msg) {
+                            ctx.model.error(msg);
+                            if (--numToLoad === 0) {
+                                ok();
+                            }
                         }
-                    }, function (msg) {
-                        ctx.model.error(msg);
-                        if (--numToLoad === 0) {
-                            ok();
-                        }
-                    });
+                    );
                 }
             } else {
                 ok();
@@ -695,25 +716,31 @@
         function loadBuffer(ctx, bufferInfo, ok, err) {
             var uri = bufferInfo.uri;
             if (uri) {
-                loadArrayBuffer(ctx, uri, function (data) {
+                loadArrayBuffer(
+                    ctx,
+                    uri,
+                    function(data) {
                         bufferInfo._buffer = data;
                         ok();
                     },
-                    err);
-            }
-            else {
-                err('gltf/handleBuffer missing uri in ' + JSON.stringify(bufferInfo));
+                    err
+                );
+            } else {
+                err(
+                    'gltf/handleBuffer missing uri in ' +
+                        JSON.stringify(bufferInfo)
+                );
             }
         }
 
         function loadArrayBuffer(ctx, url, ok, err) {
-
             // Check for data: URI
 
             var dataUriRegex = /^data:(.*?)(;base64)?,(.*)$/;
             var dataUriRegexResult = url.match(dataUriRegex);
 
-            if (dataUriRegexResult) { // Safari can't handle data URIs through XMLHttpRequest
+            if (dataUriRegexResult) {
+                // Safari can't handle data URIs through XMLHttpRequest
 
                 var mimeType = dataUriRegexResult[1];
                 var isBase64 = !!dataUriRegexResult[2];
@@ -731,30 +758,33 @@
                     for (var i = 0; i < data.length; i++) {
                         view[i] = data.charCodeAt(i);
                     }
-                    window.setTimeout(function () {
+                    window.setTimeout(function() {
                         ok(buffer);
                     }, 0);
                 } catch (error) {
-                    window.setTimeout(function () {
+                    window.setTimeout(function() {
                         err(error);
                     }, 0);
                 }
             } else {
-
                 if (ctx.loadBuffer) {
                     ctx.loadBuffer(url, ok, err);
-
                 } else {
-
                     var request = new XMLHttpRequest();
                     request.open('GET', ctx.basePath + url, true);
                     request.responseType = 'arraybuffer';
-                    request.onreadystatechange = function () {
+                    request.onreadystatechange = function() {
                         if (request.readyState === 4) {
-                            if (request.status === "200" || request.status === 200) {
+                            if (
+                                request.status === '200' ||
+                                request.status === 200
+                            ) {
                                 ok(request.response);
                             } else {
-                                err('loadArrayBuffer error : ' + request.response);
+                                err(
+                                    'loadArrayBuffer error : ' +
+                                        request.response
+                                );
                             }
                         }
                     };
@@ -773,7 +803,6 @@
         }
 
         function loadBufferView(ctx, bufferViewInfo) {
-
             var buffer = ctx.json.buffers[bufferViewInfo.buffer];
 
             bufferViewInfo._typedArray = null;
@@ -781,14 +810,19 @@
             var byteLength = bufferViewInfo.byteLength || 0;
             var byteOffset = bufferViewInfo.byteOffset || 0;
 
-            bufferViewInfo._buffer = buffer._buffer.slice(byteOffset, byteOffset + byteLength);
+            bufferViewInfo._buffer = buffer._buffer.slice(
+                byteOffset,
+                byteOffset + byteLength
+            );
 
             if (bufferViewInfo.target === 34963) {
-                bufferViewInfo._typedArray = new Uint16Array(bufferViewInfo._buffer);
-
+                bufferViewInfo._typedArray = new Uint16Array(
+                    bufferViewInfo._buffer
+                );
             } else if (bufferViewInfo.target === 34962) {
-                bufferViewInfo._typedArray = new Float32Array(bufferViewInfo._buffer);
-
+                bufferViewInfo._typedArray = new Float32Array(
+                    bufferViewInfo._buffer
+                );
             } else {
                 //ctx.model.log(bufferViewInfo._typedArray)
             }
@@ -813,18 +847,25 @@
             var itemBytes = elementBytes * itemSize;
 
             // The buffer is not interleaved if the stride is the item size in bytes.
-            if (accessorInfo.byteStride && accessorInfo.byteStride !== itemBytes) {
-
+            if (
+                accessorInfo.byteStride &&
+                accessorInfo.byteStride !== itemBytes
+            ) {
                 //TODO
-
-//                alert("interleaved buffer!");
-
+                //                alert("interleaved buffer!");
             } else {
-                accessorInfo._typedArray = new TypedArray(arraybuffer._buffer, accessorInfo.byteOffset || 0, accessorInfo.count * itemSize);
+                accessorInfo._typedArray = new TypedArray(
+                    arraybuffer._buffer,
+                    accessorInfo.byteOffset || 0,
+                    accessorInfo.count * itemSize
+                );
                 accessorInfo._itemSize = itemSize;
 
                 if (idx % 3 === 0) {
-                    const divideBy = getDividedBy(accessorInfo._typedArray, VALID_NUM_DIGITS)
+                    const divideBy = getDividedBy(
+                        accessorInfo._typedArray,
+                        VALID_NUM_DIGITS
+                    );
                     if (divideBy > ctx.divideBy) {
                         ctx.divideBy = divideBy;
                     }
@@ -832,15 +873,20 @@
             }
         }
 
-         // functions to calculate the number of digits of abolute values in postions array
+        // functions to calculate the number of digits of abolute values in postions array
         // returns a value on which every postion (x,y,z) has to be devided by to get valid amount
-        // of digits 
+        // of digits
         function getDividedBy(accessor, validDigits) {
-
-            const maxValue = accessor.reduce(function(a,b) { return Math.max(Math.abs(a),Math.abs(b)); });
-            const numDigits = ((Math.log10((maxValue ^ (maxValue >> 31)) - (maxValue >> 31)) | 0) + 1);
-            return numDigits > validDigits ? Math.pow(10,numDigits-validDigits) : 1;
-    
+            const maxValue = accessor.reduce(function(a, b) {
+                return Math.max(Math.abs(a), Math.abs(b));
+            });
+            const numDigits =
+                (Math.log10((maxValue ^ (maxValue >> 31)) - (maxValue >> 31)) |
+                    0) +
+                1;
+            return numDigits > validDigits
+                ? Math.pow(10, numDigits - validDigits)
+                : 1;
         }
 
         function loadTextures(ctx) {
@@ -854,7 +900,9 @@
 
         function loadTexture(ctx, textureInfo) {
             var texture = new xeogl.Texture(ctx.scene, {
-                src: ctx.json.images[textureInfo.source].uri ? ctx.basePath + ctx.json.images[textureInfo.source].uri : undefined,
+                src: ctx.json.images[textureInfo.source].uri
+                    ? ctx.basePath + ctx.json.images[textureInfo.source].uri
+                    : undefined,
                 flipY: !!textureInfo.flipY
             });
             ctx.model._addComponent(texture);
@@ -881,7 +929,6 @@
         }
 
         function loadMaterial(ctx, materialInfo) {
-
             var json = ctx.json;
             var cfg = {};
             var textureInfo;
@@ -893,7 +940,7 @@
                 textureInfo = json.textures[normalTexture.index];
                 if (textureInfo) {
                     cfg.normalMap = textureInfo._texture;
-                    cfg.normalMap.encoding = "linear";
+                    cfg.normalMap.encoding = 'linear';
                 }
             }
 
@@ -910,7 +957,7 @@
                 textureInfo = json.textures[emissiveTexture.index];
                 if (textureInfo) {
                     cfg.emissiveMap = textureInfo._texture;
-                    cfg.emissiveMap.encoding = "sRGB";
+                    cfg.emissiveMap.encoding = 'sRGB';
                 }
             }
 
@@ -923,14 +970,14 @@
 
             var alphaMode = materialInfo.alphaMode;
             switch (alphaMode) {
-                case "OPAQUE":
-                    cfg.alphaMode = "opaque";
+                case 'OPAQUE':
+                    cfg.alphaMode = 'opaque';
                     break;
-                case "MASK":
-                    cfg.alphaMode = "mask";
+                case 'MASK':
+                    cfg.alphaMode = 'mask';
                     break;
-                case "BLEND":
-                    cfg.alphaMode = "blend";
+                case 'BLEND':
+                    cfg.alphaMode = 'blend';
                     break;
                 default:
             }
@@ -942,12 +989,11 @@
 
             var extensions = materialInfo.extensions;
             if (extensions) {
-
                 // Specular PBR material
 
-                var specularPBR = extensions["KHR_materials_pbrSpecularGlossiness"];
+                var specularPBR =
+                    extensions['KHR_materials_pbrSpecularGlossiness'];
                 if (specularPBR) {
-
                     var diffuseFactor = specularPBR.diffuseFactor;
                     if (diffuseFactor !== null && diffuseFactor !== undefined) {
                         cfg.diffuse = diffuseFactor.slice(0, 3);
@@ -959,26 +1005,34 @@
                         textureInfo = json.textures[diffuseTexture.index];
                         if (textureInfo) {
                             cfg.diffuseMap = textureInfo._texture;
-                            cfg.diffuseMap.encoding = "sRGB";
+                            cfg.diffuseMap.encoding = 'sRGB';
                         }
                     }
 
                     var specularFactor = specularPBR.specularFactor;
-                    if (specularFactor !== null && specularFactor !== undefined) {
+                    if (
+                        specularFactor !== null &&
+                        specularFactor !== undefined
+                    ) {
                         cfg.specular = specularFactor.slice(0, 3);
                     }
 
                     var glossinessFactor = specularPBR.glossinessFactor;
-                    if (glossinessFactor !== null && glossinessFactor !== undefined) {
+                    if (
+                        glossinessFactor !== null &&
+                        glossinessFactor !== undefined
+                    ) {
                         cfg.glossiness = glossinessFactor;
                     }
 
-                    var specularGlossinessTexture = specularPBR.specularGlossinessTexture;
+                    var specularGlossinessTexture =
+                        specularPBR.specularGlossinessTexture;
                     if (specularGlossinessTexture) {
-                        textureInfo = json.textures[specularGlossinessTexture.index];
+                        textureInfo =
+                            json.textures[specularGlossinessTexture.index];
                         if (textureInfo) {
                             cfg.specularGlossinessMap = textureInfo._texture;
-                            cfg.specularGlossinessMap.encoding = "linear";
+                            cfg.specularGlossinessMap.encoding = 'linear';
                         }
                     }
 
@@ -987,19 +1041,22 @@
 
                 // Common Phong, Blinn, Lambert or Constant materials
 
-                var common = extensions["KHR_materials_common"];
+                var common = extensions['KHR_materials_common'];
                 if (common) {
-
                     var technique = common.technique;
                     var values = common.values || {};
 
-                    var blinn = technique === "BLINN";
-                    var phong = technique === "PHONG";
-                    var lambert = technique === "LAMBERT";
-                    var constant = technique === "CONSTANT";
+                    var blinn = technique === 'BLINN';
+                    var phong = technique === 'PHONG';
+                    var lambert = technique === 'LAMBERT';
+                    var constant = technique === 'CONSTANT';
 
                     var shininess = values.shininess;
-                    if ((blinn || phong) && shininess !== null && shininess !== undefined) {
+                    if (
+                        (blinn || phong) &&
+                        shininess !== null &&
+                        shininess !== undefined
+                    ) {
                         cfg.shininess = shininess;
                     } else {
                         cfg.shininess = 0;
@@ -1011,7 +1068,7 @@
                             texture = ctx.textures[diffuse];
                             if (texture) {
                                 cfg.diffuseMap = texture;
-                                cfg.diffuseMap.encoding = "sRGB";
+                                cfg.diffuseMap.encoding = 'sRGB';
                             }
                         } else {
                             cfg.diffuse = diffuse.slice(0, 3);
@@ -1070,7 +1127,6 @@
 
             var metallicPBR = materialInfo.pbrMetallicRoughness;
             if (metallicPBR) {
-
                 var baseColorFactor = metallicPBR.baseColorFactor;
                 if (baseColorFactor) {
                     cfg.baseColor = baseColorFactor.slice(0, 3);
@@ -1082,7 +1138,7 @@
                     textureInfo = json.textures[baseColorTexture.index];
                     if (textureInfo) {
                         cfg.baseColorMap = textureInfo._texture;
-                        cfg.baseColorMap.encoding = "sRGB";
+                        cfg.baseColorMap.encoding = 'sRGB';
                     }
                 }
 
@@ -1096,12 +1152,13 @@
                     cfg.roughness = roughnessFactor;
                 }
 
-                var metallicRoughnessTexture = metallicPBR.metallicRoughnessTexture;
+                var metallicRoughnessTexture =
+                    metallicPBR.metallicRoughnessTexture;
                 if (metallicRoughnessTexture) {
                     textureInfo = json.textures[metallicRoughnessTexture.index];
                     if (textureInfo) {
                         cfg.metallicRoughnessMap = textureInfo._texture;
-                        cfg.metallicRoughnessMap.encoding = "linear";
+                        cfg.metallicRoughnessMap.encoding = 'linear';
                     }
                 }
 
@@ -1115,16 +1172,15 @@
 
         // Extract diffuse/baseColor and alpha into RGBA Mesh 'colorize' property
         function loadMaterialColorize(ctx, materialInfo) {
-
             var json = ctx.json;
             var colorize = new Float32Array([1, 1, 1, 1]);
 
             var extensions = materialInfo.extensions;
             if (extensions) {
-
                 // Specular PBR material
 
-                var specularPBR = extensions["KHR_materials_pbrSpecularGlossiness"];
+                var specularPBR =
+                    extensions['KHR_materials_pbrSpecularGlossiness'];
                 if (specularPBR) {
                     var diffuseFactor = specularPBR.diffuseFactor;
                     if (diffuseFactor !== null && diffuseFactor !== undefined) {
@@ -1134,16 +1190,15 @@
 
                 // Common Phong, Blinn, Lambert or Constant materials
 
-                var common = extensions["KHR_materials_common"];
+                var common = extensions['KHR_materials_common'];
                 if (common) {
-
                     var technique = common.technique;
                     var values = common.values || {};
 
-                    var blinn = technique === "BLINN";
-                    var phong = technique === "PHONG";
-                    var lambert = technique === "LAMBERT";
-                    var constant = technique === "CONSTANT";
+                    var blinn = technique === 'BLINN';
+                    var phong = technique === 'PHONG';
+                    var lambert = technique === 'LAMBERT';
+                    var constant = technique === 'CONSTANT';
 
                     var diffuse = values.diffuse;
                     if (diffuse && (blinn || phong || lambert)) {
@@ -1187,7 +1242,6 @@
         }
 
         function loadMesh(ctx, meshInfo) {
-
             var json = ctx.json;
             var mesh = [];
             var primitivesInfo = meshInfo.primitives;
@@ -1198,7 +1252,6 @@
             var attributes;
 
             if (primitivesInfo) {
-
                 var primitiveInfo;
                 var indicesIndex;
                 var positionsIndex;
@@ -1208,12 +1261,13 @@
                 var meshCfg;
                 var geometry;
 
+                var id;
+
                 const divideBy = ctx.divideBy;
 
                 for (var i = 0, len = primitivesInfo.length; i < len; i++) {
-
                     geometryCfg = {
-                        primitive: "triangles",
+                        primitive: 'triangles',
                         combined: ctx.combineGeometry,
                         quantized: ctx.quantizeGeometry,
                         edgeThreshold: ctx.edgeThreshold
@@ -1224,7 +1278,8 @@
 
                     if (indicesIndex !== null && indicesIndex !== undefined) {
                         accessorInfo = json.accessors[indicesIndex];
-                        bufferViewInfo = json.bufferViews[accessorInfo.bufferView];
+                        bufferViewInfo =
+                            json.bufferViews[accessorInfo.bufferView];
                         geometryCfg.indices = accessorInfo._typedArray;
                     }
 
@@ -1235,18 +1290,29 @@
 
                     positionsIndex = attributes.POSITION;
 
-                    if (positionsIndex !== null && positionsIndex !== undefined) {
+                    if (
+                        positionsIndex !== null &&
+                        positionsIndex !== undefined
+                    ) {
                         accessorInfo = json.accessors[positionsIndex];
-                        bufferViewInfo = json.bufferViews[accessorInfo.bufferView];
+                        geometryCfg.id = accessorInfo.name.substring(
+                            0,
+                            accessorInfo.name.length - 14
+                        );
+                        bufferViewInfo =
+                            json.bufferViews[accessorInfo.bufferView];
                         // console.log(accessorInfo._typedArray);
-                        geometryCfg.positions = accessorInfo._typedArray.map(a => a / divideBy);
+                        geometryCfg.positions = accessorInfo._typedArray.map(
+                            a => a / divideBy
+                        );
                     }
 
                     normalsIndex = attributes.NORMAL;
 
                     if (normalsIndex !== null && normalsIndex !== undefined) {
                         accessorInfo = json.accessors[normalsIndex];
-                        bufferViewInfo = json.bufferViews[accessorInfo.bufferView];
+                        bufferViewInfo =
+                            json.bufferViews[accessorInfo.bufferView];
                         geometryCfg.normals = accessorInfo._typedArray;
                     }
 
@@ -1254,7 +1320,8 @@
 
                     if (uv0Index !== null && uv0Index !== undefined) {
                         accessorInfo = json.accessors[uv0Index];
-                        bufferViewInfo = json.bufferViews[accessorInfo.bufferView];
+                        bufferViewInfo =
+                            json.bufferViews[accessorInfo.bufferView];
                         geometryCfg.uv = accessorInfo._typedArray;
                     }
 
@@ -1272,7 +1339,6 @@
                             meshCfg.material = materialInfo._material;
                         }
                     }
-
                     mesh.push(meshCfg);
                 }
             }
@@ -1284,7 +1350,7 @@
             var scene = json.scene || 0;
             var defaultSceneInfo = json.scenes[scene];
             if (!defaultSceneInfo) {
-                error(ctx, "glTF has no default scene");
+                error(ctx, 'glTF has no default scene');
                 return;
             }
             loadScene(ctx, defaultSceneInfo);
@@ -1300,7 +1366,7 @@
             for (var i = 0, len = nodes.length; i < len; i++) {
                 nodeInfo = json.nodes[nodes[i]];
                 if (!nodeInfo) {
-                    error(ctx, "Node not found: " + i);
+                    error(ctx, 'Node not found: ' + i);
                     continue;
                 }
                 loadNode(ctx, i, nodeInfo, null, null);
@@ -1308,7 +1374,6 @@
         }
 
         function loadNode(ctx, nodeIdx, nodeInfo, matrix, parent, parentCfg) {
-
             parent = parent || ctx.model;
             var createObject;
 
@@ -1329,7 +1394,8 @@
             var model = ctx.model;
             var math = xeogl.math;
             var localMatrix;
-            var hasChildNodes = nodeInfo.children && nodeInfo.children.length > 0;
+            var hasChildNodes =
+                nodeInfo.children && nodeInfo.children.length > 0;
             var group;
 
             if (nodeInfo.matrix) {
@@ -1371,32 +1437,36 @@
             ctx.numObjects++;
 
             if (nodeInfo.mesh !== undefined) {
-
                 var meshInfo = json.meshes[nodeInfo.mesh];
 
                 if (meshInfo) {
-
                     var meshesInfo = meshInfo._mesh;
                     var meshesInfoMesh;
                     var mesh;
                     var numMeshes = meshesInfo.length;
 
                     if (!createObject && numMeshes > 0 && !hasChildNodes) {
-
                         // Case 1: Not creating object, node has meshes, node has no child nodes
 
                         for (var i = 0, len = numMeshes; i < len; i++) {
                             meshesInfoMesh = meshesInfo[i];
                             var meshCfg = {
+                                id:
+                                    parent.id +
+                                    '#' +
+                                    meshesInfoMesh.geometry.id,
                                 geometry: meshesInfoMesh.geometry,
                                 matrix: matrix
                             };
                             xeogl._apply(ctx.modelProps, meshCfg);
                             if (ctx.lambertMaterials) {
                                 if (!model.material) {
-                                    model.material = new xeogl.LambertMaterial(ctx.scene, {
-                                        backfaces: true
-                                    });
+                                    model.material = new xeogl.LambertMaterial(
+                                        ctx.scene,
+                                        {
+                                            backfaces: true
+                                        }
+                                    );
                                 }
                                 meshCfg.material = model.material;
                                 meshCfg.colorize = meshesInfoMesh.material;
@@ -1412,20 +1482,23 @@
                     }
 
                     if (createObject && numMeshes === 1 && !hasChildNodes) {
-
                         // Case 2: Creating object, node has one mesh, node has no child nodes
 
                         meshesInfoMesh = meshesInfo[0];
                         var meshCfg = {
+                            id: parent.id + '#' + meshesInfoMesh.geometry.id,
                             geometry: meshesInfoMesh.geometry,
                             matrix: matrix
                         };
                         xeogl._apply(ctx.modelProps, meshCfg);
                         if (ctx.lambertMaterials) {
                             if (!model.material) {
-                                model.material = new xeogl.LambertMaterial(ctx.scene, {
-                                    backfaces: true
-                                });
+                                model.material = new xeogl.LambertMaterial(
+                                    ctx.scene,
+                                    {
+                                        backfaces: true
+                                    }
+                                );
                             }
                             meshCfg.material = model.material;
                             meshCfg.colorize = meshesInfoMesh.material; // [R,G,B,A]
@@ -1441,7 +1514,6 @@
                     }
 
                     if (createObject && numMeshes > 0 && !hasChildNodes) {
-
                         // Case 3: Creating object, node has meshes, node has no child nodes
 
                         var groupCfg = {
@@ -1455,14 +1527,21 @@
                         for (var i = 0, len = numMeshes; i < len; i++) {
                             meshesInfoMesh = meshesInfo[i];
                             var meshCfg = {
+                                id:
+                                    parent.id +
+                                    '#' +
+                                    meshesInfoMesh.geometry.id,
                                 geometry: meshesInfoMesh.geometry
                             };
                             xeogl._apply(ctx.modelProps, meshCfg);
                             if (ctx.lambertMaterials) {
                                 if (!model.material) {
-                                    model.material = new xeogl.LambertMaterial(ctx.scene, {
-                                        backfaces: true
-                                    });
+                                    model.material = new xeogl.LambertMaterial(
+                                        ctx.scene,
+                                        {
+                                            backfaces: true
+                                        }
+                                    );
                                 }
                                 meshCfg.material = model.material;
                                 meshCfg.colorize = meshesInfoMesh.material;
@@ -1471,7 +1550,7 @@
                                 meshCfg.material = meshesInfoMesh.material;
                             }
                             xeogl._apply(createObject, meshCfg);
-                            meshCfg.id = createObject.id + "." + i;
+                            meshCfg.id = createObject.id + '.' + i;
                             meshCfg.entityType = null;
                             mesh = new xeogl.Mesh(ctx.scene, meshCfg);
                             group.addChild(mesh, false);
@@ -1481,7 +1560,6 @@
                     }
 
                     if (!createObject && numMeshes > 0 && hasChildNodes) {
-
                         // Case 4: Not creating object, node has meshes, node has child nodes
 
                         var groupCfg = {
@@ -1494,6 +1572,10 @@
                         for (var i = 0, len = numMeshes; i < len; i++) {
                             meshesInfoMesh = meshesInfo[i];
                             var meshCfg = {
+                                id:
+                                    parent.id +
+                                    '#' +
+                                    meshesInfoMesh.geometry.id,
                                 geometry: meshesInfoMesh.geometry
                             };
                             xeogl._apply(groupCfg, meshCfg);
@@ -1501,9 +1583,12 @@
                             meshCfg.matrix = null; // Group has matrix
                             if (ctx.lambertMaterials) {
                                 if (!model.material) {
-                                    model.material = new xeogl.LambertMaterial(ctx.scene, {
-                                        backfaces: true
-                                    });
+                                    model.material = new xeogl.LambertMaterial(
+                                        ctx.scene,
+                                        {
+                                            backfaces: true
+                                        }
+                                    );
                                 }
                                 meshCfg.material = model.material;
                                 meshCfg.colorize = meshesInfoMesh.material;
@@ -1521,7 +1606,6 @@
                     }
 
                     if (createObject && numMeshes === 0 && hasChildNodes) {
-
                         // Case 5: Creating explicit object, node has meshes OR node has child nodes
 
                         var groupCfg = {
@@ -1538,11 +1622,10 @@
                         parentCfg = groupCfg;
                     }
 
-                    if (createObject && numMeshes > 0 || hasChildNodes) {
-
+                    if ((createObject && numMeshes > 0) || hasChildNodes) {
                         // Case 6: Creating explicit object, node has meshes OR node has child nodes
 
-                        console.log("Case 6");
+                        console.log('Case 6');
 
                         var groupCfg = {
                             matrix: matrix
@@ -1557,14 +1640,21 @@
                         for (var i = 0, len = numMeshes; i < len; i++) {
                             meshesInfoMesh = meshesInfo[i];
                             var meshCfg = {
+                                id:
+                                    parent.id +
+                                    '#' +
+                                    meshesInfoMesh.geometry.id,
                                 geometry: meshesInfoMesh.geometry
                             };
                             xeogl._apply(ctx.modelProps, meshCfg);
                             if (ctx.lambertMaterials) {
                                 if (!model.material) {
-                                    model.material = new xeogl.LambertMaterial(ctx.scene, {
-                                        backfaces: true
-                                    });
+                                    model.material = new xeogl.LambertMaterial(
+                                        ctx.scene,
+                                        {
+                                            backfaces: true
+                                        }
+                                    );
                                 }
                                 meshCfg.material = model.material;
                                 meshCfg.colorize = meshesInfoMesh.material; // [R,G,B,A]
@@ -1574,7 +1664,7 @@
                             }
                             if (createObject) {
                                 xeogl._apply(createObject, meshCfg);
-                                meshCfg.id = createObject.id + "." + i;
+                                meshCfg.id = createObject.id + '.' + i;
                             }
                             meshCfg.entityType = null;
                             mesh = new xeogl.Mesh(ctx.scene, meshCfg);
@@ -1596,10 +1686,17 @@
                     childNodeIdx = children[i];
                     childNodeInfo = json.nodes[childNodeIdx];
                     if (!childNodeInfo) {
-                        error(ctx, "Node not found: " + i);
+                        error(ctx, 'Node not found: ' + i);
                         continue;
                     }
-                    loadNode(ctx, nodeIdx, childNodeInfo, matrix, parent, parentCfg);
+                    loadNode(
+                        ctx,
+                        nodeIdx,
+                        childNodeInfo,
+                        matrix,
+                        parent,
+                        parentCfg
+                    );
                 }
             }
         }
@@ -1607,6 +1704,5 @@
         function error(ctx, msg) {
             ctx.model.error(msg);
         }
-
     })();
 }

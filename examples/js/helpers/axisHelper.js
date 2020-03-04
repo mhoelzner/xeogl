@@ -49,6 +49,13 @@
         document.getElementById(container).appendChild(div);
         var helperCanvas = document.getElementById(canvasId);
 
+        // canvas.on("boundary",
+        //     function (boundary) {
+        //         //style.left = boundary[0] + 10 + "px";
+        // 		style.right = boundary[0] + 10 + "px";
+        //         style.bottom = (boundary[0] + 20) + "px";
+        //     });
+
         // The scene containing this helper
         var scene = new xeogl.Scene({
             canvas: helperCanvas,
@@ -232,8 +239,8 @@
                 pickable: false,
                 collidable: false,
                 visible: !!cfg.visible,
-                position: [-5, 0, 0],
-                rotation: [0, 0, 90]
+                position: [5, 0, 0],
+                rotation: [0, 0, 270]
             }),
 
             new xeogl.Mesh(scene, {
@@ -243,8 +250,8 @@
                 pickable: false,
                 collidable: false,
                 visible: !!cfg.visible,
-                position: [-2, 0, 0],
-                rotation: [0, 0, 90]
+                position: [2, 0, 0],
+                rotation: [0, 0, 270]
             }),
 
             new xeogl.Mesh(scene, {
@@ -257,7 +264,7 @@
                 pickable: false,
                 collidable: false,
                 visible: !!cfg.visible,
-                position: [-7, 0, 0],
+                position: [7, 0, 0],
                 billboard: 'spherical'
             }),
 
