@@ -10924,7 +10924,7 @@ componentClasses[type$6] = PhongMaterial;
  @extends Component
  */
 
-const type$7 = 'xeogl.Object';
+const type$7 = "xeogl.Object";
 const angleAxis = new Float32Array(4);
 const q1 = new Float32Array(4);
 const q2 = new Float32Array(4);
@@ -10938,6 +10938,8 @@ const vecb = new Float32Array(3);
 const identityMat = math.identityMat4();
 
 class xeoglObject extends Component {
+
+
     /**
      JavaScript class name for this Component.
 
@@ -10952,6 +10954,7 @@ class xeoglObject extends Component {
     }
 
     init(cfg) {
+
         super.init(cfg);
 
         this._guid = cfg.guid;
@@ -11056,11 +11059,7 @@ class xeoglObject extends Component {
                 this._worldMatrix[i] = localMatrix[i];
             }
         } else {
-            math.mulMat4(
-                this._parent.worldMatrix,
-                localMatrix,
-                this._worldMatrix
-            );
+            math.mulMat4(this._parent.worldMatrix, localMatrix, this._worldMatrix);
         }
         this._worldMatrixDirty = false;
     }
@@ -11079,7 +11078,7 @@ class xeoglObject extends Component {
 
     _setSubtreeAABBsDirty(object) {
         object._aabbDirty = true;
-        object.fire('boundary', true);
+        object.fire("boundary", true);
         if (object._childList) {
             for (let i = 0, len = object._childList.length; i < len; i++) {
                 this._setSubtreeAABBsDirty(object._childList[i]);
@@ -11092,7 +11091,7 @@ class xeoglObject extends Component {
         if (this.collidable) {
             for (let object = this; object; object = object._parent) {
                 object._aabbDirty = true;
-                object.fire('boundary', true);
+                object.fire("boundary", true);
             }
         }
     }
@@ -11104,8 +11103,7 @@ class xeoglObject extends Component {
         }
         if (this._buildMeshAABB) {
             this._buildMeshAABB(this.worldMatrix, this._aabb); // Geometry
-        } else {
-            // Object | Group | Model
+        } else { // Object | Group | Model
             math.collapseAABB3(this._aabb);
             let object;
             for (let i = 0, len = this._childList.length; i < len; i++) {
@@ -11145,22 +11143,22 @@ class xeoglObject extends Component {
             const objectId = object;
             object = this.scene.objects[objectId];
             if (!object) {
-                this.warn('Object not found: ' + utils.inQuotes(objectId));
+                this.warn("Object not found: " + utils.inQuotes(objectId));
                 return;
             }
         } else if (utils.isObject(object)) {
-            throw 'addChild( * ) not implemented';
+            throw "addChild( * ) not implemented";
             if (!object) {
                 return;
             }
         } else {
-            if (!object.isType('xeogl.Object')) {
-                this.error('Not a xeogl.Object: ' + object.id);
+            if (!object.isType("xeogl.Object")) {
+                this.error("Not a xeogl.Object: " + object.id);
                 return;
             }
             if (object._parent) {
                 if (object._parent.id === this.id) {
-                    this.warn('Already a child object: ' + object.id);
+                    this.warn("Already a child object: " + object.id);
                     return;
                 }
                 object._parent.removeChild(object);
@@ -11168,7 +11166,7 @@ class xeoglObject extends Component {
         }
         const id = object.id;
         if (object.scene.id !== this.scene.id) {
-            this.error('Object not in same Scene: ' + object.id);
+            this.error("Object not in same Scene: " + object.id);
             return;
         }
         delete this.scene.rootObjects[object.id];
@@ -11449,16 +11447,16 @@ class xeoglObject extends Component {
             const objectId = object;
             object = this.scene.objects[objectId];
             if (!object) {
-                this.warn('Group not found: ' + utils.inQuotes(objectId));
+                this.warn("Group not found: " + utils.inQuotes(objectId));
                 return;
             }
         }
         if (object.scene.id !== this.scene.id) {
-            this.error('Group not in same Scene: ' + object.id);
+            this.error("Group not in same Scene: " + object.id);
             return;
         }
         if (this._parent && this._parent.id === object.id) {
-            this.warn('Already a child of Group: ' + object.id);
+            this.warn("Already a child of Group: " + object.id);
             return;
         }
         object.addChild(this);
@@ -11499,7 +11497,7 @@ class xeoglObject extends Component {
      */
     set rotation(value) {
         this._rotation.set(value || [0, 0, 0]);
-        math.eulerToQuaternion(this._rotation, 'XYZ', this._quaternion);
+        math.eulerToQuaternion(this._rotation, "XYZ", this._quaternion);
         this._setLocalMatrixDirty();
         this._setAABBDirty();
         this._renderer.imageDirty();
@@ -11518,7 +11516,7 @@ class xeoglObject extends Component {
      */
     set quaternion(value) {
         this._quaternion.set(value || [0, 0, 0, 1]);
-        math.quaternionToEuler(this._quaternion, 'XYZ', this._rotation);
+        math.quaternionToEuler(this._quaternion, "XYZ", this._rotation);
         this._setLocalMatrixDirty();
         this._setAABBDirty();
         this._renderer.imageDirty();
@@ -11554,16 +11552,12 @@ class xeoglObject extends Component {
      * @type {Float32Array}
      */
     set matrix(value) {
+
         if (!this.__localMatrix) {
             this.__localMatrix = math.identityMat4();
         }
         this.__localMatrix.set(value || identityMat);
-        math.decomposeMat4(
-            this.__localMatrix,
-            this._position,
-            this._quaternion,
-            this._scale
-        );
+        math.decomposeMat4(this.__localMatrix, this._position, this._quaternion, this._scale);
         this._localMatrixDirty = false;
         this._setWorldMatrixDirty();
         this._setAABBDirty();
@@ -11575,12 +11569,7 @@ class xeoglObject extends Component {
             if (!this.__localMatrix) {
                 this.__localMatrix = math.identityMat4();
             }
-            math.composeMat4(
-                this._position,
-                this._quaternion,
-                this._scale,
-                this.__localMatrix
-            );
+            math.composeMat4(this._position, this._quaternion, this._scale, this.__localMatrix);
             this._localMatrixDirty = false;
         }
         return this.__localMatrix;
@@ -28265,7 +28254,7 @@ window.requestAnimationFrame(frame);
  @extends Component
  */
 
-const type$22 = 'xeogl.CameraFlightAnimation';
+const type$22 = "xeogl.CameraFlightAnimation";
 
 const tempVec3$2 = math.vec3();
 const newLook = math.vec3();
@@ -28275,6 +28264,7 @@ const newLookEyeVec = math.vec3();
 const lookEyeVec = math.vec3();
 
 class CameraFlightAnimation extends Component {
+
     /**
      JavaScript class name for this Component.
 
@@ -28289,10 +28279,10 @@ class CameraFlightAnimation extends Component {
     }
 
     init(cfg) {
+
         super.init(cfg);
 
-        this._aabbHelper = new Mesh(this, {
-            // Shows a wireframe box for target AABBs
+        this._aabbHelper = new Mesh(this, { // Shows a wireframe box for target AABBs
             geometry: new AABBGeometry(this),
             material: new PhongMaterial(this, {
                 diffuse: [0, 0, 0],
@@ -28356,6 +28346,7 @@ class CameraFlightAnimation extends Component {
      * @param [scope] {Object} Optional scope for callback
      */
     flyTo(params, callback, scope) {
+
         params = params || this.scene;
 
         if (this._flying) {
@@ -28392,27 +28383,29 @@ class CameraFlightAnimation extends Component {
 
         if (params.aabb) {
             aabb = params.aabb;
+
         } else if (params.length === 6) {
             aabb = params;
+
         } else if ((params.eye && params.look) || params.up) {
             eye = params.eye;
             look = params.look;
             up = params.up;
+
         } else if (params.eye) {
             eye = params.eye;
+
         } else if (params.look) {
             look = params.look;
-        } else {
-            // Argument must be an instance or ID of a Component (subtype)
+
+        } else { // Argument must be an instance or ID of a Component (subtype)
 
             let component = params;
             if (utils.isNumeric(component) || utils.isString(component)) {
                 componentId = component;
                 component = this.scene.components[componentId];
                 if (!component) {
-                    this.error(
-                        'Component not found: ' + utils.inQuotes(componentId)
-                    );
+                    this.error("Component not found: " + utils.inQuotes(componentId));
                     if (callback) {
                         if (scope) {
                             callback.call(scope);
@@ -28429,20 +28422,13 @@ class CameraFlightAnimation extends Component {
         const poi = params.poi;
 
         if (aabb) {
-            if (aabb[3] < aabb[0] || aabb[4] < aabb[1] || aabb[5] < aabb[2]) {
-                // Don't fly to an inverted boundary
+            if (aabb[3] < aabb[0] || aabb[4] < aabb[1] || aabb[5] < aabb[2]) { // Don't fly to an inverted boundary
                 return;
             }
-            if (
-                aabb[3] === aabb[0] &&
-                aabb[4] === aabb[1] &&
-                aabb[5] === aabb[2]
-            ) {
-                // Don't fly to an empty boundary
+            if (aabb[3] === aabb[0] && aabb[4] === aabb[1] && aabb[5] === aabb[2]) { // Don't fly to an empty boundary
                 return;
             }
-            if (params.showAABB !== false) {
-                // Show boundary
+            if (params.showAABB !== false) { // Show boundary
                 this._aabbHelper.geometry.targetAABB = aabb;
                 //this._aabbHelper.visible = true;
             }
@@ -28454,24 +28440,24 @@ class CameraFlightAnimation extends Component {
 
             const eyeLookVec = math.subVec3(this._eye1, this._look1, tempVec3$2);
             const eyeLookVecNorm = math.normalizeVec3(eyeLookVec);
-            const diag = poi
-                ? math.getAABB3DiagPoint(aabb, poi)
-                : math.getAABB3Diag(aabb);
+            const diag = poi ? math.getAABB3DiagPoint(aabb, poi) : math.getAABB3Diag(aabb);
             const fitFOV = params.fitFOV || this._fitFOV;
             const sca = Math.abs(diag / Math.tan(fitFOV * math.DEGTORAD));
 
             this._orthoScale2 = diag * 1.1;
 
-            this._eye2[0] = this._look2[0] + eyeLookVecNorm[0] * sca;
-            this._eye2[1] = this._look2[1] + eyeLookVecNorm[1] * sca;
-            this._eye2[2] = this._look2[2] + eyeLookVecNorm[2] * sca;
+            this._eye2[0] = this._look2[0] + (eyeLookVecNorm[0] * sca);
+            this._eye2[1] = this._look2[1] + (eyeLookVecNorm[1] * sca);
+            this._eye2[2] = this._look2[2] + (eyeLookVecNorm[2] * sca);
 
             this._up2[0] = this._up1[0];
             this._up2[1] = this._up1[1];
             this._up2[2] = this._up1[2];
 
             this._flyEyeLookUp = false;
+
         } else if (eye || look || up) {
+
             this._flyEyeLookUp = !!eye && !!look && !!up;
             this._flyingEye = !!eye && !look;
             this._flyingLook = !!look && !eye;
@@ -28495,12 +28481,10 @@ class CameraFlightAnimation extends Component {
             }
         }
 
-        this.fire('started', params, true);
+        this.fire("started", params, true);
 
         this._time1 = Date.now();
-        this._time2 =
-            this._time1 +
-            (params.duration ? params.duration * 1000 : this._duration);
+        this._time2 = this._time1 + (params.duration ? params.duration * 1000 : this._duration);
 
         this._flying = true; // False as soon as we stop
 
@@ -28534,6 +28518,7 @@ class CameraFlightAnimation extends Component {
     }
 
     _jumpTo(params) {
+
         if (this._flying) {
             this.stop();
         }
@@ -28546,19 +28531,18 @@ class CameraFlightAnimation extends Component {
         var newLook;
         var newUp;
 
-        if (params.aabb) {
-            // Boundary3D
+        if (params.aabb) { // Boundary3D
             aabb = params.aabb;
-        } else if (params.length === 6) {
-            // AABB
+
+        } else if (params.length === 6) { // AABB
             aabb = params;
-        } else if (params.eye || params.look || params.up) {
-            // Camera pose
+
+        } else if (params.eye || params.look || params.up) { // Camera pose
             newEye = params.eye;
             newLook = params.look;
             newUp = params.up;
-        } else {
-            // Argument must be an instance or ID of a Component (subtype)
+
+        } else { // Argument must be an instance or ID of a Component (subtype)
 
             let component = params;
 
@@ -28566,9 +28550,7 @@ class CameraFlightAnimation extends Component {
                 componentId = component;
                 component = this.scene.components[componentId];
                 if (!component) {
-                    this.error(
-                        'Component not found: ' + utils.inQuotes(componentId)
-                    );
+                    this.error("Component not found: " + utils.inQuotes(componentId));
                     return;
                 }
             }
@@ -28578,18 +28560,12 @@ class CameraFlightAnimation extends Component {
         const poi = params.poi;
 
         if (aabb) {
-            if (
-                aabb[3] <= aabb[0] ||
-                aabb[4] <= aabb[1] ||
-                aabb[5] <= aabb[2]
-            ) {
-                // Don't fly to an empty boundary
+
+            if (aabb[3] <= aabb[0] || aabb[4] <= aabb[1] || aabb[5] <= aabb[2]) { // Don't fly to an empty boundary
                 return;
             }
 
-            var diag = poi
-                ? math.getAABB3DiagPoint(aabb, poi)
-                : math.getAABB3Diag(aabb);
+            var diag = poi ? math.getAABB3DiagPoint(aabb, poi) : math.getAABB3Diag(aabb);
 
             newLook = poi || math.getAABB3Center(aabb, newLook);
 
@@ -28601,26 +28577,22 @@ class CameraFlightAnimation extends Component {
 
             math.normalizeVec3(newLookEyeVec);
             let dist;
-            const fit = params.fit !== undefined ? params.fit : this._fit;
+            const fit = (params.fit !== undefined) ? params.fit : this._fit;
 
             if (fit) {
-                dist = Math.abs(
-                    diag /
-                        Math.tan(
-                            (params.fitFOV || this._fitFOV) * math.DEGTORAD
-                        )
-                );
+                dist = Math.abs((diag) / Math.tan((params.fitFOV || this._fitFOV) * math.DEGTORAD));
+
             } else {
-                dist = math.lenVec3(
-                    math.subVec3(camera.eye, camera.look, tempVec3$2)
-                );
+                dist = math.lenVec3(math.subVec3(camera.eye, camera.look, tempVec3$2));
             }
 
             math.mulVec3Scalar(newLookEyeVec, dist);
 
             camera.eye = math.addVec3(newLook, newLookEyeVec, tempVec3$2);
             camera.look = newLook;
+
         } else if (newEye || newLook || newUp) {
+
             if (newEye) {
                 camera.eye = newEye;
             }
@@ -28639,7 +28611,7 @@ class CameraFlightAnimation extends Component {
         }
         const time = Date.now();
         let t = (time - this._time1) / (this._time2 - this._time1);
-        const stopping = t >= 1;
+        const stopping = (t >= 1);
         if (t > 1) {
             t = 1;
         }
@@ -28648,37 +28620,16 @@ class CameraFlightAnimation extends Component {
         if (this._flyingEye || this._flyingLook) {
             if (this._flyingEye) {
                 math.subVec3(camera.eye, camera.look, newLookEyeVec);
-                camera.eye = math.lerpVec3(
-                    t,
-                    0,
-                    1,
-                    this._eye1,
-                    this._eye2,
-                    newEye
-                );
+                camera.eye = math.lerpVec3(t, 0, 1, this._eye1, this._eye2, newEye);
                 camera.look = math.subVec3(newEye, newLookEyeVec, newLook);
             } else if (this._flyingLook) {
-                camera.look = math.lerpVec3(
-                    t,
-                    0,
-                    1,
-                    this._look1,
-                    this._look2,
-                    newLook
-                );
+                camera.look = math.lerpVec3(t, 0, 1, this._look1, this._look2, newLook);
                 //    camera.eye = math.addVec3(newLook, newLookEyeVec, newEye);
                 camera.up = math.lerpVec3(t, 0, 1, this._up1, this._up2, newUp);
             }
         } else if (this._flyEyeLookUp) {
             camera.eye = math.lerpVec3(t, 0, 1, this._eye1, this._eye2, newEye);
-            camera.look = math.lerpVec3(
-                t,
-                0,
-                1,
-                this._look1,
-                this._look2,
-                newLook
-            );
+            camera.look = math.lerpVec3(t, 0, 1, this._look1, this._look2, newLook);
             camera.up = math.lerpVec3(t, 0, 1, this._up1, this._up2, newUp);
         } else {
             math.lerpVec3(t, 0, 1, this._look1, this._look2, newLook);
@@ -28696,8 +28647,7 @@ class CameraFlightAnimation extends Component {
             camera.eye = math.addVec3(newLook, newLookEyeVec, newEye);
             camera.look = newLook;
         }
-        this.scene.camera.ortho.scale =
-            this._orthoScale1 + t * (this._orthoScale2 - this._orthoScale1);
+        this.scene.camera.ortho.scale = this._orthoScale1 + (t * (this._orthoScale2 - this._orthoScale1));
         if (stopping) {
             this.stop();
             return;
@@ -28705,8 +28655,7 @@ class CameraFlightAnimation extends Component {
         tasks.scheduleTask(this._update, this); // Keep flying
     }
 
-    _ease(t, b, c, d) {
-        // Quadratic easing out - decelerating to zero velocity http://gizma.com/easing
+    _ease(t, b, c, d) { // Quadratic easing out - decelerating to zero velocity http://gizma.com/easing
         t /= d;
         return -c * t * (t - 2) + b;
     }
@@ -28732,7 +28681,7 @@ class CameraFlightAnimation extends Component {
                 callback();
             }
         }
-        this.fire('stopped', true, true);
+        this.fire("stopped", true, true);
     }
 
     /**
@@ -28750,7 +28699,7 @@ class CameraFlightAnimation extends Component {
         if (this._callback) {
             this._callback = null;
         }
-        this.fire('canceled', true, true);
+        this.fire("canceled", true, true);
     }
 
     /**
@@ -28763,7 +28712,7 @@ class CameraFlightAnimation extends Component {
      * @type Number
      */
     set duration(value) {
-        this._duration = value ? value * 1000.0 : 500;
+        this._duration = value ? (value * 1000.0) : 500;
         this.stop();
     }
 
@@ -28790,6 +28739,7 @@ class CameraFlightAnimation extends Component {
     get fit() {
         return this._fit;
     }
+
 
     /**
      * How much of the perspective field-of-view, in degrees, that a target {{#crossLink "Object"}}{{/crossLink}} or its AABB should
@@ -28901,9 +28851,10 @@ componentClasses[type$22] = CameraFlightAnimation;
  @param [cfg.dir=[0,0 -1]] {Array of Number} Vector perpendicular to the plane surface, indicating its orientation.
  @extends Component
  */
-const type$23 = 'xeogl.Clip';
+const type$23 = "xeogl.Clip";
 
 class Clip extends Component {
+
     /**
      JavaScript class name for this Component.
 
@@ -28918,6 +28869,7 @@ class Clip extends Component {
     }
 
     init(cfg) {
+
         super.init(cfg);
 
         this._state = new State({
@@ -28949,7 +28901,7 @@ class Clip extends Component {
          @event active
          @param value {Boolean} The property's new value
          */
-        this.fire('active', this._state.active);
+        this.fire("active", this._state.active);
     }
 
     get active() {
@@ -28972,7 +28924,7 @@ class Clip extends Component {
          @event pos
          @param value Float32Array The property's new value
          */
-        this.fire('pos', this._state.pos);
+        this.fire("pos", this._state.pos);
     }
 
     get pos() {
@@ -28998,7 +28950,7 @@ class Clip extends Component {
          @event dir
          @param value {Float32Array} The property's new value
          */
-        this.fire('dir', this._state.dir);
+        this.fire("dir", this._state.dir);
     }
 
     get dir() {
