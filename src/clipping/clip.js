@@ -73,13 +73,14 @@
  @param [cfg.dir=[0,0 -1]] {Array of Number} Vector perpendicular to the plane surface, indicating its orientation.
  @extends Component
  */
-import { Component } from '../component.js';
-import { State } from '../renderer/state.js';
-import { componentClasses } from './../componentClasses.js';
+import {Component} from '../component.js';
+import {State} from '../renderer/state.js';
+import {componentClasses} from "./../componentClasses.js";
 
-const type = 'xeogl.Clip';
+const type = "xeogl.Clip";
 
 class Clip extends Component {
+
     /**
      JavaScript class name for this Component.
 
@@ -94,6 +95,7 @@ class Clip extends Component {
     }
 
     init(cfg) {
+
         super.init(cfg);
 
         this._state = new State({
@@ -125,7 +127,7 @@ class Clip extends Component {
          @event active
          @param value {Boolean} The property's new value
          */
-        this.fire('active', this._state.active);
+        this.fire("active", this._state.active);
     }
 
     get active() {
@@ -148,7 +150,7 @@ class Clip extends Component {
          @event pos
          @param value Float32Array The property's new value
          */
-        this.fire('pos', this._state.pos);
+        this.fire("pos", this._state.pos);
     }
 
     get pos() {
@@ -174,7 +176,7 @@ class Clip extends Component {
          @event dir
          @param value {Float32Array} The property's new value
          */
-        this.fire('dir', this._state.dir);
+        this.fire("dir", this._state.dir);
     }
 
     get dir() {
@@ -190,4 +192,4 @@ class Clip extends Component {
 
 componentClasses[type] = Clip;
 
-export { Clip };
+export{Clip};
