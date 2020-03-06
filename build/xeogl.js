@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  *
- * Built on 2020-03-03
+ * Built on 2020-03-06
  *
  * MIT License
  * Copyright 2020, Lindsay Kay
@@ -29025,7 +29025,7 @@ class ClipControl extends Component {
     init(cfg) {
         super.init(cfg);
 
-        this._scene = cfg.scene;
+        this._scene = this.scene;
 
         this._visible = false;
         this._pos = xeogl.math.vec3();
@@ -29844,7 +29844,9 @@ class ClipControl extends Component {
             }
             down = false;
             // reset parent cameraControl to true
-            self._cameraControl.active = true;
+            if (self._cameraControl) {
+                self._cameraControl.active = true;
+            }
         });
 
         canvas.addEventListener('mouseenter', function() {
@@ -29876,9 +29878,9 @@ class ClipControl extends Component {
             if (dragAction === DRAG_ACTIONS.none) {
                 return;
             }
-
-            self._cameraControl.active = false;
-
+            if (self._cameraControl) {
+                self._cameraControl.active = false;
+            }
             switch (dragAction) {
                 case DRAG_ACTIONS.xPan:
                     // defined by projections on axis
