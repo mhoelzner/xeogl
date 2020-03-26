@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  *
- * Built on 2020-03-06
+ * Built on 2020-03-26
  *
  * MIT License
  * Copyright 2020, Lindsay Kay
@@ -6218,6 +6218,12 @@ class Component {
 
         this.scene._removeComponent(this);
 
+        /**
+         * Fired when this Component is destroyed.
+         * @event destroyed
+         */
+        this.fire("destroyed", this.destroyed = true);
+
         // Memory leak avoidance
         this._attached = {};
         this._attachments = null;
@@ -6229,11 +6235,6 @@ class Component {
         this._adoptees = null;
         this._updateScheduled = false;
 
-        /**
-         * Fired when this Component is destroyed.
-         * @event destroyed
-         */
-        this.fire("destroyed", this.destroyed = true);
     }
 }
 
@@ -21650,26 +21651,26 @@ class Input extends Component {
     }
 
     destroy() {
-        super.destroy();
         // Prevent memory leak when destroying canvas/WebGL context
-        document.removeEventListener("keydown", this._keyDownListener);
+        document.removeEventListener("keydown", this._keyDownListener, true);
         document.removeEventListener("keyup", this._keyUpListener);
         this._element.removeEventListener("mouseenter", this._mouseEnterListener);
         this._element.removeEventListener("mouseleave", this._mouseLeaveListener);
         this._element.removeEventListener("mousedown", this._mouseDownListener);
-        document.removeEventListener("mouseup", this._mouseDownListener);
+        document.removeEventListener("mouseup", this._mouseUpListener, true);
         document.removeEventListener("dblclick", this._dblClickListener);
         this._element.removeEventListener("mousemove", this._mouseMoveListener);
         this._element.removeEventListener("wheel", this._mouseWheelListener);
         if (window.OrientationChangeEvent) {
-            window.removeEventListener('orientationchange', this._orientationchangedListener);
+            window.removeEventListener('orientationchange', this._orientationchangedListener, false);
         }
         if (window.DeviceMotionEvent) {
-            window.removeEventListener('devicemotion', this._deviceMotionListener);
+            window.removeEventListener('devicemotion', this._deviceMotionListener, false);
         }
         if (window.DeviceOrientationEvent) {
-            window.addEventListener("deviceorientation", this._deviceOrientListener);
+            window.removeEventListener("deviceorientation", this._deviceOrientListener, false);
         }
+        super.destroy();
     }
 }
 
@@ -28022,7 +28023,7 @@ const core = {
                     scene.clear();
                 } else {
                     scene.destroy();
-                    delete core.scenes[scene.id];
+                    // delete core.scenes[scene.id];
                 }
             }
         }
@@ -30843,7 +30844,7 @@ class CameraControl extends Component {
                 }
             }
 
-            document.addEventListener("keyDown", function (e) {
+            document.addEventListener("keydown", self._specialKeyDownListener=function (e) {
                 if (!self._active) {
                     return;
                 }
@@ -30855,7 +30856,7 @@ class CameraControl extends Component {
                 }
             }, true);
 
-            document.addEventListener("keyup", function (e) {
+            document.addEventListener("keyup", self._keyUpListener=function (e) {
                 if (!self._active) {
                     return;
                 }
@@ -30939,7 +30940,7 @@ class CameraControl extends Component {
                     yDelta = 0;
                 });
 
-                document.addEventListener("mouseup", function (e) {
+                document.addEventListener("mouseup", self._mouseUpListener=function (e) {
                     if (!self._active) {
                         return;
                     }
@@ -31678,7 +31679,7 @@ class CameraControl extends Component {
                 up: new Float32Array(3)
             };
 
-            document.addEventListener("keydown", function (e) {
+            document.addEventListener("keydown", self._cameraAxisKeyDownListener=function (e) {
 
                 if (!self._active) {
                     return;
@@ -31817,6 +31818,10 @@ class CameraControl extends Component {
 
     destroy() {
         this.active = false;
+        document.removeEventListener("keydown",this._specialKeyDownListener,true);
+        document.removeEventListener("keyup",this._keyUpListener);
+        document.removeEventListener("keydown",this._cameraAxisKeyDownListener);
+        document.removeEventListener("mouseup", this._mouseUpListener);
         super.destroy();
     }
 }
