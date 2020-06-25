@@ -1,11 +1,11 @@
 /**
  * xeogl V0.9.0
- *
+ * 
  * WebGL-based 3D visualization library
  * http://xeogl.org/
- *
- * Built on 2020-03-26
- *
+ * 
+ * Built on 2020-06-25
+ * 
  * MIT License
  * Copyright 2020, Lindsay Kay
  * http://xeolabs.com/
@@ -6212,7 +6212,9 @@ class Component {
             const ids = Object.keys(this._adoptees);
             for (i = 0, len = ids.length; i < len; i++) {
                 component = this._adoptees[ids[i]];
-                component.destroy();
+                if (component) {
+                    component.destroy();
+                }
             }
         }
 

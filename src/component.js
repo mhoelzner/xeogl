@@ -1050,7 +1050,9 @@ class Component {
             const ids = Object.keys(this._adoptees);
             for (i = 0, len = ids.length; i < len; i++) {
                 component = this._adoptees[ids[i]];
-                component.destroy();
+                if (component) {
+                    component.destroy();
+                }
             }
         }
 
