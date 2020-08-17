@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  * 
- * Built on 2020-06-25
+ * Built on 2020-08-17
  * 
  * MIT License
  * Copyright 2020, Lindsay Kay
@@ -21211,15 +21211,15 @@ class Input extends Component {
 
                 } else {
                     self.keyDown[e.keyCode] = true;
-
-                    /**
-                     * Fired whenever a key is pressed while the parent
-                     * {{#crossLink "Scene"}}Scene{{/crossLink}}'s {{#crossLink "Canvas"}}Canvas{{/crossLink}} has input focus.
-                     * @event keydown
-                     * @param value {Number} The key code, for example {{#crossLink "Input/KEY_LEFT_ARROW:property"}}{{/crossLink}},
-                     */
-                    self.fire("keydown", e.keyCode, true);
                 }
+
+                /**
+                 * Fired whenever a key is pressed while the parent
+                 * {{#crossLink "Scene"}}Scene{{/crossLink}}'s {{#crossLink "Canvas"}}Canvas{{/crossLink}} has input focus.
+                 * @event keydown
+                 * @param value {Number} The key code, for example {{#crossLink "Input/KEY_LEFT_ARROW:property"}}{{/crossLink}},
+                 */
+                self.fire("keydown", e.keyCode, true);
             }
 
             if (self.mouseover) {
@@ -21244,15 +21244,16 @@ class Input extends Component {
 
                 } else {
                     self.keyDown[e.keyCode] = false;
-
-                    /**
-                     * Fired whenever a key is released while the parent
-                     * {{#crossLink "Scene"}}Scene{{/crossLink}}'s {{#crossLink "Canvas"}}Canvas{{/crossLink}} has input focus.
-                     * @event keyup
-                     * @param value {Number} The key code, for example {{#crossLink "Input/KEY_LEFT_ARROW:property"}}{{/crossLink}},
-                     */
-                    self.fire("keyup", e.keyCode, true);
                 }
+
+                /**
+                 * Fired whenever a key is released while the parent
+                 * {{#crossLink "Scene"}}Scene{{/crossLink}}'s {{#crossLink "Canvas"}}Canvas{{/crossLink}} has input focus.
+                 * @event keyup
+                 * @param value {Number} The key code, for example {{#crossLink "Input/KEY_LEFT_ARROW:property"}}{{/crossLink}},
+                 */
+                self.fire("keyup", e.keyCode, true);
+
             }
         });
 
