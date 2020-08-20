@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  * 
- * Built on 2020-08-17
+ * Built on 2020-08-20
  * 
  * MIT License
  * Copyright 2020, Lindsay Kay
@@ -31843,7 +31843,6 @@ class MeasureControl extends Component {
 
     this._scene = cfg.scene;
     this._color = cfg.color || [1, 0, 0];
-    this._cameraControl = undefined;
     this._visible = true;
     this._active = true;
     this._scale = [1, 1, 1];
@@ -31949,7 +31948,6 @@ class MeasureControl extends Component {
 
     const self = this;
     const math = xeogl.math;
-    this.cameraControl = cfg.cameraControl;
 
     this.scale = cfg.scale;
 
@@ -32002,22 +32000,7 @@ class MeasureControl extends Component {
           return true;
         }
       } else {
-        switch (measureAction) {
-          case MEASURE_ACTIONS.startPoint:
-            nextMeasureAction = MEASURE_ACTIONS.startPoint;
-            break;
-
-          case MEASURE_ACTIONS.line:
-            nextMeasureAction = MEASURE_ACTIONS.line;
-            break;
-
-          case MEASURE_ACTIONS.endPoint:
-            nextMeasureAction = MEASURE_ACTIONS.endPoint;
-            break;
-
-          default:
-            break;
-        }
+        nextMeasureAction = measureAction;
 
         return false;
       }
@@ -32057,9 +32040,9 @@ class MeasureControl extends Component {
 
       var coords = getClickCoordsWithinElement(e);
 
-      pick(coords);
-
-      updateControls();
+      if (pick(coords)) {
+        updateControls();
+      }
     });
 
     canvas.addEventListener("mousedown", function (e) {
@@ -32067,14 +32050,22 @@ class MeasureControl extends Component {
       if (!self._active) {
         return;
       }
+    });
+
+    canvas.addEventListener("mouseup", function (e) {
+      e.preventDefault();
+      if (!self._active) {
+        return;
+      }
+      if (scene.input.altDown) {
+        return;
+      }
       switch (e.which) {
         case 1: // Left button
           measureAction = nextMeasureAction;
           var coords = getClickCoordsWithinElement(e);
-          const success = pick(coords);
-          if (success) {
+          if (pick(coords)) {
             updateControls();
-
             measureAction = nextMeasureAction;
           }
           break;
@@ -32084,20 +32075,10 @@ class MeasureControl extends Component {
       }
     });
 
-    canvas.addEventListener("mouseup", function (e) {
-      if (!self._active) {
-        return;
-      }
-      // reset parent cameraControl to true
-      self._cameraControl.active = true;
-    });
-
     const updateControls = () => {
       if (measureAction === MEASURE_ACTIONS.none) {
         return;
       }
-
-      self._cameraControl.active = false;
 
       switch (measureAction) {
         case MEASURE_ACTIONS.startPoint:
@@ -32122,7 +32103,7 @@ class MeasureControl extends Component {
             self._measurementPoints[1].coords
           );
 
-          this.fire("distanceChanged", self._distance);
+          self.fire("distanceChanged", self._distance);
 
           break;
 
@@ -32138,8 +32119,6 @@ class MeasureControl extends Component {
 
           displayVectorGeometry();
 
-          self._cameraControl.active = true;
-
           self.active = false;
 
           const result = {
@@ -32147,7 +32126,11 @@ class MeasureControl extends Component {
             endPoint: self._measurementPoints[2]
           };
 
-          this.fire("measurementDone", result);
+          // timeout because picked will fire after 250ms
+          setTimeout(function () {
+            self.fire("measurementDone", result);
+          }, 300);
+
           break;
 
         default:
@@ -32201,14 +32184,6 @@ class MeasureControl extends Component {
         })
       );
     };
-  }
-
-  set cameraControl(value) {
-    this._cameraControl = value;
-  }
-
-  get cameraControl() {
-    return this._cameraControl;
   }
 
   /**
@@ -32295,8 +32270,6 @@ class MeasureControl extends Component {
 
   destroy() {
     this.active = false;
-
-    this.cameraControl.active = true;
 
     super.destroy();
 
