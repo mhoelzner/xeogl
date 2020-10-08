@@ -4,7 +4,7 @@
  * WebGL-based 3D visualization library
  * http://xeogl.org/
  * 
- * Built on 2020-08-20
+ * Built on 2020-10-08
  * 
  * MIT License
  * Copyright 2020, Lindsay Kay
@@ -27376,6 +27376,8 @@ class Scene extends Component {
                                 math.decompressPosition(positionC, positionsDecodeMatrix, positionC);
                             }
                         }
+
+                        hit.trianglePositions = [positionA, positionB, positionC];
 
                         // Attempt to ray-pick the triangle in local space
 

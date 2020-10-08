@@ -1989,6 +1989,8 @@ class Scene extends Component {
                             }
                         }
 
+                        hit.trianglePositions = [positionA, positionB, positionC];
+
                         // Attempt to ray-pick the triangle in local space
 
                         let canvasPos;
