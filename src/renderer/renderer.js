@@ -90,8 +90,13 @@ const Renderer = function ( scene, options) {
         if (canvasTransparent) { // Canvas is transparent
             gl.clearColor(0, 0, 0, 0);
         } else {
-            const color = params.ambientColor || this.lights.getAmbientColor();
-            gl.clearColor(color[0], color[1], color[2], 1.0);
+            if (!scene.canvas._backgroundColor) {
+                const color = params.ambientColor || this.lights.getAmbientColor();
+                gl.clearColor(color[0], color[1], color[2], 1.0);
+            } else {
+                const bgColor = scene.canvas._backgroundColor;
+                gl.clearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3])
+            }   
         }
         if (bindOutputFrameBuffer) {
             bindOutputFrameBuffer(params.pass);
@@ -193,7 +198,18 @@ const Renderer = function ( scene, options) {
         const boundary = scene.viewport.boundary;
         gl.viewport(boundary[0], boundary[1], boundary[2], boundary[3]);
 
-        gl.clearColor(0, 0, 0, 1);
+        if (canvasTransparent) { // Canvas is transparent
+            gl.clearColor(0, 0, 0, 0);
+        } else {
+            if (!scene.canvas._backgroundColor) {
+                const ambientColor = scene._lightsState.getAmbientColor();
+                gl.clearColor(ambientColor[0], ambientColor[1], ambientColor[2], 1.0);
+            } else {
+                const bgColor = scene.canvas._backgroundColor;
+                gl.clearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3])
+            }   
+        }
+        
         gl.enable(gl.DEPTH_TEST);
         gl.disable(gl.BLEND);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -258,8 +274,6 @@ const Renderer = function ( scene, options) {
                 gl.getExtension("OES_standard_derivatives");
             }
 
-            const ambientColor = scene._lightsState.getAmbientColor();
-
             frame.reset();
             frame.pass = params.pass;
 
@@ -269,7 +283,13 @@ const Renderer = function ( scene, options) {
             if (canvasTransparent) { // Canvas is transparent
                 gl.clearColor(0, 0, 0, 0);
             } else {
-                gl.clearColor(ambientColor[0], ambientColor[1], ambientColor[2], 1.0);
+                if (!scene.canvas._backgroundColor) {
+                    const ambientColor = scene._lightsState.getAmbientColor();
+                    gl.clearColor(ambientColor[0], ambientColor[1], ambientColor[2], 1.0);
+                } else {
+                    const bgColor = scene.canvas._backgroundColor;
+                    gl.clearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3])
+                }   
             }
 
             gl.enable(gl.DEPTH_TEST);
@@ -831,7 +851,18 @@ const Renderer = function ( scene, options) {
         const boundary = scene.viewport.boundary;
         gl.viewport(boundary[0], boundary[1], boundary[2], boundary[3]);
 
-        gl.clearColor(0, 0, 0, 0);
+        if (canvasTransparent) { // Canvas is transparent
+            gl.clearColor(0, 0, 0, 0);
+        } else {
+            if (!scene.canvas._backgroundColor) {
+                const ambientColor = scene._lightsState.getAmbientColor();
+                gl.clearColor(ambientColor[0], ambientColor[1], ambientColor[2], 1.0);
+            } else {
+                const bgColor = scene.canvas._backgroundColor;
+                gl.clearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3])
+            }   
+        }
+
         gl.enable(gl.DEPTH_TEST);
         gl.disable(gl.CULL_FACE);
         gl.disable(gl.BLEND);
@@ -879,7 +910,18 @@ const Renderer = function ( scene, options) {
         const boundary = scene.viewport.boundary;
         gl.viewport(boundary[0], boundary[1], boundary[2], boundary[3]);
 
-        gl.clearColor(0, 0, 0, 0);
+        if (canvasTransparent) { // Canvas is transparent
+            gl.clearColor(0, 0, 0, 0);
+        } else {
+            if (!scene.canvas._backgroundColor) {
+                const ambientColor = scene._lightsState.getAmbientColor();
+                gl.clearColor(ambientColor[0], ambientColor[1], ambientColor[2], 1.0);
+            } else {
+                const bgColor = scene.canvas._backgroundColor;
+                gl.clearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3])
+            }   
+        }
+        
         gl.enable(gl.DEPTH_TEST);
         gl.disable(gl.CULL_FACE);
         gl.disable(gl.BLEND);
